@@ -1,0 +1,10 @@
+# forbidden
+.env
+reference/
+common_crawl/
+notebook/
+
+
+# open-source 
+cc_net/
+dps/
