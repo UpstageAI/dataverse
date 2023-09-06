@@ -1,16 +1,9 @@
 
 
 from pyspark.rdd import RDD
-# from dataverse.etl.register import BaseETL
-# from dataverse.etl.register import register_etl
-# from dataverse.etl.register import ETLRegistry
-
-import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from register import BaseETL
-from register import register_etl
-from register import ETLRegistry
-
+from dataverse.etl.register import BaseETL
+from dataverse.etl.register import register_etl
+from dataverse.etl.register import ETLRegistry
 
 
 @register_etl
