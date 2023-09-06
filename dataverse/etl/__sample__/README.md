@@ -5,8 +5,8 @@ ETL is managed by Registry.
 What ever ETL you make, you need to register it to Registry.
 
 ## How to register ETL
-1. Inherit `BaseETL` class
-2. Use decorator `@register_etl` to register your ETL
+1. Inherit `BaseETL` for ETL `class`
+2. Use decorator `@register_etl` to register your ETL `function`
 
 ## Naming
 ETL name should be named with the following convention
@@ -26,7 +26,7 @@ e.g. ingestion___github_to_parquet
     - `junk`
     - `decontamination`
     - `deduplication`
-    - `ingestion`
+    - `data_ingestion`
     - `pil`
     - `quality`
     - `toxicity`
