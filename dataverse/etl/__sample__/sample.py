@@ -1,9 +1,16 @@
 
 
 from pyspark.rdd import RDD
-from dataverse.etl.register import BaseETL
-from dataverse.etl.register import register_etl
-from dataverse.etl.register import ETLRegistry
+# from dataverse.etl.register import BaseETL
+# from dataverse.etl.register import register_etl
+# from dataverse.etl.register import ETLRegistry
+
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from register import BaseETL
+from register import register_etl
+from register import ETLRegistry
+
 
 
 @register_etl
@@ -25,19 +32,17 @@ class sample___inheriting_base_etl(BaseETL):
 
 
 if __name__ == "__main__":
-    register = ETLRegistry()
+    registry = ETLRegistry()
 
-    print("[ Testing ] register etl using decorator")
+    print("[ Testing ] registry etl using decorator")
     # this could seem like a function but it is actually a BaseETL class
     sample___using_decorator()(rdd=None)
 
-    print("[ Testing ] register etl using inheritance with BaseETL")
+    print("[ Testing ] registry etl using inheritance with BaseETL")
     sample___inheriting_base_etl()(rdd=None)
 
-    # check is it properly registered
-    print("[ Testing ] check is it properly registered")
+    # check is it properly registryed
+    print("[ Testing ] check is it properly registry")
     print("="*50)
-    print(register._registry)
-
-
-    
+    print(registry._registry)
+    print("="*50)

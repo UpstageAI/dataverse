@@ -7,6 +7,63 @@ import abc
 from pyspark.rdd import RDD
 
 
+# To avoid circular dependency
+class ETLStructure: ...
+
+
+class ETLRegistry:
+    """Singleton class to register the ETL classes"""
+    _initialized = False
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(ETLRegistry, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        """
+        when the class is initialized, this is called everytime
+        regardless of the singleton. So adding the flag to check
+        """
+        if self._initialized:
+            return
+        self._registry = {}
+        self._initialized = True
+
+    def register(self, name: str, etl: ETLStructure):
+        """
+        register the etl
+        """
+        # TODO: check the name of the etl
+        # the name should be the format of the following
+        # <category_name>___<etl_name>
+        # 1. is it all lowercase
+        # 2. is it separated by ___
+        if not name.islower():
+            raise ValueError(f"The name [ {name} ] should be all lowercase")
+        if "___" not in name:
+            raise ValueError(f"The name [ {name} ] should be separated by ___")
+
+        # all the etl should be the subclass of ETLStructure
+        if not issubclass(etl, ETLStructure):
+            raise TypeError(f"ETL class should be subclass of ETLStructure not {etl}")
+
+        # register already exists
+        if name in self._registry:
+            raise KeyError(f"The name [ {name} ] is already registered")
+
+        self._registry[name] = etl
+
+    def get(self, name: str) -> ETLStructure:
+        """
+        get the etl
+        """
+        if name not in self._registry:
+            raise KeyError(f"The name {name} is not registered")
+
+        return self._registry[name]
+
+
 class ETLAutoRegistry(abc.ABCMeta, type):
     def __new__(cls, name, bases, attrs):
         """
@@ -25,7 +82,8 @@ class ETLAutoRegistry(abc.ABCMeta, type):
 
         return new_class
 
-class BaseETL(metaclass=ETLAutoRegistry):
+
+class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     """
     spark ETL
     """
@@ -41,49 +99,6 @@ class BaseETL(metaclass=ETLAutoRegistry):
         call the method to do the preprocessing
         """
         return self.run(rdd)
-
-class ETLRegistry:
-    """Singleton class to register the ETL classes"""
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(ETLRegistry, cls).__new__(cls)
-        return cls.instance
-
-    def __init__(self):
-        self._registry = {}
-
-    def register(self, name: str, etl: BaseETL):
-        """
-        register the etl
-        """
-        # TODO: check the name of the etl
-        # the name should be the format of the following
-        # <category_name>___<etl_name>
-        # 1. is it all lowercase
-        # 2. is it separated by ___
-        if not name.islower():
-            raise ValueError(f"The name [ {name} ] should be all lowercase")
-        if "___" not in name:
-            raise ValueError(f"The name [ {name} ] should be separated by ___")
-
-        # all the etl should be the subclass of BaseETL
-        if not issubclass(etl, BaseETL):
-            raise TypeError(f"ETL class should be subclass of BaseETL not {etl}")
-
-        # register already exists
-        if name in self._registry:
-            raise KeyError(f"The name [ {name} ] is already registered")
-
-        self._registry[name] = etl
-
-    def get(self, name: str) -> BaseETL:
-        """
-        get the etl
-        """
-        if name not in self._registry:
-            raise KeyError(f"The name {name} is not registered")
-
-        return self._registry[name]
 
 
 def add_self(func):
