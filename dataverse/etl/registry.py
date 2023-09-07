@@ -110,17 +110,17 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     spark ETL
     """
     @abc.abstractmethod
-    def run(self, rdd: RDD, *args, **kwargs):
+    def run(self, rdd: RDD, config: dict = None, *args, **kwargs):
         """
         run the preprocessing
         """
         raise NotImplementedError()
 
-    def __call__(self, rdd: RDD, *args, **kwargs):
+    def __call__(self, rdd: RDD, config: dict = None, *args, **kwargs):
         """
         call the method to do the preprocessing
         """
-        return self.run(rdd, *args, **kwargs)
+        return self.run(rdd, config, *args, **kwargs)
 
 
 def add_self(func):
