@@ -7,14 +7,14 @@ from dataverse.etl.registry import ETLRegistry
 
 
 @register_etl
-def sample___using_decorator(rdd: RDD):
+def using_decorator(rdd: RDD):
     """
     decorator will convert this function BaseETL class
     """
     print("sample using decorator")
     return rdd
 
-class sample___inheriting_base_etl(BaseETL):
+class inheriting_base_etl(BaseETL):
     """
     you must overwrite run method unless you will raise NotImplementedError
     decorator `register_etl` will do this automatically for you
@@ -29,10 +29,10 @@ if __name__ == "__main__":
 
     print("[ Testing ] registry etl using decorator")
     # this could seem like a function but it is actually a BaseETL class
-    sample___using_decorator()(rdd=None)
+    using_decorator()(rdd=None)
 
     print("[ Testing ] registry etl using inheritance with BaseETL")
-    sample___inheriting_base_etl()(rdd=None)
+    inheriting_base_etl()(rdd=None)
 
     # check is it properly registryed
     print("[ Testing ] check is it properly registry")

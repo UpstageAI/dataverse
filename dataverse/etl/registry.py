@@ -3,6 +3,8 @@
 base class to support the registration of the ETL classes
 """
 
+import sys
+import inspect
 import abc
 from pyspark.rdd import RDD
 
@@ -30,39 +32,97 @@ class ETLRegistry:
         self._registry = {}
         self._initialized = True
 
-    def register(self, name: str, etl: ETLStructure):
+    def register(
+            self,
+            category: str,
+            sub_category: str,
+            name: str,
+            etl: ETLStructure
+        ):
         """
         register the etl
         """
-        # TODO: check the name of the etl
-        # the name should be the format of the following
-        # <category_name>___<etl_name>
+        key = f"{category}___{sub_category}___{name}"
+
+        # the key should be the format of the following
+        # ==================================================
+        # <etl_type>___<file_key>___<etl_key>
+        # <category>___<sub_category>___<etl_key>
+        # ==================================================
         # 1. is it all lowercase
         # 2. is it separated by ___
-        if not name.islower():
-            raise ValueError(f"The name [ {name} ] should be all lowercase")
-        if "___" not in name:
-            raise ValueError(f"The name [ {name} ] should be separated by ___")
+        # 3. it should have 2 layers of category
+        if not key.islower():
+            raise ValueError(f"The key [ {key} ] should be all lowercase")
+        # if "___" not in key:
+        #     raise ValueError(f"The key [ {key} ] should be separated by ___")
+        # if len(key.split("___")) != 3:
+        #     raise ValueError(f"The key [ {key} ] should have 2 layers of category")
 
         # all the etl should be the subclass of ETLStructure
         if not issubclass(etl, ETLStructure):
             raise TypeError(f"ETL class should be subclass of ETLStructure not {etl}")
 
         # register already exists
-        if name in self._registry:
-            raise KeyError(f"The name [ {name} ] is already registered")
+        if key in self._registry:
+            raise KeyError(f"The key [ {key} ] is already registered")
 
-        self._registry[name] = etl
+        self._registry[key] = etl
 
-    def get(self, name: str) -> ETLStructure:
+    def get(
+            self,
+            category: str,
+            sub_category: str,
+            name: str,
+        ) -> ETLStructure:
         """
         get the etl
         """
-        if name not in self._registry:
-            raise KeyError(f"The name {name} is not registered")
+        key = f"{category}___{sub_category}___{name}"
 
-        return self._registry[name]
+        # the key should be the format of the following
+        # ==================================================
+        # <etl_type>___<file_key>___<etl_key>
+        # <category>___<sub_category>___<etl_key>
+        # ==================================================
+        # 1. is it all lowercase
+        # 2. is it separated by ___
+        # 3. it should have 2 layers of category
+        if not key.islower():
+            raise ValueError(f"The key [ {key} ] should be all lowercase")
+        # if "___" not in key:
+        #     raise ValueError(f"The key [ {key} ] should be separated by ___")
+        # if len(key.split("___")) != 3:
+        #     raise ValueError(f"The key [ {key} ] should have 2 layers of category")
 
+        if key not in self._registry:
+            raise KeyError(f"The key {key} is not registered")
+
+        return self._registry[key]
+
+
+def new_getfile(object, _old_getfile=inspect.getfile):
+    """
+    https://stackoverflow.com/questions/51566497/getting-the-source-of-an-object-defined-in-a-jupyter-notebook
+    This is a HACK to get the source code of a function defined in a Jupyter notebook.
+    """
+    if not inspect.isclass(object):
+        return _old_getfile(object)
+    
+    # Lookup by parent module (as in current inspect)
+    if hasattr(object, '__module__'):
+        object_ = sys.modules.get(object.__module__)
+        if hasattr(object_, '__file__'):
+            return object_.__file__
+    
+    # If parent module is __main__, lookup by methods (NEW)
+    for name, member in inspect.getmembers(object):
+        if inspect.isfunction(member) and object.__qualname__ + '.' + member.__name__ == member.__qualname__:
+            return inspect.getfile(member)
+    else:
+        raise TypeError('Source for {!r} not found'.format(object))
+
+inspect.getfile = new_getfile
 
 class ETLAutoRegistry(abc.ABCMeta, type):
     def __new__(cls, name, bases, attrs):
@@ -78,7 +138,18 @@ class ETLAutoRegistry(abc.ABCMeta, type):
         # because BaseETL is not initialized yet :)
         if name != 'BaseETL':
             registry = ETLRegistry()
-            registry.register(name, new_class)
+
+            # category/sub_category.py/def name():
+            filename = inspect.getfile(new_class)
+            category = filename.split("/")[-2]
+            sub_category = filename.split("/")[-1].split(".")[0]
+
+            registry.register(
+                category=category,
+                sub_category=sub_category,
+                name=name,
+                etl=new_class
+            )
 
         return new_class
 
@@ -88,17 +159,17 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     spark ETL
     """
     @abc.abstractmethod
-    def run(self, rdd: RDD, **kwargs):
+    def run(self, rdd: RDD, *args, **kwargs):
         """
         run the preprocessing
         """
         raise NotImplementedError()
 
-    def __call__(self, rdd: RDD):
+    def __call__(self, rdd: RDD, *args, **kwargs):
         """
         call the method to do the preprocessing
         """
-        return self.run(rdd)
+        return self.run(rdd, *args, **kwargs)
 
 
 def add_self(func):
