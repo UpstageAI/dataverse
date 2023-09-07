@@ -3,10 +3,56 @@
 base class to support the registration of the ETL classes
 """
 
-import sys
-import inspect
+import os
 import abc
+import importlib.util
 from pyspark.rdd import RDD
+
+
+# TODO: If you add category directories, add them here too
+# _sample is a special directory that is not imported
+ETL_CATEGORIES = [
+    'data_ingestion',
+    'decontamination',
+    'deduplication',
+    'bias',
+    'toxicity',
+    'junk',
+    'pii',
+    'quality',
+]
+
+IGNORE_FILES = [
+    '__init__.py',
+]
+
+def auto_register(etl_categories=ETL_CATEGORIES):
+    """
+    This will automatically register all ETLs to the registry
+    """
+    etl_path = os.path.dirname(os.path.abspath(__file__))
+    for etl_category in etl_categories:
+        
+        # Get the files(sub-categories) in the category
+        category_path = os.path.join(etl_path, etl_category)
+        files = os.listdir(category_path)
+
+        # Filter out non-Python files
+        files = [f for f in files if f.endswith('.py')]
+
+        # Dynamically import all Python files in the directory
+        for file in files:
+            if file in IGNORE_FILES:
+                continue
+
+            file_path = os.path.join(category_path, file)
+
+            # Remove .py at the end
+            module_name = file[:-3]
+
+            spec = importlib.util.spec_from_file_location(module_name, file_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
 
 # To avoid circular dependency

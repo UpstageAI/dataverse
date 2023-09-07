@@ -1,4 +1,0 @@
-
-"""
-ETL Processor Automatic Importer
-"""
