@@ -79,6 +79,12 @@ class ETLRegistry:
         self._registry = {}
         self._initialized = True
 
+    def reset(self):
+        """
+        reset the registry
+        """
+        self._registry = {}
+
     def register(self, key: str, etl: ETLStructure):
         """
         register the etl
