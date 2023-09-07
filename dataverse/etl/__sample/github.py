@@ -4,6 +4,7 @@ from pyspark.rdd import RDD
 from dataverse.etl.registry import BaseETL
 from dataverse.etl.registry import register_etl
 from dataverse.etl.registry import ETLRegistry
+from dataverse.etl.registry import ETLStructure
 
 
 @register_etl
