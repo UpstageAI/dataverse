@@ -169,11 +169,11 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
         """
         raise NotImplementedError()
 
-    def __call__(self, rdd: RDD, config: dict = None, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         """
         call the method to do the preprocessing
         """
-        return self.run(rdd, config, *args, **kwargs)
+        return self.run(*args, **kwargs)
 
 
 def add_self(func):
