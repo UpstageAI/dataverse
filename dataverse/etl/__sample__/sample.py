@@ -1,9 +1,9 @@
 
 
 from pyspark.rdd import RDD
-from dataverse.etl.register import BaseETL
-from dataverse.etl.register import register_etl
-from dataverse.etl.register import ETLRegistry
+from dataverse.etl.registry import BaseETL
+from dataverse.etl.registry import register_etl
+from dataverse.etl.registry import ETLRegistry
 
 
 @register_etl
