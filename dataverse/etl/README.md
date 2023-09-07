@@ -75,6 +75,7 @@ class category___subcategory___etl(BaseETL):
         - `quality`
         - `toxicity`
         - `bias`
+        - `data_load`
 2. `[ETL Sub-Category]` is the name of the file where the ETL is defined
     - no pre-defined list
         - it could be a dataset name

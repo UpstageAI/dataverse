@@ -20,6 +20,7 @@ ETL_CATEGORIES = [
     'junk',
     'pii',
     'quality',
+    'data_load',
 ]
 
 IGNORE_FILES = [
