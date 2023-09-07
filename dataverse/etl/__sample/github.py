@@ -7,16 +7,17 @@ from dataverse.etl.registry import ETLRegistry
 
 
 @register_etl
-def using_decorator(rdd: RDD):
+def __sample___github___using_decorator(rdd: RDD):
     """
     decorator will convert this function BaseETL class
     """
     print("sample using decorator")
     return rdd
 
-class inheriting_base_etl(BaseETL):
+class __sample___github___inheriting_base_etl(BaseETL):
     """
-    you must overwrite run method unless you will raise NotImplementedError
+    Inheriting BaseETL class will automatically register the class to the registry
+    but you must overwrite run method unless you will raise NotImplementedError
     decorator `register_etl` will do this automatically for you
     """
     def run(self, rdd: RDD, **kwargs):
@@ -29,10 +30,10 @@ if __name__ == "__main__":
 
     print("[ Testing ] registry etl using decorator")
     # this could seem like a function but it is actually a BaseETL class
-    using_decorator()(rdd=None)
+    __sample___github___using_decorator()(rdd=None)
 
     print("[ Testing ] registry etl using inheritance with BaseETL")
-    inheriting_base_etl()(rdd=None)
+    __sample___github___inheriting_base_etl()(rdd=None)
 
     # check is it properly registryed
     print("[ Testing ] check is it properly registry")

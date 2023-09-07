@@ -8,24 +8,31 @@ What ever ETL you make, you need to register it to Registry.
 1. Inherit `BaseETL` for ETL `class`
 2. Use decorator `@register_etl` to register your ETL `function`
 
-## ETL Processor Registered Name
+## ETL Processor Class Naming Convention
+> Why does folder, file name included in the ETL class name?
+- because to manage name space on dynamic construction of ETL class, the resgistry registers in tmp folder, file name. 
+    - e.g. `tmp___ipykernel_181248___remove_url` <- jupyter notebook env
+    - e.g. `python3.10___abc___remove_url` <- dynamic class construction by `type`
+- so decided to control the name space by only `ETL class name` which includes folder, file name
+
+
 ```python
 [ETL Category]___[ETL Sub-Category]___[ETL Name]
 ======================================
 - "__sample/"
     - github.py
-        - def remove_url()      # -> __sample___github___remove_url
-        - def filter_by_stars() # -> __sample___github___filter_by_stars
+        - def __sample___github___remove_url()
+        - def __sample___github___filter_by_stars()
+- "bias/"
     - mmlu.py
-        - def remove_word()     # -> __sample___mmlu___remove_word
-        - def to_parquet()      # -> __sample___mmlu___to_parquet
+        - def bias___mmlu___remove_word()
+        - def bias___mmlu___to_parquet()
     - ducky.py
-        - def fly()             # -> __sample___ducky___fly
-        - def quark()           # -> __sample___ducky___quark
+        - def bias___ducky___fly()
+        - def bias___ducky___quark()
 ======================================
 ```
 
-## ETL Processor Class Naming Convention
 > caveat: the combination of `[ETL Category]___[ETL Sub-Category]___[ETL Name]` MUST be unique
 
 1. `[ETL Category]` is the folder and category where the ETL is defined
@@ -47,3 +54,5 @@ What ever ETL you make, you need to register it to Registry.
 3. `[ETL Name]` naming should follow `function` naming convention, even it's `class`
     - all lower case
     - use underscore `_` to separate words
+4. Each is separated by `___` (triple underscore)
+    - e.g. `bias___mmlu___remove_word()`

@@ -7,7 +7,7 @@ from dataverse.etl.registry import ETLRegistry
 
 
 @register_etl
-def make_your_own_etl_processor(rdd: RDD):
+def __sample___ducky___make_your_own_etl_processor(rdd: RDD):
     """
     decorator will convert this function BaseETL class
     """
