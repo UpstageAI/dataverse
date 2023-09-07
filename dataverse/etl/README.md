@@ -46,13 +46,6 @@ class category___subcategory___etl(BaseETL):
 
 <details>
 
-> Why does folder, file name included in the ETL class name?
-- because to manage name space on dynamic construction of ETL class, the resgistry registers in tmp folder, file name. 
-    - e.g. `tmp___ipykernel_181248___remove_url` <- jupyter notebook env
-    - e.g. `python3.10___abc___remove_url` <- dynamic class construction by `type`
-- so decided to control the name space by only `ETL class name` which includes folder, file name
-
-
 ```python
 [ETL Category]___[ETL Sub-Category]___[ETL Name]
 ======================================
@@ -94,6 +87,15 @@ class category___subcategory___etl(BaseETL):
 4. Each is separated by `___` (triple underscore)
     - e.g. `bias___mmlu___remove_word()`
 
+
+#### Why does folder, file name included in the ETL class name?
+- To avoid the following tmp names on dynamic construction of ETL class
+    - e.g. `tmp___ipykernel_181248___remove_url` <- jupyter notebook env
+    - e.g. `python3.10___abc___remove_url` <- dynamic class construction by `type`
+- so decided to control the name space by only `ETL class name` which includes folder, file name
+
+
+
 </details>
 
 ### How to add a new ETL Category
@@ -123,7 +125,7 @@ when you want to make a file just for storage purpose, you can add the file name
 ```python
 ETL_IGNORE = [
     '__init__.py',
-    'storage.py
+    'storage.py'
 ]
 ```
 

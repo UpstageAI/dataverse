@@ -9,12 +9,6 @@ What ever ETL you make, you need to register it to Registry.
 2. Use decorator `@register_etl` to register your ETL `function`
 
 ## ETL Processor Class Naming Convention
-> Why does folder, file name included in the ETL class name?
-- because to manage name space on dynamic construction of ETL class, the resgistry registers in tmp folder, file name. 
-    - e.g. `tmp___ipykernel_181248___remove_url` <- jupyter notebook env
-    - e.g. `python3.10___abc___remove_url` <- dynamic class construction by `type`
-- so decided to control the name space by only `ETL class name` which includes folder, file name
-
 
 ```python
 [ETL Category]___[ETL Sub-Category]___[ETL Name]
@@ -56,3 +50,10 @@ What ever ETL you make, you need to register it to Registry.
     - use underscore `_` to separate words
 4. Each is separated by `___` (triple underscore)
     - e.g. `bias___mmlu___remove_word()`
+
+
+### Why does folder, file name included in the ETL class name?
+- To avoid the following tmp names on dynamic construction of ETL class
+    - e.g. `tmp___ipykernel_181248___remove_url` <- jupyter notebook env
+    - e.g. `python3.10___abc___remove_url` <- dynamic class construction by `type`
+- so decided to control the name space by only `ETL class name` which includes folder, file name
