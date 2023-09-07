@@ -9,7 +9,7 @@ from dataverse.etl.registry import ETLRegistry
 @register_etl
 def __sample___github___using_decorator(rdd: RDD, config: dict = None, *args, **kwargs):
     """
-    decorator will convert this function BaseETL class
+    decorator will convert this function to BaseETL class
     """
     print("sample using decorator")
     return rdd
@@ -17,7 +17,7 @@ def __sample___github___using_decorator(rdd: RDD, config: dict = None, *args, **
 @register_etl
 def __sample___github___config(rdd: RDD, config: dict = None, *args, **kwargs):
     """
-    decorator will convert this function BaseETL class
+    decorator will convert this function to BaseETL class
     """
     print("config says", config)
     return rdd
