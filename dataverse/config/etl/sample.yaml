@@ -1,0 +1,11 @@
+# This is a sample config file for the etl process
+
+spark:
+  appname: dataverse_etl_sample
+  driver:
+    memory: 4g
+etl:
+  - name: data_ingestion___parquet___df
+    args:
+      input_paths:
+        - /data/private/dataverse/.cache/huggingface_224b71e119ece785.parquet
