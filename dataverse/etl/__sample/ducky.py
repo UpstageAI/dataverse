@@ -1,15 +1,17 @@
 
 
 from pyspark.rdd import RDD
-from dataverse.etl.registry import BaseETL
+from pyspark.sql import DataFrame
+
 from dataverse.etl.registry import register_etl
-from dataverse.etl.registry import ETLRegistry
+
+from typing import Union
 
 
 @register_etl
-def __sample___ducky___make_your_own_etl_processor(rdd: RDD, config: dict = None, *args, **kwargs):
+def __sample___ducky___make_your_own_etl_processor(data: Union[RDD, DataFrame], *args, **kwargs):
     """
     decorator will convert this function to BaseETL class
     """
     print("make_your_own_etl_processor")
-    return rdd
+    return data

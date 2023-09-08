@@ -6,7 +6,11 @@ base class to support the registration of the ETL classes
 import os
 import abc
 import importlib.util
+
 from pyspark.rdd import RDD
+from pyspark.sql import DataFrame
+
+from typing import Union
 
 
 # TODO: If you add category directories, add them here too
@@ -163,7 +167,7 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     spark ETL
     """
     @abc.abstractmethod
-    def run(self, rdd: RDD, config: dict = None, *args, **kwargs):
+    def run(self, data: Union[RDD, DataFrame], *args, **kwargs):
         """
         run the preprocessing
         """

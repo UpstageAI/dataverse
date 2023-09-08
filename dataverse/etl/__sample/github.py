@@ -1,27 +1,31 @@
 
 
 from pyspark.rdd import RDD
+from pyspark.sql import DataFrame
+
 from dataverse.etl.registry import BaseETL
 from dataverse.etl.registry import register_etl
 from dataverse.etl.registry import ETLRegistry
 from dataverse.etl.registry import ETLStructure
 
+from typing import Union
+
 
 @register_etl
-def __sample___github___using_decorator(rdd: RDD, config: dict = None, *args, **kwargs):
+def __sample___github___using_decorator(data: Union[RDD, DataFrame], *args, **kwargs):
     """
     decorator will convert this function to BaseETL class
     """
     print("sample using decorator")
-    return rdd
+    return data
 
 @register_etl
-def __sample___github___config(rdd: RDD, config: dict = None, *args, **kwargs):
+def __sample___github___config(data: Union[RDD, DataFrame], config: dict = None, *args, **kwargs):
     """
     decorator will convert this function to BaseETL class
     """
     print("config says", config)
-    return rdd
+    return data
 
 class __sample___github___inheriting_base_etl(BaseETL):
     """
@@ -29,9 +33,9 @@ class __sample___github___inheriting_base_etl(BaseETL):
     but you must overwrite run method unless you will raise NotImplementedError
     decorator `register_etl` will do this automatically for you
     """
-    def run(self, rdd: RDD, config: dict = None, *args, **kwargs):
+    def run(self, data: Union[RDD, DataFrame], *args, **kwargs):
         print("sample inheriting base etl run")
-        return rdd
+        return data
 
 
 if __name__ == "__main__":
@@ -40,17 +44,17 @@ if __name__ == "__main__":
     print("[ Testing ] registry etl using decorator")
     # this could seem like a function but it is actually a BaseETL class
     etl = __sample___github___using_decorator
-    etl()(rdd=None)
+    etl()(data=None)
     print("is subclass of ETLStructure?", issubclass(etl, ETLStructure), "\n")
 
     print("[ Testing ] registry etl using decorator with config")
     etl = __sample___github___config
-    etl()(rdd=None, config={"hello": "world"})
+    etl()(data=None, config={"hello": "world"})
     print("is subclass of ETLStructure?", issubclass(etl, ETLStructure), "\n")
 
     print("[ Testing ] registry etl using inheritance with BaseETL")
     etl = __sample___github___inheriting_base_etl
-    etl()(rdd=None)
+    etl()(data=None)
     print("is subclass of ETLStructure?", issubclass(etl, ETLStructure), "\n")
 
     # check is it properly registryed
