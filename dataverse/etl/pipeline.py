@@ -20,9 +20,9 @@ from dataverse.etl.registry import auto_register
 
 
 
-class ETLInterface:
+class ETLPipeline:
     """
-    ETL Interface
+    ETL Pipeline
     """
     def __init__(self):
         self.registry = ETLRegistry()
@@ -31,7 +31,7 @@ class ETLInterface:
         self.registry.reset()
         auto_register()
 
-    def run(self, config: Union[str, dict, OmegaConf], *args, **kwargs):
+    def run(self, config: Union[str, dict, DictConfig, OmegaConf], *args, **kwargs):
         """
         Args:
             config (Union[str, dict, OmegaConf]): config for the etl
