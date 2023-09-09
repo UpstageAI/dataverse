@@ -65,23 +65,31 @@ class ETLInterface:
         # [ Preprocessing ]
         # [ Save RDD/DataFrame ] - data load
         etl_configs = config.etl
-        for etl_config in etl_configs:
+        total_etl_n = len(etl_configs)
+        for etl_i, etl_config in enumerate(etl_configs):
             # etl_config.name format
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
-            etl_cate = etl_config.name.split('___')[0]
+            etl_category = etl_config.name.split('___')[0]
             etl_class = self.registry.get(key=etl_config.name)
             
             # instantiate etl class
             etl_instance = etl_class()
 
-            # for data ingestion specially, `spark` is required
-            if etl_cate == 'data_ingestion':
+            # loading data MUST be the first ETL process
+            if etl_i == 0 and etl_category != 'data_ingestion':
+                raise ValueError(f"First ETL process should be data ingestion but got {etl_category}")
+
+            # saving data MUST be the last ETL process
+            if etl_i == total_etl_n - 1 and etl_category != 'data_load':
+                raise ValueError(f"Last ETL process should be data load but got {etl_category}")
+
+            # for first ETL process w/ data ingestion, `spark` is required
+            # for the rest, even data ingestion, it is about reformating data
+            # so treated as other ETL process
+            if etl_i == 0 and etl_category == 'data_ingestion':
                 data = etl_instance(spark, **etl_config.args)
             else:
                 data = etl_instance(data, **etl_config.args)
-
-        # data load
-        ...
 
         # =============== [ Stop Spark ] ==================
         spark.stop()
