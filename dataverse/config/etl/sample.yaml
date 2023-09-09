@@ -5,7 +5,8 @@ spark:
   driver:
     memory: 4g
 etl:
-  - name: data_ingestion___parquet___df
+  - name: data_ingestion___parquet___rdd
     args:
       input_paths:
         - /data/private/dataverse/.cache/huggingface_224b71e119ece785.parquet
+      repartition: 3

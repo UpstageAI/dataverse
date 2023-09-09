@@ -12,9 +12,19 @@ from typing import Union
 
 
 @register_etl
-def data_ingestion___parquet___df(spark, input_paths, *args, **kwargs):
+def data_ingestion___parquet___df(spark, input_paths, repartition=20, *args, **kwargs):
     """
+    Load parquet file as DataFrame
     """
-    print("loading parquet text")
     df = spark.read.parquet(",".join(input_paths))
+    df = df.repartition(repartition)
     return df
+
+@register_etl
+def data_ingestion___parquet___rdd(spark, input_paths, repartition=20, *args, **kwargs):
+    """
+    Load parquet file as RDD
+    """
+    df = spark.read.parquet(",".join(input_paths))
+    rdd = df.rdd.repartition(repartition)
+    return rdd
