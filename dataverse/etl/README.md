@@ -1,15 +1,68 @@
 # ETL (Extract, Transform, Load)
 > The ETL only includes the process backed by Spark. There is currently 8 steps in the ETL pipeline which the following and this will be modified in the future.
 
+## 🌌 What is ETL process?
+> ETL process is the small code snippet, that is considered as a single unit of ETL pipeline. It is meant to be used in various combination of ETL pipeline so it should be as generic as possible.
 
-## How to run ETL process?
-- TBD
+## 🌌 Principles for ETL Process
+1. No `DRY` (Don't Repeat Yourself)
+2. One file Only
 
-## How to add new ETL process?
+
+### 🌠 No `DRY` (Don't Repeat Yourself)
+As you can see in the following example, there are 2 ETL processes `common_process_a` and `common_process_b`seems nice to be shared. But as you can see, they are not shared. They are repeated. This is because of the No `DRY` principle.
+
+```python
+- deduplication/
+	- exact.py
+        - "def common_process_a():"
+        - "def common_process_b():"
+        - def deduplication___exact___a():
+    - exact_datasketch.py
+        - "def common_process_a():"
+        - "def common_process_b():"
+        - def deduplication___exact_datasketch___a():
+        - def deduplication___exact_datasketch___b():
+```
+
+### 🌠 One file Only
+Code that ETL process uses should be in the same file. This is because of the `One file Only` principle. Except **ETL Base class, few required utils functions, and open sources** there should be no dependency outside the file.
+
+```python
+# This is OK ✅
+- deduplication/
+    - exact.py
+        - def helper_a():
+        - def helper_b():
+        - def etl_process():
+            helper_a()
+            helper_b()
+
+                    
+# This is not allowed ❌
+- deduplication/
+    - helper.py
+        - def helper_a():
+        - def helper_b():
+    - exact.py
+        from helper import helper_a
+        from helper import helper_b
+
+        - def etl_process():
+            helper_a()
+            helper_b()
+
+```
+
+ETL process itself is meant to be built to be used in various combination of ETL pipeline **So try to make it as generic as possible.** 😊
+
+
+## 🌌 How to add new ETL process?
 > ETL is managed by registry. What ever ETL you make, you need to register it to registry.
 - `registry.py` - registry for ETL process classes
 
-### How to add a new ETL Process
+
+### 🌠 How to add a new ETL Process
 
 <details>
 
@@ -40,7 +93,7 @@ class category___subcategory___etl(BaseETL):
 
 </details>
 
-### ETL Processor Class Naming Convention
+### 🌠 ETL Processor Class Naming Convention
 > This shared the same documentary with README.md in `__sample/` folder
 
 
@@ -99,7 +152,7 @@ class category___subcategory___etl(BaseETL):
 
 </details>
 
-### How to add a new ETL Category
+### 🌠 How to add a new ETL Category
 
 <details>
 
@@ -118,7 +171,7 @@ ETL_CATEGORIES = [
 ```
 </details>
 
-### Ignoring ETL Sub-Category python files
+### 🌠 Ignoring ETL Sub-Category python files
 > If you want to ignore some of the ETL sub-category python files, you can add the file name to `ETL_IGNORE` in `registry.py`
 
 when you want to make a file just for storage purpose, you can add the file name to `ETL_IGNORE` in `registry.py`
@@ -130,39 +183,44 @@ ETL_IGNORE = [
 ]
 ```
 
+## 🌌 How to run ETL process?
+- TBD
 
 
-## ETL Categories
+## 🌌 ETL Categories
 > This is predefined and you can modify the list if needed. Just make sure you update the `ETL_CATEGORIES` list in `registry.py` as well.
 
-### __Sample__
+### 🌠 __Sample__
 > This is to show how to use the etl package
 
-### Data Ingestion
+### 🌠 Data Ingestion
 > converting data from one format, schema to another
 
-### Deduplications
+### 🌠 Data Loading
+> saving data to desired location
+
+### 🌠 Deduplications
 > includes removing duplication inside data
 
-### Decontamination
+### 🌠 Decontamination
 > removing contamination from data
 - e.g. removing benchmark data from data
 
-### Junk
+### 🌠 Junk
 > removing junk data
 - e.g. removing HTML tags from text
 
-### PII (Personally Identifiable Information)
+### 🌠 PII (Personally Identifiable Information)
 > removing PII from data
 
-### Quality
+### 🌠 Quality
 > improving data quality
 - e.g. removing data with low quality
 
-### Toxicity
+### 🌠 Toxicity
 > removing toxic data
 - e.g. removing data with toxic words
 
-### Bias
+### 🌠 Bias
 > removing bias from data
 - e.g. removing data with gender bias words
