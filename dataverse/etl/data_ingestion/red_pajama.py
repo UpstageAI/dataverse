@@ -7,6 +7,7 @@ from dataverse.etl.registry import BaseETL
 from dataverse.etl.registry import register_etl
 from dataverse.etl.registry import ETLRegistry
 from dataverse.utils.format import huggingface2parquet
+from dataverse.utils.format import get_uuidv1
 
 from typing import Union
 
@@ -20,13 +21,9 @@ https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T-Sample
 """
 
 
-import uuid
-
-def get_uuid():
-    return uuid.uuid1().hex
 
 def convert2ufl(row):
-    row['id'] = get_uuid()
+    row['id'] = get_uuidv1()
     row['name'] = 'red_pajama'
     return row
 
