@@ -5,8 +5,8 @@ spark:
   driver:
     memory: 4g
 etl:
-  - name: data_ingestion___parquet___rdd
+  - name: data_ingestion___red_pajama___hf2ufl
     args:
-      input_paths:
-        - /data/private/dataverse/.cache/huggingface_224b71e119ece785.parquet
+      name_or_path: togethercomputer/RedPajama-Data-1T-Sample
+      split: train
       repartition: 3
