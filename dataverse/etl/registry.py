@@ -15,6 +15,8 @@ from typing import Union
 
 # TODO: If you add category directories, add them here too
 # _sample is a special directory that is not imported
+
+# This is where you choose what categories to register
 ETL_CATEGORIES = [
     'data_ingestion',
     'decontamination',
