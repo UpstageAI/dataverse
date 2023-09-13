@@ -12,26 +12,31 @@
 > This is a strong recommendation. You can use your own naming convention if you want.
 
 - Name sub-category (python file) to the data source name
-- Name the ETL process as the final format
+- Name the ETL process as the `raw source` -> `target format`
+    - e.g. `parquet2ufl` means converting parquet to ufl format
+    - e.g. `hf2ufl` means converting huggingface dataset to ufl format
+
+**caveat**
+- `ufl` is not a file format rather a schema(data format). 
     
 ```python
 - "data_ingestion/"
     # converting raw data to desired format
     - mmlu.py
-        - def data_ingestion___mmlu___parquet()
-        - def data_ingestion___mmlu___ufl()
+        - def data_ingestion___mmlu___parquet2ufl()
+        - def data_ingestion___mmlu___hf2ufl()
     - squad.py
-        - def data_ingestion___squad___ufl()
+        - def data_ingestion___squad___hf2ufl()
     - mnist.py
-        - def data_ingestion___mnist___ufl()
+        - def data_ingestion___mnist___csv2ufl()
 
-    # this is used when loading UFL format
+    # this is used when loading UFL format saved in parquet
     - ufl.py
-        - def data_ingestion___ufl___ufl()
+        - def data_ingestion___ufl___parquet2ufl()
 ```
 
 ## UFL (Upstage Format for LLM)
-> This is the data format recommended by the Upstage LLM. Dataverse standard format for preparing pretraining dataset.
+> This is the schema(data format) recommended by the Upstage LLM. Dataverse standard format for preparing pretraining dataset.
 ```python
 {
 	"id":"uuid",
