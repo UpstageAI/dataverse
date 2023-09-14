@@ -86,10 +86,17 @@ class ETLPipeline:
             # for first ETL process w/ data ingestion, `spark` is required
             # for the rest, even data ingestion, it is about reformating data
             # so treated as other ETL process
-            if etl_i == 0 and etl_category == 'data_ingestion':
-                data = etl_instance(spark, **etl_config.args)
+
+            # when args is not defined, set it to empty dict
+            if 'args' in etl_config:
+                args = etl_config.args
             else:
-                data = etl_instance(data, **etl_config.args)
+                args = {}
+
+            if etl_i == 0 and etl_category == 'data_ingestion':
+                data = etl_instance(spark, **args)
+            else:
+                data = etl_instance(data, **args)
 
         # =============== [ Stop Spark ] ==================
         spark.stop()
