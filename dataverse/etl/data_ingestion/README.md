@@ -63,8 +63,8 @@ ufl = {
 ### 📗 1 step flow
 - Name sub-category (python file) to the data source name
 - Name the ETL process as the `raw source` -> `target format`
-    - e.g. `parquet2ufl` means converting parquet to ufl format
-    - e.g. `hf2ufl` means converting huggingface dataset to ufl format
+    - e.g. `parquet2ufl` means loading parquet to ufl format
+    - e.g. `hf2ufl` means loading huggingface dataset to ufl format
 
     
 ```python
@@ -90,8 +90,8 @@ def [ETL Category]___[ETL Sub-Category]___[raw source]2[target format]()
 
 #### 📖 Step 1 - load raw data to raw format
 - Name the ETL process as the `raw source` -> `raw format`
-    - e.g. `parquet2raw` means converting parquet to raw format
-    - e.g. `hf2raw` means converting huggingface dataset to raw format
+    - e.g. `parquet2raw` means loading parquet to raw format
+    - e.g. `hf2raw` means loading huggingface dataset to raw format
 
 ```python
 def [ETL Category]___[ETL Sub-Category]___[raw source]2raw()
@@ -123,9 +123,9 @@ def [ETL Category]___[ETL Sub-Category]___raw2[target format]_[template name]()
         - def data_ingestion___mmlu___raw2ufl_q()
         - def data_ingestion___mmlu___raw2ufl_qa()
     - squad.py
-        - def data_ingestion___squad___raw2ufl()
+        - def data_ingestion___squad___raw2ufl_v1()
     - mnist.py
-        - def data_ingestion___mnist___raw2ufl()
+        - def data_ingestion___mnist___raw2ufl_v1()
 ```
 
 
