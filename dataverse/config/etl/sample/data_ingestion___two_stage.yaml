@@ -1,0 +1,14 @@
+# This is a sample config file for the etl process
+
+spark:
+  appname: dataverse_etl_sample
+  driver:
+    memory: 4g
+etl:
+  - name: data_ingestion___red_pajama___hf2raw
+    args:
+      name_or_path: togethercomputer/RedPajama-Data-1T-Sample
+
+  # you can choose to use the default template or create your own
+  - name: data_ingestion___red_pajama___raw2ufl_templatev1
+  

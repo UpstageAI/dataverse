@@ -8,5 +8,4 @@ etl:
   - name: data_ingestion___red_pajama___hf2ufl
     args:
       name_or_path: togethercomputer/RedPajama-Data-1T-Sample
-      split: train
       repartition: 3
