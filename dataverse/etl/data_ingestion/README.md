@@ -27,13 +27,12 @@ And with the following 2 templates, we can create 2 different data with `ufl` fo
 To give user a broader choice, multiple templates for the same data source is necessary and 2 step flow is the way to go.
 
 ```python
-# original format
-"Let p = (1, 2, 5, 4)(2, 3) in S_5 . Find the index of <p> in S_5."	
-"8"	
-"2"	
-"24"	
-"120"	
-"C"
+# raw format
+raw = {
+    "question": "Let p = (1, 2, 5, 4)(2, 3) in S_5 . Find the index of <p> in S_5.",
+    "choices": ["8", "2", "24", "120"],
+    "answer": 1,
+}
 
 # template v1 - only question (q)
 ufl = {
