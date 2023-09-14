@@ -59,7 +59,7 @@ def huggingface2parquet(
         # save the parquet at package root path
         save_path = Path(os.path.abspath(__file__)).parents[3]
 
-    dataset_path = f"{save_path}/.cache/huggingface_{dataset._fingerprint}.parquet"
+    dataset_path = f"{save_path}/.cache/dataverse/dataset/huggingface_{dataset._fingerprint}.parquet"
 
     # check the dataset exist
     if os.path.exists(dataset_path):
@@ -67,14 +67,14 @@ def huggingface2parquet(
             print(f"Dataset already exists at {dataset_path}")
         return dataset_path
 
-    os.makedirs(f"{save_path}/.cache", exist_ok=True)
+    os.makedirs(f"{save_path}/.cache/dataverse/dataset", exist_ok=True)
     dataset.to_parquet(dataset_path)
 
     return dataset_path
 
 if __name__ == "__main__":
     # test the function
-    dataset = datasets.load_dataset("glue", "mrpc")
+    dataset = load_huggingface_dataset(["glue", "mrpc"])
     dataset_path = huggingface2parquet(dataset, verbose=True)
 
     print(f"Dataset saved at {dataset_path}")
