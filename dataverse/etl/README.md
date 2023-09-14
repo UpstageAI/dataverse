@@ -14,7 +14,7 @@ As you can see in the following example, there are 2 ETL processes `common_proce
 
 ```python
 - deduplication/
-	- exact.py
+    - exact.py
         - "def common_process_a():"
         - "def common_process_b():"
         - def deduplication___exact___a():
