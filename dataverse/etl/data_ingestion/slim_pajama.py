@@ -7,6 +7,7 @@ from dataverse.etl.registry import BaseETL
 from dataverse.etl.registry import register_etl
 from dataverse.etl.registry import ETLRegistry
 from dataverse.utils.format import huggingface2parquet
+from dataverse.utils.format import load_huggingface_dataset
 
 from typing import Union, List
 from omegaconf import ListConfig
@@ -50,16 +51,7 @@ def data_ingestion___slim_pajama___hf2ufl(
         repartition (int): the number of partitions
         verbose (bool): whether to print the information of the dataset
     """
-    # load huggingface dataset
-    if isinstance(name_or_path, str):
-        dataset = datasets.load_dataset(name_or_path, split=split)
-    elif isinstance(name_or_path, list):
-        dataset = datasets.load_dataset(*name_or_path, split=split)
-    elif isinstance(name_or_path, ListConfig):
-        dataset = datasets.load_dataset(*name_or_path, split=split)
-    else:
-        raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
-
+    dataset = load_huggingface_dataset(name_or_path, split=split)
     parquet_path = huggingface2parquet(dataset, verbose=verbose)
 
     df = spark.read.parquet(parquet_path)

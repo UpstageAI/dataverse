@@ -2,7 +2,28 @@
 import os
 import datasets
 from pathlib import Path
+from omegaconf import ListConfig
 
+
+def load_huggingface_dataset(name_or_path, split=None):
+    """
+    load huggingface dataset
+    
+    Args:
+        name_or_path (str or list): the name or path of the huggingface dataset
+        split (str): the split of the dataset
+    """
+    # load huggingface dataset
+    if isinstance(name_or_path, str):
+        dataset = datasets.load_dataset(name_or_path, split=split)
+    elif isinstance(name_or_path, list):
+        dataset = datasets.load_dataset(*name_or_path, split=split)
+    elif isinstance(name_or_path, ListConfig):
+        dataset = datasets.load_dataset(*name_or_path, split=split)
+    else:
+        raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
+
+    return dataset
 
 def huggingface2parquet(
         dataset: datasets.Dataset,
