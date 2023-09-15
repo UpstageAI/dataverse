@@ -18,4 +18,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=get_requirements(),
+    entry_points={
+        "console_scripts": [
+            "dataverse = dataverse.api.cli:main"
+        ]
+    },
 )
