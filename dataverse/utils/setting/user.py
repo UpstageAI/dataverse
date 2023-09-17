@@ -58,7 +58,8 @@ class UserSetting:
         """
         reset the setting
         """
-        self.user_setting = None
+        self.user_setting = {}
+        self.sync_file()
 
     def sync_file(self):
         """
