@@ -15,8 +15,7 @@ class SystemSetting:
     system setting holds all the variables
     that influence the behavior of the dataverse system.
 
-    Convention:
-    - all the system setting keys are in `Capitalized` format
+    Also, this class is a singleton class, so you can use it anywhere in the code
     
     [ MEMORY ONLY ]
     - system setting is stored in memory only
