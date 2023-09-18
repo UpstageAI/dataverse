@@ -7,22 +7,23 @@
 
 ### naming convention
 1. Only CAPITALIZED format
-    - e.g. CACHE_DIR (O)
-    - e.g. cache_dir (X)
+    - e.g. `CACHE_DIR` (O)
+    - e.g. `cache_dir` (X)
 2. Only alphanumeric and underscore
-    - e.g. CACHE_DIR2 (O)
-    - e.g. cache-dir (X)
-    - e.g. CACHE_@DIR (X)
+    - e.g. `CACHE_DIR2` (O)
+    - e.g. `cache-dir` (X)
+    - e.g. `CACHE_@DIR` (X)
 3. Only one underscore between words
-    - e.g. CACHE__DIR (X)
+    - e.g. `CACHE__DIR` (X)
 4. No underscore at the start/end of the key
-    - e.g. _CACHE_DIR (X)
-    - e.g. CACHE_DIR_ (X)
+    - e.g. `_CACHE_DIR` (X)
+    - e.g. `CACHE_DIR_` (X)
 
 ### System Setting Policy
 - Only memory (not stored in the file)
 - Only updated by `Environment Variables`
-- Manually updated - check `system.py.SystemSetting.default_setting()`
+- Default Setting Manually updated
+    - check `system.py.SystemSetting.default_setting()`
 - No update after the system is initialized
     - If you want to change the setting, you must restart the system.
 
@@ -31,15 +32,15 @@
 
 ```bash
 # dynamic
-DATASET_CACHE_DIR=/path/to/cache/dir python3 main.py
+CACHE_DIR=/path/to/cache/dir python3 main.py
 
 # static
-export DATASET_CACHE_DIR=/path/to/cache/dir
+export CACHE_DIR=/path/to/cache/dir
 python3 main.py
 ```
 
 ### How to use `SystemSetting`
-> **This MUST be used internally by the system**. But just in case, you can use it in 3 ways to use it.
+> **This MUST be used internally by the system**. But just in case, you can use it in 3 ways.
 
 ```python
 from dataverse.utils.setting import SystemSetting
@@ -61,17 +62,17 @@ SystemSetting().CACHE_DIR = '/path/to/cache/dir'
 
 ### naming convention
 1. Only CAPITALIZED format
-    - e.g. GITHUB_API (O)
-    - e.g. github_api (X)
+    - e.g. `GITHUB_API` (O)
+    - e.g. `github_api` (X)
 2. Only alphanumeric and underscore
-    - e.g. GITHUB_API2 (O)
-    - e.g. github-api (X)
-    - e.g. GITHUB_@API (X)
+    - e.g. `GITHUB_API2` (O)
+    - e.g. `github-api` (X)
+    - e.g. `GITHUB_@API` (X)
 3. Only one underscore between words
-    - e.g. GITHUB__API (X)
+    - e.g. `GITHUB__API` (X)
 4. No underscore at the start/end of the key
-    - e.g. _GITHUB_API (X)
-    - e.g. GITHUB_API_ (X)
+    - e.g. `_GITHUB_API` (X)
+    - e.g. `GITHUB_API_` (X)
 
 ### Where does it store?
 > Setting will be stored in `CACHE_DIR` set in `SystemSetting` with the name of `user_setting.json`.
