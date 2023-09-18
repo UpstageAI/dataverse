@@ -61,8 +61,7 @@ class SystemSetting:
         self.system_setting = {}
 
         # HARD CODED DEFAULT SETTING
-        # FIXME: change this from package root to user home
-        self.system_setting["CACHE_DIR"] = Path(os.path.abspath(__file__)).parents[3].as_posix()
+        self.system_setting["CACHE_DIR"] = Path.home().as_posix()
 
         # TODO: add more default setting here
         ...
