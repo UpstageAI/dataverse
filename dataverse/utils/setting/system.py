@@ -1,0 +1,135 @@
+
+"""
+Interface for system setting
+"""
+
+import os
+import json
+from pathlib import Path
+
+
+class SystemSetting:
+    """
+    System Setting CRUD interface
+
+    system setting holds all the variables
+    that influence the behavior of the dataverse system.
+
+    Convention:
+    - all the system setting keys are in `Capitalized` format
+    
+    [ MEMORY ONLY ]
+    - system setting is stored in memory only
+    - system setting is not persistent
+
+    [ Update by Env Variable ]
+    - system setting can be updated by env variable
+
+    [ Manual Update ]
+    - default system setting can be updated manually
+    - check `default_setting()`
+
+    [ No Update after Initialization ]
+    - system could be updated but not reflected in the program
+    - need to restart the program to use new system setting
+    """
+    # Singleton
+    _initialized = False
+
+    # TODO: system setting per user [Candidate]
+    ...
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(SystemSetting, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        # when the class is initialized, this is called everytime
+        # regardless of the singleton. So adding the flag to check
+        if self._initialized:
+            return
+
+        self.default_setting()
+        self.update_by_env()
+        self._initialized = True
+
+    def default_setting(self):
+        """
+        Reset the system setting to default
+        """
+        self.system_setting = {}
+
+        # HARD CODED DEFAULT SETTING
+        # FIXME: change this from package root to user home
+        self.system_setting["CACHE_DIR"] = Path(os.path.abspath(__file__)).parents[3].as_posix()
+
+        # TODO: add more default setting here
+        ...
+
+    def update_by_env(self):
+        """
+        Update the system setting by env variable
+        """
+        # check if the env variable is set
+        for key in self.system_setting:
+            if key in os.environ:
+                self.system_setting[key] = os.environ[key]
+
+    def get(self, key):
+        """
+        """
+        if key not in self.system_setting:
+            raise KeyError(f"key [ {key} ] does not exist in SYSTEM setting")
+        return self.system_setting[key]
+
+    def set(self, key, value):
+        """
+        """
+        self.system_setting[key] = value
+
+    # Support dot-like access, e.g. setting.CACHE_DIR
+    def __getattr__(self, key):
+        if key in [
+            "_initialized",
+            "system_setting"
+        ]:
+            return super().__getattr__(key)
+        else:
+            return self.get(key)
+
+    def __setattr__(self, key, value):
+        if key in [
+            "_initialized",
+            "system_setting"
+        ]:
+            super().__setattr__(key, value)
+        else:
+            self.set(key, value)
+
+    # Support dict-like access, e.g. setting["CACHE_DIR"]
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def delete(self, key):
+        """
+        """
+        if key in self.system_setting:
+            self.system_setting.pop(key, None)
+        else:
+            raise KeyError(f"key [ {key} ] does not exist in SYSTEM setting")
+
+    def list(self):
+        """
+        List all settings
+        """
+        print(self.system_setting)
+
+    def __repr__(self):
+        return json.dumps(self.system_setting, indent=4)
+
+    def __str__(self):
+        return json.dumps(self.system_setting, indent=4)

@@ -7,6 +7,8 @@ import os
 import json
 from pathlib import Path
 
+from dataverse.utils.setting.system import SystemSetting
+
 
 class UserSetting:
     """
@@ -45,10 +47,12 @@ class UserSetting:
         if self._initialized:
             return
 
-        # FIXME: when env variable manager is ready, get it from env variable
-        cache_path = Path(os.path.abspath(__file__)).parents[3]
-        os.makedirs(f"{cache_path}/.cache/dataverse/setting", exist_ok=True)
-        self.user_setting_path = os.path.join(cache_path, ".cache/dataverse/setting/user_setting.json")
+        # create the user setting path
+        os.makedirs(f"{SystemSetting().CACHE_DIR}/.cache/dataverse/setting", exist_ok=True)
+        self.user_setting_path = os.path.join(
+            SystemSetting().CACHE_DIR,
+            ".cache/dataverse/setting/user_setting.json"
+        )
 
         # load the user setting, if not exist, empty dict will be assigned
         self.user_setting = self.load(self.user_setting_path)
