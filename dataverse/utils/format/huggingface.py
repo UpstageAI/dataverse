@@ -4,6 +4,8 @@ import datasets
 from pathlib import Path
 from omegaconf import ListConfig
 
+from dataverse.utils.setting import SystemSetting
+
 
 def load_huggingface_dataset(name_or_path, split=None):
     """
@@ -27,7 +29,7 @@ def load_huggingface_dataset(name_or_path, split=None):
 
 def huggingface2parquet(
         dataset: datasets.Dataset,
-        cache_path: str = None,
+        cache_dir: str = None,
         verbose: bool = True,
         **kwargs
     ):
@@ -36,7 +38,7 @@ def huggingface2parquet(
     
     Args:
         dataset (datasets.Dataset): a huggingface dataset
-        cache_path (str): cache path to save the dataset
+        cache_dir (str): cache path to save the dataset
         verbose (bool): whether to print the information of the dataset
     """
     # check the dataset which has train, test, validation or other splits
@@ -55,11 +57,11 @@ def huggingface2parquet(
     # save the dataset to parquet
     # FIXME: this is a temporary solution to store the dataset in the package root path
     #        we will change it to a better solution in the future
-    if cache_path is None:
+    if cache_dir is None:
         # save the parquet at package root path
-        cache_path = Path(os.path.abspath(__file__)).parents[3]
+        cache_dir = SystemSetting().CACHE_DIR
 
-    dataset_path = f"{cache_path}/.cache/dataverse/dataset/huggingface_{dataset._fingerprint}.parquet"
+    dataset_path = f"{cache_dir}/.cache/dataverse/dataset/huggingface_{dataset._fingerprint}.parquet"
 
     # check the dataset exist
     if os.path.exists(dataset_path):
@@ -67,7 +69,7 @@ def huggingface2parquet(
             print(f"Dataset already exists at {dataset_path}")
         return dataset_path
 
-    os.makedirs(f"{cache_path}/.cache/dataverse/dataset", exist_ok=True)
+    os.makedirs(f"{cache_dir}/.cache/dataverse/dataset", exist_ok=True)
     dataset.to_parquet(dataset_path)
 
     return dataset_path
