@@ -47,17 +47,20 @@ SystemSetting().CACHE_DIR = '/path/to/cache/dir'
 
 
 ## User Settings
-> API keys, passwords, or other sensitive information of user
+> API keys, passwords, or other sensitive information of user.
 
 ### Where does it store?
-> Setting will be stored in `cache` with the name of `user_setting.json`.
+> Setting will be stored in `CACHE_DIR` set in `SystemSetting` with the name of `user_setting.json`.
 
 ```python
-{CACHE_DIR}/.cache/dataverse/setting/user_setting.json
+from dataverse.utils.setting import SystemSetting
+
+{SystemSetting().CACHE_DIR}/.cache/dataverse/setting/user_setting.json
 ```
+
  
 ### How to modify?
-1. You could modify the file directly
+1. You could modify the `user_setting.json` file directly
 2. or can use proxy class `UserSetting`
     - this is synchronized with the `user_setting.json` file
 
@@ -66,15 +69,19 @@ from dataverse.utils.setting import UserSetting
 ```
 
 ### How to use `UserSetting` proxy?
+> There is 3 ways to use it.
+
 
 ```python
 from dataverse.utils.setting import UserSetting
 
-user_setting = UserSetting()
-
 # get the value
-user_setting.get('key')
+github_api = UserSetting().get('GITHUB_API')
+github_api = UserSetting()['GITHUB_API']
+github_api = UserSetting().GITHUB_API
 
 # set the value
-user_setting.set('key', 'value')
+UserSetting().set('GITHUB_API', 'your_github_api_key')
+UserSetting()['GITHUB_API'] = 'your_github_api_key'
+UserSetting().GITHUB_API = 'your_github_api_key'
 ```

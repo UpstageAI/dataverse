@@ -36,6 +36,9 @@ class UserSetting:
     # Singleton
     _initialized = False
 
+    # TODO: system setting per user [Candidate]
+    ...
+
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls.instance = super(UserSetting, cls).__new__(cls)
@@ -98,7 +101,7 @@ class UserSetting:
         """
         self.sync_class()
         if key not in self.user_setting:
-            return None
+            raise KeyError(f"key [ {key} ] does not exist in USER setting")
         return self.user_setting[key]
 
     def set(self, key, value):
@@ -107,6 +110,34 @@ class UserSetting:
         self.user_setting[key] = value
         self.sync_file()
 
+    # Support dot-like access, e.g. setting.GITHUB_API
+    def __getattr__(self, key):
+        if key in [
+            "_initialized",
+            "user_setting",
+            "user_setting_path"
+        ]:
+            return super().__getattr__(key)
+        else:
+            return self.get(key)
+
+    def __setattr__(self, key, value):
+        if key in [
+            "_initialized",
+            "user_setting",
+            "user_setting_path"
+        ]:
+            super().__setattr__(key, value)
+        else:
+            self.set(key, value)
+
+    # Support dict-like access, e.g. setting["GITHUB_API"]
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
     def delete(self, key):
         """
         """
@@ -114,7 +145,7 @@ class UserSetting:
             self.user_setting.pop(key, None)
             self.sync_file()
         else:
-            raise KeyError(f"Key [ {key} ] does not exist")
+            raise KeyError(f"key [ {key} ] does not exist in USER setting")
 
     def list(self):
         """
