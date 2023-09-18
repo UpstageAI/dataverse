@@ -5,9 +5,19 @@
 ## System Settings
 > The heart of the system. It contains the configuration of the system.
 
-### Naming Convention
-- All uppercase
-    - e.g. `CACHE_DIR`
+### naming convention
+1. Only CAPITALIZED format
+    - e.g. CACHE_DIR (O)
+    - e.g. cache_dir (X)
+2. Only alphanumeric and underscore
+    - e.g. CACHE_DIR2 (O)
+    - e.g. cache-dir (X)
+    - e.g. CACHE_@DIR (X)
+3. Only one underscore between words
+    - e.g. CACHE__DIR (X)
+4. No underscore at the start/end of the key
+    - e.g. _CACHE_DIR (X)
+    - e.g. CACHE_DIR_ (X)
 
 ### System Setting Policy
 - Only memory (not stored in the file)
@@ -48,6 +58,20 @@ SystemSetting().CACHE_DIR = '/path/to/cache/dir'
 
 ## User Settings
 > API keys, passwords, or other sensitive information of user.
+
+### naming convention
+1. Only CAPITALIZED format
+    - e.g. GITHUB_API (O)
+    - e.g. github_api (X)
+2. Only alphanumeric and underscore
+    - e.g. GITHUB_API2 (O)
+    - e.g. github-api (X)
+    - e.g. GITHUB_@API (X)
+3. Only one underscore between words
+    - e.g. GITHUB__API (X)
+4. No underscore at the start/end of the key
+    - e.g. _GITHUB_API (X)
+    - e.g. GITHUB_API_ (X)
 
 ### Where does it store?
 > Setting will be stored in `CACHE_DIR` set in `SystemSetting` with the name of `user_setting.json`.

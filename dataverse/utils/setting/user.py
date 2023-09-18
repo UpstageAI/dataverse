@@ -96,6 +96,43 @@ class UserSetting:
 
         return json_file
 
+    def check_naming_convention(self, key):
+        """
+        1. only CAPITALIZED format
+            - e.g. GITHUB_API (O)
+            - e.g. github_api (X)
+        2. only alphanumeric and underscore
+            - e.g. GITHUB_API2 (O)
+            - e.g. github-api (X)
+            - e.g. GITHUB_@API (X)
+        3. only one underscore between words
+            - e.g. GITHUB__API (X)
+        4. no underscore at the start/end of the key
+            - e.g. _GITHUB_API (X)
+            - e.g. GITHUB_API_ (X)
+        """
+        # 1. only CAPITALIZED format
+        if key != key.upper():
+            raise ValueError(f"key [ {key} ] is not in Capitalized format")
+
+        # 2. only alphanumeric and underscore
+        for char in key:
+            if not char.isalnum() and char != "_":
+                raise ValueError(f"key [ {key} ] should only contains alphanumeric and underscore")
+
+        # 3. only one underscore between words
+        if "_" in key:
+            # check if there is only one underscore
+            divided_key = key.split("_")
+            for word in divided_key:
+                if "" in word:
+                    raise ValueError(f"key [ {key} ] contains more than one underscore")
+
+        # 4. no underscore at the start/end of the key
+        if key.startswith("_") or key.endswith("_"):
+            raise ValueError(f"key [ {key} ] contains underscore at the start/end of the key")
+
+
     def get(self, key):
         """
         """
@@ -107,6 +144,7 @@ class UserSetting:
     def set(self, key, value):
         """
         """
+        self.check_naming_convention(key)
         self.user_setting[key] = value
         self.sync_file()
 

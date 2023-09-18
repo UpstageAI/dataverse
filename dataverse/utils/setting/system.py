@@ -75,6 +75,42 @@ class SystemSetting:
             if key in os.environ:
                 self.system_setting[key] = os.environ[key]
 
+    def check_naming_convention(self, key):
+        """
+        1. only CAPITALIZED format
+            - e.g. CACHE_DIR (O)
+            - e.g. cache_dir (X)
+        2. only alphanumeric and underscore
+            - e.g. CACHE_DIR2 (O)
+            - e.g. cache-dir (X)
+            - e.g. CACHE_@DIR (X)
+        3. only one underscore between words
+            - e.g. CACHE__DIR (X)
+        4. no underscore at the start/end of the key
+            - e.g. _CACHE_DIR (X)
+            - e.g. CACHE_DIR_ (X)
+        """
+        # 1. only CAPITALIZED format
+        if key != key.upper():
+            raise ValueError(f"key [ {key} ] is not in Capitalized format")
+
+        # 2. only alphanumeric and underscore
+        for char in key:
+            if not char.isalnum() and char != "_":
+                raise ValueError(f"key [ {key} ] should only contains alphanumeric and underscore")
+
+        # 3. only one underscore between words
+        if "_" in key:
+            # check if there is only one underscore
+            divided_key = key.split("_")
+            for word in divided_key:
+                if "" in word:
+                    raise ValueError(f"key [ {key} ] contains more than one underscore")
+
+        # 4. no underscore at the start/end of the key
+        if key.startswith("_") or key.endswith("_"):
+            raise ValueError(f"key [ {key} ] contains underscore at the start/end of the key")
+
     def get(self, key):
         """
         """
@@ -85,6 +121,7 @@ class SystemSetting:
     def set(self, key, value):
         """
         """
+        self.check_naming_convention(key)
         self.system_setting[key] = value
 
     # Support dot-like access, e.g. setting.CACHE_DIR
