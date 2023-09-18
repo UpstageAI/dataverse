@@ -56,11 +56,16 @@ class SystemSetting:
     def default_setting(self):
         """
         Reset the system setting to default
+
+        Default setting:
+        - `CACHE_DIR`: default cache directory
+        - `IS_CLI`: if the program is running in CLI mode
         """
         self.system_setting = {}
 
         # HARD CODED DEFAULT SETTING
-        self.system_setting["CACHE_DIR"] = Path.home().as_posix()
+        self.CACHE_DIR = Path.home().as_posix()
+        self.IS_CLI = False
 
         # TODO: add more default setting here
         ...
@@ -101,10 +106,9 @@ class SystemSetting:
         # 3. only one underscore between words
         if "_" in key:
             # check if there is only one underscore
-            divided_key = key.split("_")
-            for word in divided_key:
-                if "" in word:
-                    raise ValueError(f"key [ {key} ] contains more than one underscore")
+            divided_keys = key.split("_")
+            if "" in divided_keys:
+                raise ValueError(f"key [ {key} ] contains more than one underscore")
 
         # 4. no underscore at the start/end of the key
         if key.startswith("_") or key.endswith("_"):

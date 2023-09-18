@@ -123,10 +123,9 @@ class UserSetting:
         # 3. only one underscore between words
         if "_" in key:
             # check if there is only one underscore
-            divided_key = key.split("_")
-            for word in divided_key:
-                if "" in word:
-                    raise ValueError(f"key [ {key} ] contains more than one underscore")
+            divided_keys = key.split("_")
+            if "" in divided_keys:
+                raise ValueError(f"key [ {key} ] contains more than one underscore")
 
         # 4. no underscore at the start/end of the key
         if key.startswith("_") or key.endswith("_"):
