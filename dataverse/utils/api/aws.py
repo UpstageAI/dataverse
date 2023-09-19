@@ -22,6 +22,20 @@ def aws_check_credentials():
     sts = boto3.client('sts')
     sts.get_caller_identity()
 
+def aws_s3_create_bucket(bucket_name, location='ap-northeast-2'):
+    """
+    create aws s3 bucket
+
+    Args:
+        bucket_name (str): bucket name (must be unique)
+        location (str): aws region name
+    """
+    s3 = boto3.client('s3', region_name=location)
+    s3.create_bucket(
+        Bucket=bucket_name,
+        CreateBucketConfiguration={'LocationConstraint': location}
+    )
+
 def aws_s3_download(bucket_name, key, local_path):
     """
     Args:
