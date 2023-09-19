@@ -1,14 +1,42 @@
 
+"""
+Usage:
+
+```python
+from dataverse.utils.api import aws_buckets
+from dataverse.utils.api import aws_list
+
+aws_buckets()
+aws_list("bucket_name")
+```
+"""
 
 import boto3
 
 
 def aws_check_credentials():
+    """
+    simple check if aws credentials are valid
+    if no error, then credentials are valid
+    """
     sts = boto3.client('sts')
     sts.get_caller_identity()
 
+def aws_buckets():
+    """
+    get all buckets from aws s3
+    """
+    s3 = boto3.client("s3")
+    buckets = s3.list_buckets()['Buckets']
+    bucket_names = []
+    for bucket in buckets:
+        bucket_names.append(bucket['Name'])
+
+    return bucket_names
+
 def aws_list(bucket_name, prefix="", delimiter="/", remove_prefix=False):
     """
+    list files/folders from specific path from aws s3
     aws s3 ls s3://bucket_name/prefix
 
     Args:
