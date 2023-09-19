@@ -3,11 +3,11 @@
 Usage:
 
 ```python
-from dataverse.utils.api import aws_buckets
-from dataverse.utils.api import aws_list
+from dataverse.utils.api import aws_s3_list_buckets
+from dataverse.utils.api import aws_s3_list
 
-aws_buckets()
-aws_list("bucket_name")
+aws_s3_list_buckets()
+aws_s3_list("bucket_name")
 ```
 """
 
@@ -22,7 +22,7 @@ def aws_check_credentials():
     sts = boto3.client('sts')
     sts.get_caller_identity()
 
-def aws_buckets():
+def aws_s3_list_buckets():
     """
     get all buckets from aws s3
     """
@@ -34,7 +34,7 @@ def aws_buckets():
 
     return bucket_names
 
-def aws_list(bucket_name, prefix="", delimiter="/", remove_prefix=False):
+def aws_s3_list(bucket_name, prefix="", delimiter="/", remove_prefix=False):
     """
     list files/folders from specific path from aws s3
     aws s3 ls s3://bucket_name/prefix
