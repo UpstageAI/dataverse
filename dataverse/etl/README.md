@@ -2,7 +2,104 @@
 > The ETL only includes the process backed by Spark. There is currently 8 steps in the ETL pipeline which the following and this will be modified in the future.
 
 ## 🌌 What is ETL process?
-> ETL process is the small code snippet, that is considered as a single unit of ETL pipeline. It is meant to be used in various combination of ETL pipeline so it should be as generic as possible.
+> ETL process is the small code snippet, that is considered as a single unit of ETL pipeline. It is meant to be form various combinations to accommodate different kinds of data sources and transformations in ETL pipeline so it should be as generic as possible.
+
+```python
+def ETL_process(data, config):
+    return data
+```
+
+
+## 🌌 What is ETL pipeline?
+> ETL pipeline is the sequence of ETL processes.
+
+```python
+data = ETL_process_1()
+data = ETL_process_2(data)
+data = ETL_process_3(data)
+```
+
+
+## 🌌 How to run ETL Pipeline?
+> Define the ETL process, and add in the config file to run the ETL pipeline.
+
+```python
+from dataverse.etl.pipeline import ETLPipeline
+from dataverse.config import Config
+
+# 1. Define the ETL process in the config file
+config = Config.get_config("TBD")
+
+# 2. Run the ETL pipeline
+etl_pipeline = ETLPipeline()
+etl_pipeline.run(config)
+```
+
+### 🌠 How to set ETL Process to Configuration
+> Once you have ETL process registered, you can define the ETL process in the config file. 
+
+Let's say you have the following ETL process registered
+```python
+from dataverse.etl.registry import register_etl
+
+@register_etl
+def ETL_process_start(spark, load_path, repartition=3):
+    data = spark.read.load(load_path).repartition(repartition)
+    return data
+
+@register_etl
+def ETL_process_middle(data, threshold=0.5):
+    data = data.filter(data['stars'] > threshold)
+    return data
+
+@register_etl
+def ETL_process_end(data, save_path, repartition=1):
+    data.repartition(repartition).write.save(save_path)
+    return None
+```
+
+You can use the following config to run the above ETL process in order
+- `ETL_process_start` -> `ETL_process_middle` -> `ETL_process_end`
+
+```yaml
+spark:
+  appname: dataverse_etl_sample
+  driver:
+    memory: 4g
+etl:
+  - name: ETL_process_start
+    args:
+      load_path: ./sample/raw.parquet
+      repartition: 3
+  - name: ETL_process_middle
+    args:
+      threshold: 0.5
+  - name: ETL_process_end
+    args:
+      save_path: ./sample/ufl.parquet
+      repartition: 1
+```
+
+**Check the following real example for more details**
+- This is used for `data ingestion` example
+    - convert `raw` format to `ufl` format and save it to `parquet` format
+- Config located at `dataverse/config/etl/sample/data_ingestion___one_stage.yaml`
+
+```yaml
+spark:
+  appname: dataverse_etl_sample
+  driver:
+    memory: 4g
+etl:
+  - name: data_ingestion___red_pajama___hf2ufl
+    args:
+      name_or_path: togethercomputer/RedPajama-Data-1T-Sample
+      repartition: 3
+  - name: data_load___parquet___ufl
+    args:
+      save_path: ./sample/pajama_1G_ufl_1s.parquet
+```
+
 
 ## 🌌 Principles for ETL Process
 1. No `DRY` (Don't Repeat Yourself)
@@ -183,9 +280,6 @@ ETL_IGNORE = [
     'storage.py'
 ]
 ```
-
-## 🌌 How to run ETL process?
-- TBD
 
 
 ## 🌌 ETL Categories
