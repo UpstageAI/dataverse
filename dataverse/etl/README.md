@@ -38,28 +38,28 @@ etl_pipeline.run(config)
 ### 🌠 How to set ETL Process to Configuration
 > Once you have ETL process registered, you can define the ETL process in the config file. 
 
-Let's say you have the following ETL process registered
+Let's say you have the following ETL processes registered
 ```python
 from dataverse.etl.registry import register_etl
 
 @register_etl
-def ETL_process_start(spark, load_path, repartition=3):
+def etl_process_start(spark, load_path, repartition=3):
     data = spark.read.load(load_path).repartition(repartition)
     return data
 
 @register_etl
-def ETL_process_middle(data, threshold=0.5):
+def etl_process_middle(data, threshold=0.5):
     data = data.filter(data['stars'] > threshold)
     return data
 
 @register_etl
-def ETL_process_end(data, save_path, repartition=1):
+def etl_process_end(data, save_path, repartition=1):
     data.repartition(repartition).write.save(save_path)
     return None
 ```
 
 You can use the following config to run the above ETL process in order
-- `ETL_process_start` -> `ETL_process_middle` -> `ETL_process_end`
+- `etl_process_start` -> `etl_process_middle` -> `etl_process_end`
 
 ```yaml
 spark:
@@ -67,14 +67,14 @@ spark:
   driver:
     memory: 4g
 etl:
-  - name: ETL_process_start
+  - name: etl_process_start
     args:
       load_path: ./sample/raw.parquet
       repartition: 3
-  - name: ETL_process_middle
+  - name: etl_process_middle
     args:
       threshold: 0.5
-  - name: ETL_process_end
+  - name: etl_process_end
     args:
       save_path: ./sample/ufl.parquet
       repartition: 1
