@@ -22,6 +22,32 @@ def aws_check_credentials():
     sts = boto3.client('sts')
     sts.get_caller_identity()
 
+def aws_s3_download(bucket_name, key, local_path):
+    """
+    Args:
+        bucket_name (str): bucket name
+        key (str): key (aws s3 file path)
+        local_path (str): local path to save file
+
+    Usage:
+        aws_s3_download('tmp', 'this/is/path.json', 'path.json')
+    """
+    s3 = boto3.client('s3')
+    s3.download_file(bucket_name, key, local_path)
+
+def aws_s3_upload(bucket_name, key, local_path):
+    """
+    Args:
+        bucket_name (str): bucket name
+        key (str): key (aws s3 file path)
+        local_path (str): local path to save file
+
+    Usage:
+        aws_s3_upload('tmp', 'this/is/path.json', 'path.json')
+    """
+    s3 = boto3.client('s3')
+    s3.upload_file(local_path, bucket_name, key)
+
 def aws_s3_list_buckets():
     """
     get all buckets from aws s3
