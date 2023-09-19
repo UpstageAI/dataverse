@@ -39,7 +39,7 @@ def data_ingestion___red_pajama___parquet2ufl(spark, input_paths, repartition=20
     """
     convert parquet file to ufl
     """
-    df = spark.read.parquet(",".join(input_paths))
+    df = spark.read.parquet(*input_paths)
     rdd = df.rdd.repartition(repartition)
     rdd = rdd.map(lambda row: row.asDict())
     rdd = rdd.map(lambda x: convert2ufl(x))
