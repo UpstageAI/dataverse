@@ -9,6 +9,6 @@ etl:
     args:
       name_or_path: togethercomputer/RedPajama-Data-1T-Sample
       repartition: 3
-  - name: data_load___parquet___ufl
+  - name: data_load___parquet___ufl2parquet
     args:
       save_path: ./sample/pajama_1G_ufl_1s.parquet

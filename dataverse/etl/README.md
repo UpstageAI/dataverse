@@ -58,7 +58,7 @@ def etl_process_end(data, save_path, repartition=1):
     return None
 ```
 
-You can use the following config to run the above ETL process in order
+You can use the following config to run the above ETL processes in order
 - `etl_process_start` -> `etl_process_middle` -> `etl_process_end`
 
 ```yaml
@@ -95,7 +95,7 @@ etl:
     args:
       name_or_path: togethercomputer/RedPajama-Data-1T-Sample
       repartition: 3
-  - name: data_load___parquet___ufl
+  - name: data_load___parquet___ufl2parquet
     args:
       save_path: ./sample/pajama_1G_ufl_1s.parquet
 ```
