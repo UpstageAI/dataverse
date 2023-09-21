@@ -1,0 +1,15 @@
+# This is a sample config file for the etl process
+
+spark:
+  appname: dataverse_etl_sample
+  driver:
+    memory: 16g
+etl:
+  - name: data_ingestion___ufl___parquet2ufl
+    args:
+      input_paths:
+        - ./sample/pajama_1G_ufl_1s.parquet
+  - name: deduplication___polyglot___minhash
+  - name: data_load___parquet___ufl2parquet
+    args:
+      save_path: ./sample/pajama_1G_preprocess_ufl.parquet
