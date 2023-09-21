@@ -3,9 +3,7 @@ from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
 from pyspark import SparkContext
-from dataverse.etl.registry import BaseETL
-from dataverse.etl.registry import register_etl
-from dataverse.etl.registry import ETLRegistry
+from dataverse.etl import register_etl
 from dataverse.utils.format import huggingface2parquet
 from dataverse.utils.format import load_huggingface_dataset
 from dataverse.utils.format import get_uuidv1

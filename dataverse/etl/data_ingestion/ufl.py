@@ -4,7 +4,7 @@ Load UFL (Upstage Format for LLM) data
 """
 
 import os
-from dataverse.etl.registry import register_etl
+from dataverse.etl import register_etl
 
 
 @register_etl

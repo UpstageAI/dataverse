@@ -7,7 +7,7 @@ Data loading to Parquets
 import os
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
-from dataverse.etl.registry import register_etl
+from dataverse.etl import register_etl
 
 
 @register_etl

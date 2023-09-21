@@ -5,6 +5,7 @@ base class to support the registration of the ETL classes
 
 import os
 import abc
+import json
 import importlib.util
 
 from pyspark.rdd import RDD
@@ -85,6 +86,13 @@ class ETLRegistry:
             return
         self._registry = {}
         self._initialized = True
+
+    def __repr__(self):
+        return json.dumps(self._registry, indent=4)
+
+
+    def __str__(self):
+        return self.__repr__()
 
     def reset(self):
         """

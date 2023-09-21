@@ -3,7 +3,7 @@
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
-from dataverse.etl.registry import register_etl
+from dataverse.etl import register_etl
 
 from typing import Union
 

@@ -15,7 +15,7 @@ from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
 
-from dataverse.etl.registry import ETLRegistry
+from dataverse.etl import ETLRegistry
 from dataverse.etl.registry import auto_register
 
 

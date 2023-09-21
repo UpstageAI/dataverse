@@ -4,7 +4,7 @@ Sampling module for data ingestion
 """
 
 from pyspark.rdd import RDD
-from dataverse.etl.registry import register_etl
+from dataverse.etl import register_etl
 
 @register_etl
 def utils___sampling___random(

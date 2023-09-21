@@ -7,10 +7,10 @@ https://huggingface.co/docs/datasets/use_with_spark
 """
 
 import os
+from datasets import Dataset
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
-from dataverse.etl.registry import register_etl
-from datasets import Dataset
+from dataverse.etl import register_etl
 
 
 @register_etl

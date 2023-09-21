@@ -3,9 +3,9 @@
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
-from dataverse.etl.registry import BaseETL
-from dataverse.etl.registry import register_etl
-from dataverse.etl.registry import ETLRegistry
+from dataverse.etl import BaseETL
+from dataverse.etl import register_etl
+from dataverse.etl import ETLRegistry
 from dataverse.etl.registry import ETLStructure
 
 from typing import Union

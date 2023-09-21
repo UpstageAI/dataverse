@@ -14,9 +14,7 @@ from itertools import combinations
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
-from dataverse.etl.registry import BaseETL
-from dataverse.etl.registry import register_etl
-from dataverse.etl.registry import ETLRegistry
+from dataverse.etl import register_etl
 
 from typing import Union, List
 
