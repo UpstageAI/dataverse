@@ -4,3 +4,4 @@
 
 ## 🗺️ ETL (Extract, Transform, Load)
 - `ETL_how_to_run.ipynb`
+- `ETL_one_cycle.ipynb`
