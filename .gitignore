@@ -4,6 +4,7 @@ reference/
 common_crawl/
 notebook/
 .cache/
+sample/
 
 # open-source 
 cc_net/
