@@ -84,8 +84,9 @@ class ETLRegistry:
         """
         if self._initialized:
             return
-        self._registry = {}
         self._initialized = True
+        self._registry = {}
+        auto_register()
 
     def __repr__(self):
         return json.dumps(list(ETLRegistry()._registry.keys()), indent=4)

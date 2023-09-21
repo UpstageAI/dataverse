@@ -27,10 +27,6 @@ class ETLPipeline:
     def __init__(self):
         self.registry = ETLRegistry()
 
-        # reset registry to avoid duplicate registration
-        self.registry.reset()
-        auto_register()
-
     def run(self, config: Union[str, dict, DictConfig, OmegaConf], *args, **kwargs):
         """
         Args:
