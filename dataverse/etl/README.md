@@ -231,6 +231,7 @@ class category___subcategory___etl(BaseETL):
         - `toxicity`
         - `bias`
         - `data_load`
+        - `utils`
 2. `[ETL Sub-Category]` is the name of the file where the ETL is defined
     - no pre-defined list
         - it could be a dataset name
@@ -270,6 +271,7 @@ ETL_CATEGORIES = [
     'pii',
     'quality',
     'data_load',
+    'utils',
 ]
 ```
 </details>
@@ -324,3 +326,7 @@ ETL_IGNORE = [
 ### 🌠 Bias
 > removing bias from data
 - e.g. removing data with gender bias words
+
+### 🌠 Utils
+> utilities for the ETL process
+- e.g. sampling, logging, error handling, etc

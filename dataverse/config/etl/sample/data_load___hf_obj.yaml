@@ -8,5 +8,5 @@ etl:
   - name: data_ingestion___ufl___parquet2ufl
     args:
       input_paths:
-        - ./sample/pajama_1G_ufl_1s.parquet
+        - ./sample/pajama_preprocess_ufl.parquet
   - name: data_load___huggingface___ufl2hf_obj

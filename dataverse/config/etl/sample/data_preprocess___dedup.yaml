@@ -8,8 +8,8 @@ etl:
   - name: data_ingestion___ufl___parquet2ufl
     args:
       input_paths:
-        - ./sample/pajama_1G_ufl_1s.parquet
+        - ./sample/pajama_sample_ufl.parquet
   - name: deduplication___polyglot___minhash
   - name: data_load___parquet___ufl2parquet
     args:
-      save_path: ./sample/pajama_1G_preprocess_ufl.parquet
+      save_path: ./sample/pajama_preprocess_ufl.parquet

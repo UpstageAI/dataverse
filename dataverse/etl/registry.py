@@ -27,6 +27,7 @@ ETL_CATEGORIES = [
     'pii',
     'quality',
     'data_load',
+    'utils',
 ]
 
 IGNORE_FILES = [
