@@ -46,7 +46,7 @@ def data_ingestion___red_pajama___parquet2ufl(spark, input_paths, repartition=20
 @register_etl
 def data_ingestion___red_pajama___hf2ufl(
     spark,
-    name_or_path : Union[str, List[str]],
+    name_or_path : Union[str, List[str]] = 'togethercomputer/RedPajama-Data-1T-Sample',
     split=None,
     repartition=20,
     verbose=True,
@@ -82,7 +82,7 @@ loading ufl with custom template with two ETL process
 @register_etl
 def data_ingestion___red_pajama___hf2raw(
     spark,
-    name_or_path : Union[str, List[str]],
+    name_or_path : Union[str, List[str]] = 'togethercomputer/RedPajama-Data-1T-Sample',
     split=None,
     repartition=20,
     verbose=True,

@@ -3,12 +3,9 @@
 spark:
   appname: dataverse_etl_sample
   driver:
-    memory: 4g
+    memory: 16g
 etl:
   - name: data_ingestion___red_pajama___hf2ufl
-    args:
-      name_or_path: [togethercomputer/RedPajama-Data-1T, default]
-      repartition: 3
   - name: data_load___parquet___ufl2parquet
     args:
       save_path: ./sample/redpajama_1T_ufl.parquet

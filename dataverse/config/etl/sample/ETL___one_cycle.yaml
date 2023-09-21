@@ -6,8 +6,6 @@ spark:
     memory: 16g
 etl:
   - name: data_ingestion___red_pajama___hf2ufl
-    args:
-      name_or_path: togethercomputer/RedPajama-Data-1T-Sample
   - name: utils___sampling___random
     args:
       sample_n_or_frac: 0.01

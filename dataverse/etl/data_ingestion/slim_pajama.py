@@ -31,7 +31,7 @@ def data_ingestion___slim_pajama___parquet2ufl(spark, input_paths, repartition=2
 @register_etl
 def data_ingestion___slim_pajama___hf2ufl(
     spark,
-    name_or_path : Union[str, List[str]],
+    name_or_path : Union[str, List[str]] = 'cerebras/SlimPajama-627B',
     split=None,
     repartition=20,
     verbose=True,
