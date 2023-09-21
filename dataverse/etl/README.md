@@ -1,5 +1,10 @@
 # ETL (Extract, Transform, Load)
-> The ETL only includes the process backed by Spark. There is currently 8 steps in the ETL pipeline which the following and this will be modified in the future.
+> Dataverse ETL is "Block-based coding powered by Spark"
+
+- Each block is called `ETL process`
+- Combination of ETL processes is called `ETL pipeline`
+- ETL pipeline is managed by `config` file
+
 
 ## 🌌 What is ETL process?
 > ETL process is the small code snippet, that is considered as a single unit of ETL pipeline. It is meant to be form various combinations to accommodate different kinds of data sources and transformations in ETL pipeline so it should be as generic as possible.
@@ -24,7 +29,7 @@ data = ETL_process_3(data)
 > Define the ETL process, and add in the config file to run the ETL pipeline.
 
 ```python
-from dataverse.etl.pipeline import ETLPipeline
+from dataverse.etl import ETLPipeline
 from dataverse.config import Config
 
 # 1. Define the ETL process in the config file
@@ -40,7 +45,7 @@ etl_pipeline.run(config)
 
 Let's say you have the following ETL processes registered
 ```python
-from dataverse.etl.registry import register_etl
+from dataverse.etl import register_etl
 
 @register_etl
 def etl_process_start(spark, load_path, repartition=3):
@@ -92,9 +97,6 @@ spark:
     memory: 4g
 etl:
   - name: data_ingestion___red_pajama___hf2ufl
-    args:
-      name_or_path: togethercomputer/RedPajama-Data-1T-Sample
-      repartition: 3
   - name: data_load___parquet___ufl2parquet
     args:
       save_path: ./sample/pajama_1G_ufl_1s.parquet
@@ -179,8 +181,8 @@ There are 2 ways to add a new ETL process
 
 ```python
 # check the __sample/ folder for example
-from dataverse.etl.registry import BaseETL
-from dataverse.etl.registry import register_etl
+from dataverse.etl import BaseETL
+from dataverse.etl import register_etl
 
 @register_etl
 def category___subcategory___etl(rdd, config):
