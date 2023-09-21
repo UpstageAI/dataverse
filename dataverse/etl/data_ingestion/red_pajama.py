@@ -2,7 +2,6 @@
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
-from pyspark import SparkContext
 from dataverse.etl import register_etl
 from dataverse.utils.format import huggingface2parquet
 from dataverse.utils.format import load_huggingface_dataset
