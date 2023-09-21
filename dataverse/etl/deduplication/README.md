@@ -8,8 +8,8 @@ Normally this is clustered in 2 big categories:
 ☣️ **caveat**️ ☣️
 > When we cluster sub-categories with just 2 big categories, it seems waste of space. So here temporalily we cluster sub-categories with more detailed categories.
 
-- levenstein distance
-- minhash
+- part of name of full name (e.g. minhash)
+- open source name
 - etc
 
 But we will change this to much better cluster in the future. And we need your help!
