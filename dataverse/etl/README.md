@@ -107,7 +107,12 @@ etl:
 
 
 ### 🌠 No `DRY` (Don't Repeat Yourself)
+> No `DRY` is applied between **ETL sub-categories**.
+- So if similar ETL processes are used in same sub-categories, it could be shared.
+- But if it's used in different sub-categories, it should not be shared.
+
 As you can see in the following example, there are 2 ETL processes `common_process_a` and `common_process_b`seems nice to be shared. But as you can see, they are not shared. They are repeated. This is because of the No `DRY` principle.
+
 
 ```python
 - deduplication/
