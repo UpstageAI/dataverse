@@ -88,8 +88,7 @@ class ETLRegistry:
         self._initialized = True
 
     def __repr__(self):
-        return json.dumps(self._registry, indent=4)
-
+        return json.dumps(list(ETLRegistry()._registry.keys()), indent=4)
 
     def __str__(self):
         return self.__repr__()
