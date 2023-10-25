@@ -17,8 +17,8 @@ def deduplication___exact___spark_df_column(spark, data: Union[RDD, DataFrame], 
         subset: subset or columns to consider if duplicated
     """
     if isinstance(data, RDD):
-        df = data.toDF()
+        data = data.toDF()
 
-    assert isinstance(df, DataFrame), f"data must be DataFrame, got {type(data)}"
-    df = df.dropDuplicates(subset=subset)
-    return df
+    assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
+    data = data.dropDuplicates(subset=subset)
+    return data
