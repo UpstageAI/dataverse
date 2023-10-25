@@ -129,6 +129,9 @@ def deduplication___polyglot___minhash(
 
     for UFL
     """
+    if isinstance(data, DataFrame):
+        data = data.rdd
+
     overlap_kv_rdd: RDD = (
         data.flatMap(
             lambda x: expand_instances_by_minhash(
