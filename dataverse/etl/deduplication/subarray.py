@@ -10,7 +10,7 @@ from typing import Union
 
 
 @register_etl
-def deduplication___subarray___boilerplate(data: Union[RDD, DataFrame], *args, **kwargs):
+def deduplication___subarray___boilerplate(spark, data: Union[RDD, DataFrame], *args, **kwargs):
     """
     exact deduplication
     """

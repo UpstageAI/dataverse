@@ -11,7 +11,7 @@ from dataverse.etl import register_etl
 
 
 @register_etl
-def data_load___parquet___ufl2parquet(ufl, save_path, repartition=1, *args, **kwargs):
+def data_load___parquet___ufl2parquet(spark, ufl, save_path, repartition=1, *args, **kwargs):
     """
     save data to parquet and return the path
     """

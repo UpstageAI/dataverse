@@ -65,8 +65,9 @@ class ETLPipeline:
         for etl_i, etl_config in enumerate(etl_configs):
             # etl_config.name format
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
-            etl_category = etl_config.name.split('___')[0]
-            etl_class = self.registry.get(key=etl_config.name)
+            etl_name = etl_config.name
+            etl_category = etl_name.split('___')[0]
+            etl_class = self.registry.get(key=etl_name)
             
             # instantiate etl class
             etl_instance = etl_class()
@@ -89,10 +90,11 @@ class ETLPipeline:
             else:
                 args = {}
 
+            # `etl_name` is passed to args for tracking
             if etl_i == 0 and etl_category == 'data_ingestion':
-                data = etl_instance(spark, **args)
+                data = etl_instance(spark, **args, etl_name=etl_name)
             else:
-                data = etl_instance(data, **args)
+                data = etl_instance(spark, data, **args, etl_name=etl_name)
 
         # =============== [ Stop Spark ] ==================
         spark.stop()

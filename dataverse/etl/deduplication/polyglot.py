@@ -115,6 +115,7 @@ def explore_dedup_instance(hash_groups, threshold: float = 0.8):
 
 @register_etl
 def deduplication___polyglot___minhash(
+    spark,
     data: Union[RDD, DataFrame],
     expand_size: int = 64,
     n_gram: int = 15,
