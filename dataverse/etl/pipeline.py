@@ -80,10 +80,6 @@ class ETLPipeline:
             if etl_i == total_etl_n - 1 and etl_category != 'data_load':
                 raise ValueError(f"Last ETL process should be data load but got {etl_category}")
 
-            # for first ETL process w/ data ingestion, `spark` is required
-            # for the rest, even data ingestion, it is about reformating data
-            # so treated as other ETL process
-
             # when args is not defined, set it to empty dict
             if 'args' in etl_config:
                 args = etl_config.args

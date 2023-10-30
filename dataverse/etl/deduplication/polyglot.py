@@ -3,7 +3,7 @@
 Code is from EleutherAI/dps
 https://github.com/EleutherAI/dps/blob/master/dps/spark/jobs/dedup_job.py
 
-This is a port of the deduplication job from the DPS project to the Dataverse.
+This is a migration of the deduplication job from the DPS project to the Dataverse.
 """
 
 import random
