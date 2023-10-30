@@ -303,6 +303,7 @@ def data_ingestion___common_crawl___wet2raw(
     wet_path: str,
     segment_n: int = -1,
     repartition=20,
+    seed: int = 42,
     verbose=True,
     *args,
     **kwargs
@@ -345,6 +346,7 @@ def data_ingestion___common_crawl___dump2raw(
     repartition=20,
     use_cache: bool = True,
     cache_dir: str = None,
+    seed: int = 42,
     verbose=True,
     *args,
     **kwargs
@@ -362,6 +364,7 @@ def data_ingestion___common_crawl___dump2raw(
             - set as False if you wanna save disk space, because the cache is huge
             - one WET dump is about 10TB
         cache_dir (str): cache path to save the dataset
+        seed (int): random seed
         verbose (bool): whether to print the information of the dataset
     """
     if use_cache:
