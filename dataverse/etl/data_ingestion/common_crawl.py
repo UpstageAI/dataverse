@@ -384,13 +384,49 @@ def data_ingestion___common_crawl___dump2raw(
     if cache_dir and not cache_dir.exists():
         cache_dir.mkdir(parents=True)
 
-    wet_urls = cc_segment_urls(dump, cache_dir)
+    wet_urls = cc_segment_urls(dump, cache_dir, verbose=verbose)
 
     if segment_n > 0 and segment_n < len(wet_urls):
+        np.random.seed(seed)
         wet_urls = np.random.choice(wet_urls, size=segment_n, replace=False)
 
     rdd = spark.sparkContext.parallelize(wet_urls)
-    rdd = rdd.flatMap(functools.partial(process_segment_url, cache_dir=cache_dir))
+    rdd = rdd.flatMap(functools.partial(
+        process_segment_url,
+        cache_dir=cache_dir,
+        verbose=verbose,
+    ))
     rdd = rdd.repartition(repartition)
 
     return rdd
+
+
+@register_etl
+def data_ingestion___common_crawl___raw2ufl(spark, data, *args, **kwargs):
+    """
+    convert raw format to ufl with custom template
+    """
+    def templatev1(data):
+        new_data = {}
+        new_data['id'] = get_uuidv1()
+        new_data['name'] = 'common_crawl'
+        new_data['text'] = (
+            f"{data.get('raw_content', None)}"
+        )
+        new_data['meta'] = json.dumps(
+            {
+                'title': data.get('title', None),
+                'url': data.get('url', None),
+                'date_download': data.get('date_download', None),
+                'digest': data.get('digest', None),
+                'length': data.get('length', None),
+                'nlines': data.get('nlines', None),
+                'source_domain': data.get('source_domain', None),
+                'cc_segment': data.get('cc_segment', None),
+            }
+        )
+        return new_data
+
+    data = data.map(lambda x: templatev1(x))
+
+    return data
