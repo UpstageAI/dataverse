@@ -109,7 +109,7 @@ def data_ingestion___red_pajama___hf2raw(
 
 
 @register_etl
-def data_ingestion___red_pajama___raw2ufl_templatev1(ufl, *args, **kwargs):
+def data_ingestion___red_pajama___raw2ufl_templatev1(spark, ufl, *args, **kwargs):
     """
     convert raw format to ufl with custom template
     """
@@ -123,6 +123,6 @@ def data_ingestion___red_pajama___raw2ufl_templatev1(ufl, *args, **kwargs):
     return ufl
 
 @register_etl
-def data_ingestion___red_pajama___raw2ufl_templatev2(ufl, *args, **kwargs):
+def data_ingestion___red_pajama___raw2ufl_templatev2(spark, ufl, *args, **kwargs):
     ...
     return ufl
