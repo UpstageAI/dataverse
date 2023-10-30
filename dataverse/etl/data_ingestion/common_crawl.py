@@ -10,6 +10,7 @@ This is a migration of the code to Dataverse.
 
 import io
 import os
+import json
 import gzip
 import glob
 import time
@@ -20,10 +21,12 @@ import warnings
 import numpy as np
 
 from pathlib import Path
-from dataverse.etl import register_etl
-from dataverse.utils.setting import SystemSetting
 from urllib.parse import urlparse
 from typing import Any, List, Text, Tuple, Optional, Union, Dict, Iterable, TextIO
+
+from dataverse.etl import register_etl
+from dataverse.utils.setting import SystemSetting
+from dataverse.utils.format import get_uuidv1
 
 
 def parse_doc(headers: List[str], doc: List[str]) -> Optional[dict]:
@@ -103,7 +106,7 @@ def _close_when_exhausted(file) -> Iterable[str]:
     with file:
         yield from file
 
-def open_segment_file(segment: str) -> Iterable[str]:
+def open_segment_file(segment: str, verbose: bool = True) -> Iterable[str]:
     """
     overwrite the open_segment function to get the WET file from the folder
 
@@ -117,14 +120,14 @@ def open_segment_file(segment: str) -> Iterable[str]:
         file = open(filename, "rt")
     return _close_when_exhausted(file)
 
-def process_segment_file(segment: str) -> Iterable[dict]:
-    for doc in group_by_docs(open_segment_file(segment)):
+def process_segment_file(segment: str, verbose: bool = True) -> Iterable[dict]:
+    for doc in group_by_docs(open_segment_file(segment, verbose=verbose)):
         doc["cc_segment"] = segment
         yield doc
 
 def find_wet_files(directory):
     """find *.wet, *wet.gz files recursively"""
-    return glob.glob(os.path.join(directory, '**/*.gz'), recursive=True) + \
+    return glob.glob(os.path.join(directory, '**/*.wet'), recursive=True) + \
            glob.glob(os.path.join(directory, '**/*.wet.gz'), recursive=True)
 
 
@@ -192,16 +195,17 @@ def open_read(filename: ReadableFileLike) -> Iterable[str]:
     return _close_when_exhausted(file)
 
 
-def request_get_content(url: str, n_retry: int = 3) -> bytes:
+def request_get_content(url: str, n_retry: int = 3, verbose: bool = True) -> bytes:
     """Retrieve the binary content at url.
 
     Retry on connection errors.
     """
     t0 = time.time()
 
-    # TODO: Logging will be activated later
-    # logging.info(f"Starting download of {url}")
-    print(f"Starting download of {url}")
+    if verbose:
+        # TODO: Logging will be activated later
+        # logging.info(f"Starting download of {url}")
+        print(f"Starting download of {url}")
 
     for i in range(1, n_retry + 1):
         try:
@@ -219,17 +223,19 @@ def request_get_content(url: str, n_retry: int = 3) -> bytes:
             )
             time.sleep(10 * 2 ** i)
 
-    dl_time = time.time() - t0
-    dl_speed = len(r.content) / dl_time / 1024
 
-    # logging.info(
-    #     f"Downloaded {url} [{r.status_code}] took {dl_time:.0f}s ({dl_speed:.1f}kB/s)"
-    # )
-    print(f"Downloaded {url} [{r.status_code}] took {dl_time:.0f}s ({dl_speed:.1f}kB/s)")
+    if verbose:
+        dl_time = time.time() - t0
+        dl_speed = len(r.content) / dl_time / 1024
+        # logging.info(
+        #     f"Downloaded {url} [{r.status_code}] took {dl_time:.0f}s ({dl_speed:.1f}kB/s)"
+        # )
+        print(f"Downloaded {url} [{r.status_code}] took {dl_time:.0f}s ({dl_speed:.1f}kB/s)")
+
     return r.content
 
 
-def open_remote_file(url: str, cache: Path) -> Iterable[str]:
+def open_remote_file(url: str, cache: Path, verbose: bool = True) -> Iterable[str]:
     """
     Download the files at the given url to memory and opens it as a file.
     Assumes that the file is small, and fetch it when this function is called.
@@ -240,7 +246,7 @@ def open_remote_file(url: str, cache: Path) -> Iterable[str]:
     # TODO: open the remote file in streaming mode.
     # The hard part is that we need to write the content on disk at the same time,
     # to implement disk caching.
-    raw_bytes = request_get_content(url)
+    raw_bytes = request_get_content(url, verbose=verbose)
     content = io.BytesIO(raw_bytes)
     if url.endswith(".gz"):
         f: TextIO = gzip.open(content, mode="rt")  # type: ignore
@@ -269,22 +275,22 @@ def cc_wet_paths_url(dump_id: str) -> str:
 def segment_url(segment: str):
     return "/".join((WET_URL_ROOT, segment))
 
-def cc_segment_urls(dump_id: str, cache_dir: Path) -> List[str]:
+def cc_segment_urls(dump_id: str, cache_dir: Path, verbose: bool = True) -> List[str]:
     wet_paths = cc_wet_paths_url(dump_id)
     wet_paths_cache = cache_dir / f"wet_{dump_id}.paths.gz"
-    f = open_remote_file(wet_paths, cache=wet_paths_cache)
+    f = open_remote_file(wet_paths, cache=wet_paths_cache, verbose=verbose)
     return [segment.strip() for segment in f]
 
-def open_segment_url(segment: str, cache_dir: Path) -> Iterable[str]:
+def open_segment_url(segment: str, cache_dir: Path, verbose: bool = True) -> Iterable[str]:
     url = segment_url(segment)
     file: Optional[Path] = None
     if cache_dir:
         file = cache_dir / segment.split("/")[-1]
 
-    return open_remote_file(url, cache=file)
+    return open_remote_file(url, cache=file, verbose=verbose)
 
-def process_segment_url(segment: str, cache_dir: Path) -> Iterable[str]:
-    for doc in group_by_docs(open_segment_url(segment, cache_dir)):
+def process_segment_url(segment: str, cache_dir: Path, verbose: bool = True) -> Iterable[str]:
+    for doc in group_by_docs(open_segment_url(segment, cache_dir, verbose=verbose)):
         doc["cc_segment"] = segment
         yield doc
 
@@ -316,14 +322,16 @@ def data_ingestion___common_crawl___wet2raw(
             - one segment is about 1GB
             - (default) set as -1 if you wanna load all the segments
         repartition (int): the number of partitions
+        seed (int): random seed
         verbose (bool): whether to print the information of the dataset
     """
     wet_paths = find_wet_files(wet_path)
     if segment_n > 0 and segment_n < len(wet_paths):
+        np.random.seed(seed)
         wet_paths = np.random.choice(wet_paths, size=segment_n, replace=False)
 
     rdd = spark.sparkContext.parallelize(wet_paths)
-    rdd = rdd.flatMap(process_segment_file)
+    rdd = rdd.flatMap(functools.partial(process_segment_file, verbose=verbose))
     rdd = rdd.repartition(repartition)
 
     return rdd
