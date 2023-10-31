@@ -9,9 +9,9 @@ from typing import Union
 
 
 @register_etl
-def deduplication___exact___spark_df_column(spark, data: Union[RDD, DataFrame], subset=['text'], *args, **kwargs):
+def deduplication___exact___column(spark, data: Union[RDD, DataFrame], subset=['text'], *args, **kwargs):
     """
-    exact deduplication
+    exact column deduplication
 
     args:
         subset: subset or columns to consider if duplicated
