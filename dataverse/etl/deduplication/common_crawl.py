@@ -24,11 +24,32 @@ def filter_lines(row):
 
     return row
 
+def normalization_for_dedup(row):
+    row = row.asDict()
+    row['line'] = row['line'].strip().lower()
+
+    return row
+
 
 @register_etl
 def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame], subset='text', *args, **kwargs):
     """
     exact line deduplication - which is a line by line deduplication.
+
+    strip & lower is applied to the line text before deduplication
+    but this will not be applied to the original text
+
+    - input
+        - 'DuckY'
+        - 'dUKCY '
+    - after normalization
+        - 'ducky'
+        - 'ducky'
+    - after deduplication
+        - 'ducky'
+    - output
+        - 'DuckY'
+
 
     args:
         subset (str): subset or columns to consider if duplicated
@@ -41,6 +62,7 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
 
     assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
     line_data = data.select('id', posexplode(split(data[subset], '\n')).alias('line_id', 'line'))
+    line_data = line_data.rdd.map(normalization_for_dedup).toDF()
     line_data = line_data.dropDuplicates(subset=['line'])
     line_data = line_data.groupBy('id').agg(collect_list('line_id').alias('line_ids'))
 
