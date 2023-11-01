@@ -11,81 +11,6 @@ import re
 from typing import Union
 
 
-
-"""
-Below Regex related CONSTANT & Code is from facebookresearch/cc_net
-https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
-"""
-UNICODE_PUNCT = {
-    "，": ",",
-    "。": ".",
-    "、": ",",
-    "„": '"',
-    "”": '"',
-    "“": '"',
-    "«": '"',
-    "»": '"',
-    "１": '"',
-    "」": '"',
-    "「": '"',
-    "《": '"',
-    "》": '"',
-    "´": "'",
-    "∶": ":",
-    "：": ":",
-    "？": "?",
-    "！": "!",
-    "（": "(",
-    "）": ")",
-    "；": ";",
-    "–": "-",
-    "—": " - ",
-    "．": ". ",
-    "～": "~",
-    "’": "'",
-    "…": "...",
-    "━": "-",
-    "〈": "<",
-    "〉": ">",
-    "【": "[",
-    "】": "]",
-    "％": "%",
-    "►": "-",
-}
-UNICODE_PUNCT_RE = re.compile(f"[{''.join(UNICODE_PUNCT.keys())}]")
-DIGIT_RE = re.compile(r"\d")
-NON_PRINTING_CHARS_RE = re.compile(
-    f"[{''.join(map(chr, list(range(0,32)) + list(range(127,160))))}]"
-)
-PUNCT_OR_NON_PRINTING_CHARS_RE = re.compile(
-    (UNICODE_PUNCT_RE.pattern + NON_PRINTING_CHARS_RE.pattern).replace("][", "")
-)
-
-def normalize_for_dedup(line: str) -> str:
-    """
-    This is used to normalize text for deduplication.
-
-    Code is from facebookresearch/cc_net
-    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
-    """
-    line = line.strip()
-    if not line:
-        return line
-
-    # case
-    line = line.lower()
-
-    # numbers
-    line = DIGIT_RE.sub("0", line)
-    line = PUNCT_OR_NON_PRINTING_CHARS_RE.sub("", line)
-
-    return line
-
-def normalize_line_text(row):
-    row = row.asDict()
-    row['line'] = normalize_for_dedup(row['line'])
-    return row
-
 def filter_lines(row):
     row = row.asDict()
     text = row['text']
@@ -104,21 +29,6 @@ def filter_lines(row):
 def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame], subset='text', *args, **kwargs):
     """
     exact line deduplication - which is a line by line deduplication.
-    text normalization is done before deduplication.
-
-    normalized text is just used for deduplication,
-    and the original text is used for the output.
-    - example
-        - input
-            - text1: "Hello。"
-            - text2: "Hello."
-        - normalized text
-            - text1: "hello."
-            - text2: "hello."
-        - after deduplication 
-            - text: "Hello."
-        - output (original text is used)
-            - text: "Hello。"
 
     args:
         subset (str): subset or columns to consider if duplicated
@@ -131,7 +41,6 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
 
     assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
     line_data = data.select('id', posexplode(split(data[subset], '\n')).alias('line_id', 'line'))
-    line_data = line_data.rdd.map(normalize_line_text).toDF()
     line_data = line_data.dropDuplicates(subset=['line'])
     line_data = line_data.groupBy('id').agg(collect_list('line_id').alias('line_ids'))
 
