@@ -16,6 +16,9 @@ setup(
     name="dataverse",
     version="0.1.0",
     packages=find_packages(),
+    author="hyunbyung park",
+    author_email="hyunbyung87@gmail.com",
+    description="universe of data",
     include_package_data=True,
     install_requires=get_requirements(),
     entry_points={
