@@ -401,6 +401,15 @@ def data_ingestion___common_crawl___dump2raw(
     return rdd
 
 
+def convert_bytes(data):
+    if isinstance(data, bytes):
+        return data.decode()
+    if isinstance(data, dict):
+        return {convert_bytes(key): convert_bytes(value) for key, value in data.items()}
+    if isinstance(data, list):
+        return [convert_bytes(element) for element in data]
+    return data
+
 @register_etl
 def data_ingestion___common_crawl___raw2ufl(spark, data, *args, **kwargs):
     """
@@ -414,7 +423,7 @@ def data_ingestion___common_crawl___raw2ufl(spark, data, *args, **kwargs):
             f"{data.get('raw_content', None)}"
         )
         new_data['meta'] = json.dumps(
-            {
+            convert_bytes({
                 'title': data.get('title', None),
                 'url': data.get('url', None),
                 'date_download': data.get('date_download', None),
@@ -423,7 +432,7 @@ def data_ingestion___common_crawl___raw2ufl(spark, data, *args, **kwargs):
                 'nlines': data.get('nlines', None),
                 'source_domain': data.get('source_domain', None),
                 'cc_segment': data.get('cc_segment', None),
-            }
+            })
         )
         return new_data
 
