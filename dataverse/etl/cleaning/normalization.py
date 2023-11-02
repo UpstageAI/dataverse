@@ -1,10 +1,4 @@
 
-"""
-normalization for text
-
-Code is from facebookresearch/cc_net
-https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
-"""
 
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
@@ -68,6 +62,9 @@ def cleaning___normalization___remove_unicode_punct(
     """
     remove all the unicode punctuations
 
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
+
     args:
         subset (str): subset or columns to consider if duplicated
     """
@@ -95,6 +92,9 @@ def cleaning___normalization___replace_unicode_punct(
     """
     replace all the unicode punctuations
 
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
+
     args:
         subset (str): subset or columns to consider if duplicated
     """
@@ -121,6 +121,9 @@ def cleaning___normalization___remove_unprintable_char(
 ):
     """
     remove all the non-printable characters
+
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
         subset (str): subset or columns to consider if duplicated
@@ -169,6 +172,9 @@ def cleaning___normalization___strip_accents(
         - "café" -> "cafe"
         - "résumé" -> "resume"
 
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
+
     args:
         subset (str): subset or columns to consider if duplicated
     """
@@ -199,6 +205,9 @@ def cleaning___normalization___number(
     example
     - 1234 -> 0000
     - 1234.5678 -> 0000.0000
+
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
         subset (str): subset or columns to consider if duplicated
