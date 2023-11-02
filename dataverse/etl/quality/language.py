@@ -124,6 +124,7 @@ def quality___language___fasttext_filter(
     """
     if isinstance(data, DataFrame):
         data = data.rdd
+        data = data.map(lambda row: row.asDict())
 
     # detect language using fasttext
     data = data.mapPartitions(functools.partial(

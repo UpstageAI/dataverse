@@ -132,6 +132,7 @@ def deduplication___polyglot___minhash(
     """
     if isinstance(data, DataFrame):
         data = data.rdd
+        data = data.map(lambda row: row.asDict())
 
     overlap_kv_rdd: RDD = (
         data.flatMap(
