@@ -8,19 +8,20 @@ from pyspark.sql.functions import collect_list
 from dataverse.etl.registry import register_etl
 
 import re
+import functools
 from typing import Union
 
 
-def filter_lines(row):
+def filter_lines(row, subset='text'):
     row = row.asDict()
-    text = row['text']
+    text = row[subset]
     line_ids = row['line_ids']
 
     text_lines = text.split('\n')
     filtered_texts = "\n".join([text_lines[line_i] for line_i in sorted(line_ids)])
 
     del row['line_ids']
-    row['text'] = filtered_texts
+    row[subset] = filtered_texts
 
     return row
 
@@ -72,6 +73,6 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
     line_data.unpersist()
 
     # filter the lines using the line_ids
-    data = data.rdd.map(filter_lines)
+    data = data.rdd.map(functools.partial(filter_lines, subset=subset))
 
     return data
