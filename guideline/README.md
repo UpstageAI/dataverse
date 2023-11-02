@@ -4,10 +4,10 @@
 
 ## 🗺️ ETL (Extract, Transform, Load)
 > Explanation of general usage of ETL
-- `ETL_how_to_run.ipynb`
-- `ETL_one_cycle.ipynb`
-- `ETL_create_new_etl_process.ipynb`
-- `ETL_add_new_etl_process.ipynb`
+- 01. `ETL_how_to_run.ipynb`
+- 02. `ETL_one_cycle.ipynb`
+- 03. `ETL_create_new_etl_process.ipynb`
+- 04. `ETL_add_new_etl_process.ipynb`
 
 ## 🗺️ ETL with live examples
 > Showing specific usage examples of ETL
