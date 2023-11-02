@@ -24,7 +24,7 @@ ETL_CATEGORIES = [
     'deduplication',
     'bias',
     'toxicity',
-    'junk',
+    'cleaning',
     'pii',
     'quality',
     'data_load',

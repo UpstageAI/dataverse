@@ -224,7 +224,7 @@ class category___subcategory___etl(BaseETL):
 
 1. `[ETL Category]` is the folder and category where the ETL is defined
     - `[ETL Category]` MUST be one of the following pre-defined list
-        - `junk`
+        - `cleaning`
         - `decontamination`
         - `deduplication`
         - `data_ingestion`
@@ -269,7 +269,7 @@ ETL_CATEGORIES = [
     'deduplication',
     'bias',
     'toxicity',
-    'junk',
+    'cleaning',
     'pii',
     'quality',
     'data_load',
@@ -310,9 +310,10 @@ ETL_IGNORE = [
 > removing contamination from data
 - e.g. removing benchmark data from data
 
-### 🌠 Junk
-> removing junk data
+### 🌠 Cleaning
+> cleaning data
 - e.g. removing HTML tags from text
+- e.g. data normalization
 
 ### 🌠 PII (Personally Identifiable Information)
 > removing PII from data
