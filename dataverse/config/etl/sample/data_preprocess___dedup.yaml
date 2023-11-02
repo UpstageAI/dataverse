@@ -5,7 +5,7 @@ spark:
   driver:
     memory: 16g
 etl:
-  - name: data_ingestion___ufl___parquet2ufl
+  - name: data_ingestion___parquet___pq2ufl
     args:
       input_paths:
         - ./sample/pajama_sample_ufl.parquet
