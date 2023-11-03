@@ -33,6 +33,7 @@ def data_ingestion___slim_pajama___hf2ufl(
     spark,
     name_or_path : Union[str, List[str]] = 'cerebras/SlimPajama-627B',
     split=None,
+    from_disk=False,
     repartition=20,
     verbose=True,
     *args,
@@ -45,10 +46,12 @@ def data_ingestion___slim_pajama___hf2ufl(
         spark (SparkSession): spark session
         name_or_path (str or list): the name or path of the huggingface dataset
         split (str): the split of the dataset
+        from_disk (bool): whether to load from disk
+            - no split is allowed when from_disk is True
         repartition (int): the number of partitions
         verbose (bool): whether to print the information of the dataset
     """
-    dataset = load_huggingface_dataset(name_or_path, split=split)
+    dataset = load_huggingface_dataset(name_or_path, split=split, from_disk=from_disk)
     parquet_path = huggingface2parquet(dataset, verbose=verbose)
 
     df = spark.read.parquet(parquet_path)

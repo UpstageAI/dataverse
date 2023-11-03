@@ -7,7 +7,7 @@ from omegaconf import ListConfig
 from dataverse.utils.setting import SystemSetting
 
 
-def load_huggingface_dataset(name_or_path, split=None):
+def load_huggingface_dataset(name_or_path, split=None, from_disk=False):
     """
     load huggingface dataset
     
@@ -15,17 +15,32 @@ def load_huggingface_dataset(name_or_path, split=None):
         name_or_path (str or list): the name or path of the huggingface dataset
         split (str): the split of the dataset
     """
-    # load huggingface dataset
-    if isinstance(name_or_path, str):
-        dataset = datasets.load_dataset(name_or_path, split=split)
-    elif isinstance(name_or_path, list):
-        dataset = datasets.load_dataset(*name_or_path, split=split)
-    elif isinstance(name_or_path, ListConfig):
-        dataset = datasets.load_dataset(*name_or_path, split=split)
+    if from_disk:
+        if split is not None:
+            raise ValueError("split is not supported when from_disk is True")
+
+        # load huggingface dataset
+        if isinstance(name_or_path, str):
+            dataset = datasets.load_from_disk(name_or_path)
+        elif isinstance(name_or_path, list):
+            dataset = datasets.load_from_disk(*name_or_path)
+        elif isinstance(name_or_path, ListConfig):
+            dataset = datasets.load_from_disk(*name_or_path)
+        else:
+            raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
     else:
-        raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
+        # load huggingface dataset
+        if isinstance(name_or_path, str):
+            dataset = datasets.load_dataset(name_or_path, split=split)
+        elif isinstance(name_or_path, list):
+            dataset = datasets.load_dataset(*name_or_path, split=split)
+        elif isinstance(name_or_path, ListConfig):
+            dataset = datasets.load_dataset(*name_or_path, split=split)
+        else:
+            raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
 
     return dataset
+
 
 def huggingface2parquet(
         dataset: datasets.Dataset,
