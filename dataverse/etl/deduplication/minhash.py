@@ -342,7 +342,7 @@ def deduplication___minhash___lsh_jaccard(
     num_perm=250,
     band_n=None,
     row_per_band=None,
-    column="text",
+    subset="text",
     seed=42,
     *args,
     **kwargs,
@@ -358,7 +358,7 @@ def deduplication___minhash___lsh_jaccard(
         num_perm: number of permutations
         band_n: number of bands
         row_per_band: number of rows per band
-        column: column to deduplicate on
+        subset: column to deduplicate on
     """
     if isinstance(data, RDD):
         data = data.toDF()
@@ -381,11 +381,11 @@ def deduplication___minhash___lsh_jaccard(
     # endregion
 
     # region: MinHash
-    records: RDD = data.select("__id__", column).rdd.cache()
+    records: RDD = data.select("__id__", subset).rdd.cache()
     buckets: RDD = (
         records.flatMap(
             lambda x: generate_hash_values(
-                content=x[1],  # args.column
+                content=x[1],  # subset
                 idx=x[0],  # __id__
                 num_perm=num_perm,
                 ngram_size=ngram_size,
