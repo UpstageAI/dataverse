@@ -62,6 +62,11 @@ class ETLPipeline:
         # [ Save RDD/DataFrame ] - data load
         etl_configs = config.etl
         total_etl_n = len(etl_configs)
+
+        # [switch] is the ETL process ended or not
+        # if not, spark session & data will be returned to continue
+        IS_ETL_FINISHED = True
+
         for etl_i, etl_config in enumerate(etl_configs):
             # etl_config.name format
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
@@ -76,9 +81,17 @@ class ETLPipeline:
             if etl_i == 0 and etl_category != 'data_ingestion':
                 raise ValueError(f"First ETL process should be data ingestion but got {etl_category}")
 
-            # saving data MUST be the last ETL process
+            # this is middle creator mode
+            # if the last ETL process is not data load  
             if etl_i == total_etl_n - 1 and etl_category != 'data_load':
-                raise ValueError(f"Last ETL process should be data load but got {etl_category}")
+                print((
+                    f"{'=' * 50}\n"
+                    f"Last ETL process was assigned for [ {etl_category} ] which ETL is not done.\n"
+                    "spark session will be not be stopped and also returned\n"
+                    "you can test your own ETL process with the returned spark session and data\n"
+                    f"{'=' * 50}\n"
+                ))
+                IS_ETL_FINISHED = False
 
             # when args is not defined, set it to empty dict
             if 'args' in etl_config:
@@ -93,6 +106,8 @@ class ETLPipeline:
                 data = etl_instance(spark, data, **args, etl_name=etl_name)
 
         # =============== [ Stop Spark ] ==================
-        spark.stop()
-
-        return data
+        if IS_ETL_FINISHED:
+            spark.stop()
+            return data
+        else:
+            return spark, data
