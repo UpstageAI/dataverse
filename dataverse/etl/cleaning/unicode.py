@@ -124,6 +124,10 @@ def cleaning___unicode___normalize(
     Args:
         subset (str): subset or columns to consider for normalization
     """
+    if isinstance(data, DataFrame):
+        data = data.rdd
+        data = data.map(lambda row: row.asDict())
+
     def _normalize(row):
         row[subset] = unicodedata.normalize("NFC", row[subset])
         return row
