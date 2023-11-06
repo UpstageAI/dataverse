@@ -86,9 +86,15 @@ class ETLPipeline:
             if etl_i == total_etl_n - 1 and etl_category != 'data_load':
                 print((
                     f"{'=' * 50}\n"
-                    f"Last ETL process was assigned for [ {etl_category} ] which ETL is not done.\n"
-                    "spark session will be not be stopped and also returned\n"
-                    "you can test your own ETL process with the returned spark session and data\n"
+                    "[ DEBUG MODE ]\n"
+                    f"{'=' * 50}\n"
+                    f"Last ETL process was assigned for [ {etl_category} ]\n"
+                    "Spark session will not be stopped and will be returned\n"
+                    "If this is not intended, please assign [ data_load ] at the end.\n"
+                    f"{'=' * 50}\n"
+                    "Example:\n"
+                    "=> spark, data = etl_pipeline.run(config)\n"
+                    "=> data = data.map(add awesome duck to column)\n"
                     f"{'=' * 50}\n"
                 ))
                 IS_ETL_FINISHED = False
