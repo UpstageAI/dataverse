@@ -56,19 +56,49 @@ ufl = {
 ## 📚 Naming Convention
 > This is a strong recommendation. You can use your own naming convention if you want.
 
+```python
+def data_ingestion___[ETL Sub-Category]___[raw source]2[target format]()
+
+```
+-  `ETL Sub-Category` - 2 types of sub-category (python file)
+    1. Name to the data source name to handle (`specific` purpose)
+        - e.g. mmlu
+        - e.g. squad
+    2. Name `file format` itself (`general` purpose)
+        - e.g. parquet
+        - e.g. csv
+        - e.g. hugingface
+- `ETL process name`
+    - Name the ETL process as the `raw source` -> `target format`
+        - **raw source**
+            - `file format`
+                - `parquet` - (loading data from parquet)
+                - `hf` - (loading data from huggingface dataset)
+                - `csv` - (loading data from csv)
+                - etc
+            - `raw`
+                - the data is already loaded in memory as raw
+        - **target format**
+            - `ufl` - (loading data to ufl format)
+                - e.g. `parquet2ufl` means loading parquet to ufl format
+                - e.g. `hf2ufl` means loading huggingface dataset to ufl format
+            - `raw` - (loading data w/o any transformation)
+                - e.g. `parquet2raw` means loading parquet to raw format
+                - e.g. `hf2raw` means loading huggingface dataset to raw format
+            - `[YOUR_FORMAT]`
+                - this is on you
+
 **caveat**
 - `ufl` is not a file format rather a schema(data format). 
 
 ### 📗 1 step flow
-- Name sub-category (python file) to the data source name
-- Name the ETL process as the `raw source` -> `target format`
-    - e.g. `parquet2ufl` means loading parquet to ufl format
-    - e.g. `hf2ufl` means loading huggingface dataset to ufl format
+> direct loading raw data to desired format
+
+- In case of your data is already saved in UFL format, use `raw` loading ETL process
+    - e.g. `hf2raw` could be used as total 1 step when your data is already saved in UFL format
 
     
 ```python
-def [ETL Category]___[ETL Sub-Category]___[raw source]2[target format]()
-
 - "data_ingestion/"
     # converting raw data to desired format
     - mmlu.py
@@ -80,28 +110,23 @@ def [ETL Category]___[ETL Sub-Category]___[raw source]2[target format]()
         - def data_ingestion___mnist___csv2ufl()
 
     # this is used when loading UFL format saved in parquet
-    - ufl.py
-        - def data_ingestion___ufl___parquet2ufl()
+    - parquet.py
+        - def data_ingestion___parquet___pq2ufl()
 ```
 
 ### 📗 2 step flow
-- Name sub-category (python file) to the data source name
+> loading raw data to raw format first and then convert to desired format
 
 #### 📖 Step 1 - load raw data to raw format
-- Name the ETL process as the `raw source` -> `raw format`
-    - e.g. `parquet2raw` means loading parquet to raw format
-    - e.g. `hf2raw` means loading huggingface dataset to raw format
 
 ```python
-def [ETL Category]___[ETL Sub-Category]___[raw source]2raw()
-
 - "data_ingestion/"
     # converting raw data to raw format
+    - huggingface.py
+        - def data_ingestion___huggingface___hf2raw()
     - mmlu.py
         - def data_ingestion___mmlu___parquet2raw()
         - def data_ingestion___mmlu___hf2raw()
-    - squad.py
-        - def data_ingestion___squad___hf2raw()
     - mnist.py
         - def data_ingestion___mnist___csv2raw()
 ```
@@ -114,8 +139,6 @@ def [ETL Category]___[ETL Sub-Category]___[raw source]2raw()
     - e.g. `raw2ufl_qa` means converting raw format to ufl format with `question & answer` template
 
 ```python
-def [ETL Category]___[ETL Sub-Category]___raw2[target format]_[template name]()
-
 - "data_ingestion/"
     # converting raw format to desired format
     - mmlu.py
