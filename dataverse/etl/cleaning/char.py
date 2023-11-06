@@ -12,6 +12,37 @@ import unicodedata
 from typing import Union
 
 
+@register_etl
+def cleaning___char___normalize_whitespace(
+    spark,
+    data: Union[RDD, DataFrame],
+    subset='text',
+    *args,
+    **kwargs
+):
+    """
+    Normalize the whitespaces
+    - strip the leading and trailing whitespaces
+    - replace all the consecutive whitespaces with a single space
+        - this excludes the \n and \r
+
+    args:
+        subset (str): subset or columns to consider if duplicated
+    """
+    if isinstance(data, DataFrame):
+        data = data.rdd
+        data = data.map(lambda row: row.asDict())
+
+    pattern = re.compile("[^\S\r\n]+") 
+    def _normalize_whitespace(row):
+        row[subset] = re.sub(pattern, ' ', row[subset].strip())
+        return row
+
+    data = data.map(_normalize_whitespace)
+
+    return data
+
+
 
 @register_etl
 def cleaning___char___remove_unprintable(
