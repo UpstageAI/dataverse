@@ -11,6 +11,65 @@ import re
 import unicodedata
 from typing import Union
 
+import re
+from enum import IntEnum
+
+class KoreanType(IntEnum):
+    JAUM = 0
+    MOUM = 1
+    COMPLETE = 2
+    ELSE = -1
+
+KOR_BEGIN = 44032
+KOR_END = 55203
+CHOSUNG_BASE = 588
+JUNGSUNG_BASE = 28
+JAUM_BEGIN = 12593
+JAUM_END = 12622
+MOUM_BEGIN = 12623
+MOUM_END = 12643
+
+CHOSUNG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"]
+JUNGSUNG = ["ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅘ", "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ"]
+JONGSUNG = [" ", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅄ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"]
+
+JAUM = ["ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄸ", "ㄹ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅃ", "ㅄ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"]
+MOUM = ["ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅘ", "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ"]
+
+
+def character_is_korean(c):
+    i = ord(c)
+    return (
+        (KOR_BEGIN <= i <= KOR_END)
+        or (JAUM_BEGIN <= i <= JAUM_END)
+        or (MOUM_BEGIN <= i <= MOUM_END)
+    )
+
+def decompose(c):
+    if not character_is_korean(c):
+        return None
+
+    i = ord(c)
+    if JAUM_BEGIN <= i <= JAUM_END:
+        return c, " ", " "
+    if MOUM_BEGIN <= i <= MOUM_END:
+        return " ", c, " "
+
+    i -= KOR_BEGIN
+    cho = i // CHOSUNG_BASE
+    jung = (i - cho * CHOSUNG_BASE) // JUNGSUNG_BASE
+    jong = i - cho * CHOSUNG_BASE - jung * JUNGSUNG_BASE
+
+    return CHOSUNG[cho], JUNGSUNG[jung], JONGSUNG[jong]
+
+def compose(chosung, jungsung, jongsung):
+    unicode = KOR_BEGIN
+    unicode += CHOSUNG_BASE * CHOSUNG.index(chosung)
+    unicode += JUNGSUNG_BASE * JUNGSUNG.index(jungsung)
+    unicode += JONGSUNG.index(jongsung)
+    return chr(unicode)
+
+
 
 
 @register_etl
@@ -54,7 +113,7 @@ def cleaning___korean___filter_by_ratio(
     https://github.com/EleutherAI/dps/blob/master/dps/spark/prep/korean_prep.py#L52
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider to filter
         filter_type (str): `char` or `word`
         korean_ratio (float): ratio of korean char or words
     """
@@ -82,5 +141,116 @@ def cleaning___korean___filter_by_ratio(
         return (korean_counts / all_counts) >= korean_ratio
 
     data = data.filter(_korean_ratio_filter)
+
+    return data
+
+
+def classify_korean_type(unicode):
+    if JAUM_BEGIN <= unicode <= JAUM_END:
+        return KoreanType.JAUM
+    elif MOUM_BEGIN <= unicode <= MOUM_END:
+        return KoreanType.MOUM
+    elif KOR_BEGIN <= unicode <= KOR_END:
+        return KoreanType.COMPLETE
+    else:
+        return KoreanType.ELSE
+
+def reduce_repeated_emotions(text, num_repeats=2):
+    if num_repeats > 0:
+        repeat_chars_pattern = re.compile("(\w)\\1{2,}")
+        text = repeat_chars_pattern.sub("\\1" * num_repeats, text)
+
+    return text
+
+@register_etl
+def cleaning___korean___reduce_emoticon(
+    spark,
+    data: Union[RDD, DataFrame],
+    subset='text',
+    num_repeats=2,
+    *args,
+    **kwargs
+):
+    """
+    reduce emoticon korean characters
+
+    this will proceed reducing emotions ex) ㅋㅋㅋㅋ, ㅎㅎㅎㅎ 
+    1. split complete korean character into individual characters, prev jaum, next moum
+        - e.g. (remain) ㅋㅋ킄ㅋㅋㅋ -> ㅋㅋ킄ㅋㅋㅋ
+            - only prev jaum, next moum will be splitted
+        - e.g. (splited) ㅋㅋ쿠ㅜㅜㅜ -> ㅋㅋㅋㅜㅜㅜㅜ
+    2. reduce repeating korean characters
+        - e.g. ㅋㅋㅋㅋㅋ -> ㅋㅋ
+
+    [ potential risk of splitting complete korean character ]
+    splitting emoticon characters into individual characters has high risk inside
+    so only left one case that is `complete korean character between jaum and moum`
+    other cases were added also but due to the risk, wiped out
+
+    - you can check the risk of other cases
+        - when complete korean character followed by jaum
+            - 케익ㄱㄱㄱ -> 케이ㄱㄱㄱ
+            - 안녕하세요ㅋㅋ -> 안녕하세ㅋㅋ
+        - when complete korean character is after jaum
+            - ㅋㅋ큰일났어요 -> ㅋㅋㅡ일났어요
+
+    Function that reduces repeating Korean characters
+    - e.g. ㅋㅋㅋㅋㅋ => ㅋㅋ
+
+    Args:
+        subset (str): subset or columns to consider for reducing emotion
+        num_repeats (int): number of repeating characters to reduce
+
+    Reference
+    - https://github.com/lovit/soynlp/blob/master/soynlp/normalizer/_normalizer.py
+    - https://github.com/EleutherAI/dps/blob/master/dps/spark/prep/korean_prep.py
+    """
+
+    def _reduce_korean_emotion(row):
+        text = row[subset]
+        if not text:
+            return row
+
+        korean_types = [classify_korean_type(ord(c)) for c in text]
+        last_idx = len(korean_types) - 1
+
+        normalized_text = []
+        for i, (korean_type, c) in enumerate(zip(korean_types, text)):
+
+            # when complete korean character is between jaum and moum
+            if (0 < i < last_idx) and (
+                korean_types[i - 1] == KoreanType.JAUM
+                and korean_type == KoreanType.COMPLETE
+                and korean_types[i + 1] == KoreanType.MOUM
+            ):
+                cho, jung, jong = decompose(c)
+
+                # case 1. when complete kor char is combination of prev jaum and next moum
+                # e.g. ㅋ(쿠)ㅜ -> ㅋ(ㅋㅜ)ㅜ
+                if (
+                    cho == text[i - 1]
+                    and jung == text[i + 1]
+                    and jong == " "
+                ):
+                    normalized_text.append(cho)
+                    normalized_text.append(jung)
+
+                # case 2. otherwise, just leave it
+                # e.g. ㅋ(쿵)ㅜ -> ㅋ(쿵)ㅜ
+                else:
+                    normalized_text.append(c)
+
+            else:
+                normalized_text.append(c)
+
+        row[subset] = reduce_repeated_emotions("".join(normalized_text), num_repeats)
+
+        return row
+
+    if isinstance(data, DataFrame):
+        data = data.rdd
+        data = data.map(lambda row: row.asDict())
+
+    data = data.map(_reduce_korean_emotion)
 
     return data
