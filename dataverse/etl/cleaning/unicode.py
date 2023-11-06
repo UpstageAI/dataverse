@@ -66,7 +66,7 @@ def cleaning___unicode___remove_punct(
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider
     """
     if isinstance(data, DataFrame):
         data = data.rdd
@@ -108,4 +108,25 @@ def cleaning___unicode___replace_punct(
 
     data = data.map(_replace_unicode_punct)
 
+    return data
+
+@register_etl
+def cleaning___unicode___normalize(
+    spark,
+    data: Union[RDD, DataFrame],
+    subset='text',
+    *args,
+    **kwargs
+):
+    """
+    normalize the unicode
+
+    Args:
+        subset (str): subset or columns to consider for normalization
+    """
+    def _normalize(row):
+        row[subset] = unicodedata.normalize("NFC", row[subset])
+        return row
+
+    data = data.map(_normalize)
     return data
