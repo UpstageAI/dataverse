@@ -39,7 +39,7 @@ def cleaning___accent___remove(
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider
     """
     if isinstance(data, DataFrame):
         data = data.rdd

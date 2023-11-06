@@ -32,7 +32,7 @@ def cleaning___number___normalize(
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider
         assign_number (int): number to assign
     """
     if isinstance(data, DataFrame):

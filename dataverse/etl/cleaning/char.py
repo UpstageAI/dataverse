@@ -27,7 +27,7 @@ def cleaning___char___normalize_whitespace(
         - this excludes the \n and \r
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider
     """
     if isinstance(data, DataFrame):
         data = data.rdd
@@ -59,7 +59,7 @@ def cleaning___char___remove_unprintable(
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
     args:
-        subset (str): subset or columns to consider if duplicated
+        subset (str): subset or columns to consider
     """
     if isinstance(data, DataFrame):
         data = data.rdd
