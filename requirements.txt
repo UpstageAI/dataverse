@@ -8,3 +8,4 @@ pyspark
 scipy
 trafilatura
 html2text
+faker
