@@ -56,7 +56,7 @@ def parse_doc(headers: List[str], doc: List[str]) -> Optional[dict]:
                 length = int(header.split()[1])
 
     except Exception as e:
-        logger.warning("Can't parse header:", e, headers, doc)
+        # logger.warning("Can't parse header:", e, headers, doc)
         return None
 
     # Docs are separated by two empty lines.
