@@ -2,3 +2,9 @@ requests
 numpy
 pandas
 fasttext
+omegaconf
+datasets
+pyspark
+scipy
+trafilatura
+html2text
