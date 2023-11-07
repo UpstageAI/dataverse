@@ -76,7 +76,13 @@ def small_star(edges):
 
     neighbors = edges.map(small_star_map).groupByKey().map(lambda x: (x[0], list(set(x[1]))))
     edges_with_change = neighbors.map(small_star_reduce).cache()
-    total_change = edges_with_change.map(lambda x: x[1]).reduce(add)
+
+    # no duplicate edges
+    if edges_with_change.isEmpty():
+        total_change = 0
+    else:
+        total_change = edges_with_change.map(lambda x: x[1]).reduce(add)
+
     edges = edges_with_change.flatMap(lambda x: x[0])
     edges_with_change.unpersist()
 
@@ -99,7 +105,13 @@ def large_star(edges):
 
     neighbors = edges.flatMap(large_star_map).groupByKey().map(lambda x: (x[0], list(set(x[1]))))
     edges_with_change = neighbors.map(large_star_reduce).cache()
-    total_change = edges_with_change.map(lambda x: x[1]).reduce(add)
+
+    # no duplicate edges
+    if edges_with_change.isEmpty():
+        total_change = 0
+    else:
+        total_change = edges_with_change.map(lambda x: x[1]).reduce(add)
+
     edges = edges_with_change.flatMap(lambda x: x[0])
     edges_with_change.unpersist()
     return edges, total_change
@@ -409,35 +421,36 @@ def deduplication___minhash___lsh_jaccard(
     # endregion
 
     # region: Merge Results
-    self_edges: pyspark.RDD = duplicate_edges.values().distinct().map(lambda x: (x, x)).cache()
-    all_edges: pyspark.RDD = duplicate_edges.union(self_edges).cache()
-    data = data.join(
-        spark.createDataFrame(all_edges, schema=["__id__", "__component__"]),
-        on="__id__",
-        how="left",
-    ).cache()
-    duplicate_edges.unpersist()
-    # endregion
+    if not duplicate_edges.isEmpty():
+        self_edges: pyspark.RDD = duplicate_edges.values().distinct().map(lambda x: (x, x)).cache()
+        all_edges: pyspark.RDD = duplicate_edges.union(self_edges).cache()
+        data = data.join(
+            spark.createDataFrame(all_edges, schema=["__id__", "__component__"]),
+            on="__id__",
+            how="left",
+        ).cache()
+        duplicate_edges.unpersist()
+        # endregion
 
-    self_edges.unpersist()
+        self_edges.unpersist()
 
-    # region: Quality Control: This section is hard-coded for The Stack
-    cliques: RDD = all_edges.groupBy(lambda x: x[1]).cache()
-    all_edges.unpersist()
+        # region: Quality Control: This section is hard-coded for The Stack
+        cliques: RDD = all_edges.groupBy(lambda x: x[1]).cache()
+        all_edges.unpersist()
 
-    data = data.join(
-        spark.createDataFrame(
-            cliques.mapValues(lambda x: process_cluster(cluster=list(x))).flatMap(
-                lambda x: [(ele[0], True) for ele in x[1]]
+        data = data.join(
+            spark.createDataFrame(
+                cliques.mapValues(lambda x: process_cluster(cluster=list(x))).flatMap(
+                    lambda x: [(ele[0], True) for ele in x[1]]
+                ),
+                schema=["__id__", "__keep__"],
             ),
-            schema=["__id__", "__keep__"],
-        ),
-        on="__id__",
-        how="left",
-    )
-    cliques.unpersist()
-    data = data.filter(F.col("__component__").isNull() | F.col("__keep__")).cache()
-    data = data.drop("__component__", "__keep__").cache()
+            on="__id__",
+            how="left",
+        )
+        cliques.unpersist()
+        data = data.filter(F.col("__component__").isNull() | F.col("__keep__")).cache()
+        data = data.drop("__component__", "__keep__").cache()
     # endregion
 
     # drop temporary columns
