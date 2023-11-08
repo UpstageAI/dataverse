@@ -8,6 +8,7 @@ from dataverse.etl import register_etl
 
 @register_etl
 def utils___sampling___random(
+    spark,
     ufl: RDD,
     replace=False,
     sample_n_or_frac=0.1,
