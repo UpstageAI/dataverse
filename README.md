@@ -26,3 +26,13 @@ source ~/.bashrc
 ```python
 pip install dataverse
 ```
+
+## 🌌 Where to start?
+
+### 🌠 ETL Guideline
+> recommend starting with ETL guideline. check out below links! It will give you a glimpse of what you can do with `dataverse`.
+
+- [ETL Guideline](https://github.com/UpstageAI/dataverse/tree/main/guideline/etl)
+    - ETL_01_how_to_run.ipynb
+    - etc.
+
