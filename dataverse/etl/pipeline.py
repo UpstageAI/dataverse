@@ -27,6 +27,10 @@ class ETLPipeline:
     def __init__(self):
         self.registry = ETLRegistry()
 
+    def get(self, key):
+        """get ETL class from registry"""
+        return self.registry.get(key=key)
+
     def run(self, config: Union[str, dict, DictConfig, OmegaConf], *args, **kwargs):
         """
         Args:
@@ -72,7 +76,7 @@ class ETLPipeline:
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
             etl_name = etl_config.name
             etl_category = etl_name.split('___')[0]
-            etl_class = self.registry.get(key=etl_name)
+            etl_class = self.get(key=etl_name)
             
             # instantiate etl class
             etl_instance = etl_class()
