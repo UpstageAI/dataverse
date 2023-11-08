@@ -17,8 +17,8 @@ But we will change this to much better cluster in the future. And we need your h
 💡Any ideas are welcomed!💡
 
 
-## Exact Deduplication
+## 🌌 Exact Deduplication
 > Exact Deduplication is the process of removing exact duplicate records from a dataset.
 
-## Fuzzy Deduplication
+## 🌌 Fuzzy Deduplication
 > Fuzzy Deduplication is the process of removing records that are similar to each other from a dataset.
