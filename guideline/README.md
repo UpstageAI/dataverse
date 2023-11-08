@@ -8,6 +8,7 @@
 - 02. `ETL_one_cycle.ipynb`
 - 03. `ETL_create_new_etl_process.ipynb`
 - 04. `ETL_add_new_etl_process.ipynb`
+- 05. `ETL_test_etl_process.ipynb`
 
 ## 🗺️ ETL with live examples
 > Showing specific usage examples of ETL
