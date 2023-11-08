@@ -31,6 +31,40 @@ class ETLPipeline:
         """get ETL class from registry"""
         return self.registry.get(key=key)
 
+    def sample(self, n=100, sample_etl="data_ingestion___test___generate_fake_ufl"):
+        """
+        get spark session and sample data
+
+        use this function to test the ETL pipeline quickly without config
+
+        args:
+            n (int): the number of data to generate
+            sample_etl (str): the name of the sample ETL process
+        """
+        spark = SparkSession.builder \
+            .master('local[5]') \
+            .appName('sample') \
+            .config("spark.driver.memory", "15g") \
+            .getOrCreate()
+
+        sample_etl_class = self.get(key=sample_etl)
+        data = sample_etl_class()(spark, n=n, etl_name=sample_etl)
+
+        print((
+            f"{'=' * 50}\n"
+            "[ SAMPLE MODE ]\n"
+            f"{'=' * 50}\n"
+            "This is a quick way to get the sample data for testing or debugging w/o config.\n"
+            "If you want to test the ETL pipeline with your own data, please use `run` w/ config.\n"
+            f"{'=' * 50}\n"
+            "=> spark, data = etl_pipeline.sample()\n"
+            "=> data = data.map(add awesome duck to column)\n"
+            f"{'=' * 50}\n"
+        ))
+
+        return spark, data
+
+
     def run(self, config: Union[str, dict, DictConfig, OmegaConf], *args, **kwargs):
         """
         Args:
