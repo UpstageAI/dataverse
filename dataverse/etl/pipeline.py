@@ -27,6 +27,45 @@ class ETLPipeline:
     def __init__(self):
         self.registry = ETLRegistry()
 
+    def __len__(self):
+        return len(self.registry)
+
+    def status(self):
+        """
+        get the status of the registry. don't show you detailed information
+
+        [ info type ]
+        - category
+
+        usage:
+            >>> etl_pipeline.status()
+        """
+        print("If you need details of ETL Registry use `etl_pipeline.search()`")
+        return str(self.registry)
+
+    def search(self, category=None, sub_category=None):
+        """
+        get detailed status of the registry by searching
+
+        [ info type ]
+        - category
+        - sub_category
+        - etl_name
+
+        usage:
+            # return every etl
+            >>> etl_pipeline.search()
+
+            # only selected category
+            >>> etl_pipeline.search('data_ingestion')
+            >>> etl_pipeline.search(category='data_ingestion')
+
+            # only selected category & sub_category
+            >>> etl_pipeline.search('data_ingestion', 'ufl')
+            >>> etl_pipeline.search(category='data_ingestion', sub_category='ufl')
+        """
+        return self.registry.search(category=category, sub_category=sub_category)
+
     def get(self, key):
         """get ETL class from registry"""
         return self.registry.get(key=key)

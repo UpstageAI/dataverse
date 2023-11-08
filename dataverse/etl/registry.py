@@ -86,10 +86,15 @@ class ETLRegistry:
             return
         self._initialized = True
         self._registry = {}
+        self._status = {}
         auto_register()
 
+
+    def __len__(self):
+        return len(self._registry.keys())
+
     def __repr__(self):
-        return json.dumps(list(ETLRegistry()._registry.keys()), indent=4)
+        return self._convert_to_report_format(self._status)
 
     def __str__(self):
         return self.__repr__()
@@ -128,6 +133,100 @@ class ETLRegistry:
             raise KeyError(f"The key [ {key} ] is already registered")
 
         self._registry[key] = etl
+        self._update_status(key=key)
+
+    def _update_status(self, key: str):
+        category, sub_category, _ = key.split('___')
+        if category not in self._status:
+            self._status[category] = {}
+
+        if sub_category not in self._status[category]:
+            self._status[category][sub_category] = [key]
+        else:
+            self._status[category][sub_category].append(key)
+
+    def search(self, category=None, sub_category=None):
+        """
+        search the etl
+
+        printing all the information is fixed as default
+        - print_sub_category: print the sub-category
+        - print_etl_name: print the etl name
+        """
+        status = self._status
+
+        filtered_status = {}
+        if category is not None:
+            assert type(category) != list, 'we do not support list search for category'
+            assert type(category) == str, 'category must be a string'
+            if sub_category is None:
+                filtered_status[category] = status[category]
+            else:
+                assert type(sub_category) != list, 'we do not support list search for sub-category'
+                assert type(sub_category) == str, 'sub_category must be a string'
+                filtered_status[category] = {sub_category: status[category][sub_category]}
+        else:
+            if sub_category is not None:
+                raise ValueError('sub-category cannot be specified without category')
+            filtered_status = status
+
+        return self._convert_to_report_format(
+            filtered_status,
+            print_sub_category=True,
+            print_etl_name=True,
+        )
+
+    def _convert_to_report_format(
+        self,
+        status,
+        print_sub_category=False,
+        print_etl_name=False,
+    ):
+        """
+        convert status to report format
+
+        This includes the number of ETLs in each category and sub-category
+        and depending on the options, it can include the name of the ETLs
+
+        Args:
+            status (dict): the status from `search`
+        """
+        # count the number of etls
+        stats = {}
+        total = 0
+        categories = list(status.keys())
+        for category in categories:
+            if category not in stats:
+                stats[category] = {}
+                stats[category]['__total__'] = 0
+
+            sub_categories = list(status[category].keys())
+            for sub_category in sub_categories:
+                sub_n = len(status[category][sub_category])
+                stats[category][sub_category] = sub_n
+                stats[category]['__total__'] += sub_n
+                total += sub_n
+
+        # convert to the report format
+        infos = []
+
+        infos.append('=' * 50)
+        infos.append(f"Total [ {total} ]")
+        infos.append('=' * 50)
+
+        for category in categories:
+            infos.append(f"{category} [ {stats[category]['__total__']} ]")
+            sub_categories = list(status[category].keys())
+
+            if print_sub_category:
+                for sub_category in sub_categories:   
+                    infos.append(f"{' ' * 4}- {sub_category} [ {stats[category][sub_category]} ]")
+
+                    if print_etl_name:
+                        for etl in status[category][sub_category]:
+                            infos.append(f"{' ' * 8}- {etl}")
+
+        return '\n'.join(infos)
 
     def get(self, key: str) -> ETLStructure:
         """
