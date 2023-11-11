@@ -5,8 +5,6 @@ ETL Interface
 user will be interacting with this interface
 """
 
-import os
-import sys
 from typing import Union
 from omegaconf import OmegaConf
 from omegaconf import DictConfig
@@ -15,9 +13,8 @@ from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
 
+from dataverse.config import Config
 from dataverse.etl import ETLRegistry
-from dataverse.etl.registry import auto_register
-
 
 
 class ETLPipeline:
@@ -80,10 +77,13 @@ class ETLPipeline:
             n (int): the number of data to generate
             sample_etl (str): the name of the sample ETL process
         """
+        config = Config.default()
+        config.etl.append({'name': sample_etl, 'args': {'n': n}})
+
         spark = SparkSession.builder \
-            .master('local[5]') \
+            .master(config.spark.master) \
             .appName('sample') \
-            .config("spark.driver.memory", "15g") \
+            .config("spark.driver.memory", config.spark.driver.memory) \
             .getOrCreate()
 
         sample_etl_class = self.get(key=sample_etl)
@@ -112,25 +112,19 @@ class ETLPipeline:
                 - dict: config dict
                 - OmegaConf: config object
         """
-        # =============== [ Load Config ] ==================
-        if isinstance(config, str):
-            config = OmegaConf.load(config)
-        elif isinstance(config, dict):
-            config = OmegaConf.create(config)
-        elif isinstance(config, (OmegaConf, DictConfig)):
-            pass
-        else:
-            raise TypeError(f"config should be str, dict, or OmegaConf but got {type(config)}")
+        # =============== [ Set Config ] ==================
+        # mainly this is to fill the missing config args with default
+        config = Config.load(config)
+        config = Config.set_default(config)
 
         # ================ [ Set Spark ] ===================
-        spark_config = config.spark
-
-        # FIXME: Temp spark initialization
-        # TODO: Initialize spark depends on configuration
+        # TODO: add more spark configurations
         spark = SparkSession.builder \
-            .master('local[20]') \
-            .appName(spark_config.appname) \
-            .config("spark.driver.memory", spark_config.driver.memory) \
+            .master(config.spark.master) \
+            .appName(config.spark.appname) \
+            .config("spark.driver.memory", config.spark.driver.memory) \
+            .config("spark.executor.memory", config.spark.executor.memory) \
+            .config("spark.local.dir", config.spark.local.dir) \
             .getOrCreate()
 
         # ================= [ Run ETL ] ====================
