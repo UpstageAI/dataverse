@@ -11,6 +11,7 @@ from omegaconf import OmegaConf
 from omegaconf import DictConfig
 
 from dataverse.utils.setting import SystemSetting
+from pathlib import Path
 
 
 
@@ -23,7 +24,7 @@ class Config:
         raise NotImplementedError("Config is not allowed to be instantiated")
 
     @classmethod
-    def load(cls, config: Union[str, dict, DictConfig, OmegaConf]):
+    def load(cls, config: Union[str, dict, DictConfig, OmegaConf, Path]):
         """
         config (Union[str, dict, OmegaConf]): config for the etl
             - str: path to the config file
@@ -31,6 +32,8 @@ class Config:
             - OmegaConf: config object
         """
         if isinstance(config, str):
+            config = OmegaConf.load(config)
+        elif isinstance(config, Path):
             config = OmegaConf.load(config)
         elif isinstance(config, dict):
             config = OmegaConf.create(config)

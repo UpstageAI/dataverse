@@ -6,6 +6,7 @@ user will be interacting with this interface
 """
 
 from typing import Union
+from pathlib import Path
 from omegaconf import OmegaConf
 from omegaconf import DictConfig
 
@@ -104,7 +105,7 @@ class ETLPipeline:
         return spark, data
 
 
-    def run(self, config: Union[str, dict, DictConfig, OmegaConf], *args, **kwargs):
+    def run(self, config: Union[str, dict, DictConfig, OmegaConf, Path], *args, **kwargs):
         """
         Args:
             config (Union[str, dict, OmegaConf]): config for the etl
