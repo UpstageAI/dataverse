@@ -5,10 +5,10 @@ spark:
   driver:
     memory: 16g
 etl:
-  - name: data_ingestion___red_pajama___hf2ufl
+  - name: data_ingestion___test___generate_fake_ufl
   - name: utils___sampling___random
     args:
-      sample_n_or_frac: 0.01
+      sample_n_or_frac: 0.1
   - name: data_load___parquet___ufl2parquet
     args:
-      save_path: ./sample/pajama_sample_ufl.parquet
+      save_path: ./sample/sample_ufl.parquet

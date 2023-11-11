@@ -5,9 +5,9 @@ spark:
   driver:
     memory: 16g
 etl:
-  - name: data_ingestion___red_pajama___hf2ufl
+  - name: data_ingestion___test___generate_fake_ufl
   - name: utils___sampling___random
     args:
-      sample_n_or_frac: 0.01
-  - name: deduplication___polyglot___minhash
+      sample_n_or_frac: 0.1
+  - name: deduplication___minhash___lsh_jaccard
   - name: data_load___huggingface___ufl2hf_obj
