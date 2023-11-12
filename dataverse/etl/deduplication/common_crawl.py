@@ -4,6 +4,7 @@ from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import split, posexplode
 from pyspark.sql.functions import collect_list
+from pyspark.sql import functions as F
 
 from dataverse.etl.registry import register_etl
 
@@ -22,12 +23,6 @@ def filter_lines(row, subset='text'):
 
     del row['line_ids']
     row[subset] = filtered_texts
-
-    return row
-
-def normalization_for_dedup(row):
-    row = row.asDict()
-    row['line'] = row['line'].strip().lower()
 
     return row
 
@@ -63,16 +58,17 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
 
     assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
     line_data = data.select('id', posexplode(split(data[subset], '\n')).alias('line_id', 'line'))
-    line_data = line_data.rdd.map(normalization_for_dedup).toDF()
+    line_data = line_data.withColumn('line', F.lower(F.trim(line_data['line'])))
     line_data = line_data.dropDuplicates(subset=['line'])
     line_data = line_data.groupBy('id').agg(collect_list('line_id').alias('line_ids'))
 
     # join the line_ids to the original data
     # we are not going to use the normalized line text, but the original text
-    data = data.join(line_data, on=['id'], how='inner')
+    merged_data = data.join(line_data, on=['id'], how='inner')
+    data.unpersist()
     line_data.unpersist()
 
     # filter the lines using the line_ids
-    data = data.rdd.map(functools.partial(filter_lines, subset=subset))
+    merged_data = merged_data.rdd.map(functools.partial(filter_lines, subset=subset))
 
-    return data
+    return merged_data
