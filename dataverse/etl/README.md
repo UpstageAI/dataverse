@@ -33,7 +33,8 @@ from dataverse.etl import ETLPipeline
 from dataverse.config import Config
 
 # 1. Define the ETL process in the config file
-config = Config.get_config("TBD")
+config = Config.load("TBD")
+config = Config.set_default(config)
 
 # 2. Run the ETL pipeline
 etl_pipeline = ETLPipeline()
