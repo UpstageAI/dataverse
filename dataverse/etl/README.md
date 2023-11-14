@@ -38,8 +38,20 @@ config = Config.set_default(config)
 
 # 2. Run the ETL pipeline
 etl_pipeline = ETLPipeline()
-etl_pipeline.run(config)
+spark, data = etl_pipeline.run(config)
 ```
+
+### 🌠 What is returned after running ETL pipeline?
+> `spark` and `data` is returned after running ETL pipeline
+
+- `spark` - spark session
+- `data` - data after running ETL pipeline
+
+
+#### `spark` status depends on the last ETL process
+- if you didn't chosed `data_load` ETL process at the end of the ETL pipeline, `spark` will be returned alive so you can use it for further processing.
+- If you chosed `data_load` ETL process at the end of the ETL pipeline, `spark` will be stopped and you will not be able to use it for further processing.
+
 
 ### 🌠 How to set ETL Process to Configuration
 > Once you have ETL process registered, you can define the ETL process in the config file. 
