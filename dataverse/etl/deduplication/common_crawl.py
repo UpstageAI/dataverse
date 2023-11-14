@@ -53,20 +53,20 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
     if isinstance(data, RDD):
         data = data.toDF()
 
-    # if we don't cache, the id will be different when creating the line_df
-    data = data.cache()
+    data = data.withColumn("__id__", F.monotonically_increasing_id())
 
     assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
-    line_data = data.select('id', posexplode(split(data[subset], '\n')).alias('line_id', 'line'))
+    line_data = data.select('__id__', posexplode(split(data[subset], '\n')).alias('line_id', 'line'))
     line_data = line_data.withColumn('line', F.lower(F.trim(line_data['line'])))
     line_data = line_data.dropDuplicates(subset=['line'])
-    line_data = line_data.groupBy('id').agg(collect_list('line_id').alias('line_ids'))
+    line_data = line_data.groupBy('__id__').agg(collect_list('line_id').alias('line_ids'))
 
-    # join the line_ids to the original data
-    # we are not going to use the normalized line text, but the original text
-    merged_data = data.join(line_data, on=['id'], how='inner')
+    merged_data = data.join(line_data, on=['__id__'], how='inner')
     data.unpersist()
     line_data.unpersist()
+
+    # remove __id__
+    merged_data = merged_data.drop('__id__')
 
     # filter the lines using the line_ids
     merged_data = merged_data.rdd.map(functools.partial(filter_lines, subset=subset))
