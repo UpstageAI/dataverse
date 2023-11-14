@@ -68,7 +68,12 @@ class ETLPipeline:
         """get ETL class from registry"""
         return self.registry.get(key=key)
 
-    def sample(self, n=100, sample_etl="data_ingestion___test___generate_fake_ufl"):
+    def sample(
+        self,
+        n=100,
+        sample_etl="data_ingestion___test___generate_fake_ufl",
+        verbose=False,
+    ):
         """
         get spark session and sample data
 
@@ -77,6 +82,7 @@ class ETLPipeline:
         args:
             n (int): the number of data to generate
             sample_etl (str): the name of the sample ETL process
+            verbose (bool): if True, print the status
         """
         config = Config.default()
         config.etl.append({'name': sample_etl, 'args': {'n': n}})
@@ -90,28 +96,38 @@ class ETLPipeline:
         sample_etl_class = self.get(key=sample_etl)
         data = sample_etl_class()(spark, n=n, etl_name=sample_etl)
 
-        print((
-            f"{'=' * 50}\n"
-            "[ SAMPLE MODE ]\n"
-            f"{'=' * 50}\n"
-            "This is a quick way to get the sample data for testing or debugging w/o config.\n"
-            "If you want to test the ETL pipeline with your own data, please use `run` w/ config.\n"
-            f"{'=' * 50}\n"
-            "=> spark, data = etl_pipeline.sample()\n"
-            "=> data = data.map(add awesome duck to column)\n"
-            f"{'=' * 50}\n"
-        ))
+        if verbose:
+            print((
+                f"{'=' * 50}\n"
+                "[ SAMPLE MODE ]\n"
+                f"{'=' * 50}\n"
+                "This is a quick way to get the sample data for testing or debugging w/o config.\n"
+                "If you want to test the ETL pipeline with your own data, please use `run` w/ config.\n"
+                f"{'=' * 50}\n"
+                "=> spark, data = etl_pipeline.sample()\n"
+                "=> data = data.map(add awesome duck to column)\n"
+                f"{'=' * 50}\n"
+            ))
 
         return spark, data
 
 
-    def run(self, config: Union[str, dict, DictConfig, OmegaConf, Path], *args, **kwargs):
+    def run(
+        self,
+        config: Union[str, dict, DictConfig, OmegaConf, Path],
+        verbose=False,
+        *args,
+        **kwargs,
+    ):
         """
         Args:
             config (Union[str, dict, OmegaConf]): config for the etl
                 - str: path to the config file
                 - dict: config dict
                 - OmegaConf: config object
+            verbose (bool): if True, print the status of the etl pipeline
+                - the verbose will be applied to the ETL process as well
+                - ETL process `verbose` takes precedence over this
         """
         # =============== [ Set Config ] ==================
         # mainly this is to fill the missing config args with default
@@ -156,19 +172,20 @@ class ETLPipeline:
             # this is middle creator mode
             # if the last ETL process is not data load  
             if etl_i == total_etl_n - 1 and etl_category != 'data_load':
-                print((
-                    f"{'=' * 50}\n"
-                    "[ DEBUG MODE ]\n"
-                    f"{'=' * 50}\n"
-                    f"Last ETL process was assigned for [ {etl_category} ]\n"
-                    "Spark session will not be stopped and will be returned\n"
-                    "If this is not intended, please assign [ data_load ] at the end.\n"
-                    f"{'=' * 50}\n"
-                    "Example:\n"
-                    "=> spark, data = etl_pipeline.run(config)\n"
-                    "=> data = data.map(add awesome duck to column)\n"
-                    f"{'=' * 50}\n"
-                ))
+                if verbose:
+                    print((
+                        f"{'=' * 50}\n"
+                        "[ DEBUG MODE ]\n"
+                        f"{'=' * 50}\n"
+                        f"Last ETL process was assigned for [ {etl_category} ]\n"
+                        "Spark session will not be stopped and will be returned\n"
+                        "If this is not intended, please assign [ data_load ] at the end.\n"
+                        f"{'=' * 50}\n"
+                        "Example:\n"
+                        "=> spark, data = etl_pipeline.run(config)\n"
+                        "=> data = data.map(add awesome duck to column)\n"
+                        f"{'=' * 50}\n"
+                    ))
                 IS_ETL_FINISHED = False
 
             # when args is not defined, set it to empty dict
@@ -176,6 +193,10 @@ class ETLPipeline:
                 args = etl_config.args
             else:
                 args = {}
+
+            # if verbose is not defined, set it same to the pipeline
+            if 'verbose' not in args:
+                args['verbose'] = verbose
 
             # `etl_name` is passed to args for tracking
             if etl_i == 0 and etl_category == 'data_ingestion':
@@ -186,6 +207,5 @@ class ETLPipeline:
         # =============== [ Stop Spark ] ==================
         if IS_ETL_FINISHED:
             spark.stop()
-            return data
-        else:
-            return spark, data
+
+        return spark, data
