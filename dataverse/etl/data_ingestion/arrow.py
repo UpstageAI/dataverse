@@ -44,24 +44,6 @@ def arrow_table_to_dict(arrow_path):
 
 def arrow_table_to_dict(arrow_path):
     """
-    pyarrow generator version
-
-    speed 10000 take - 90ms
-    """
-    in_memory_stream = pa.input_stream(arrow_path)
-    opened_stream = pa.ipc.open_stream(in_memory_stream)
-    table = opened_stream.read_all()
-
-    # get schema for field names
-    schema = table.schema
-
-    # iterate over each row
-    for row in range(table.num_rows):
-        row_data = {schema.field(col).name: table.column(col)[row].as_py() for col in range(table.num_columns)}
-        yield row_data
-
-def arrow_table_to_dict(arrow_path):
-    """
     speed 10000 take - 70ms
 
     this is used because it's faster than the pyarrow -> pydict direct loading version
@@ -83,6 +65,26 @@ def arrow_table_to_dict(arrow_path):
         rows.append(row_data)
 
     return rows
+
+def arrow_table_to_dict(arrow_path):
+    """
+    pyarrow generator version
+
+    this is used because of the memory issue
+
+    speed 10000 take - 90ms
+    """
+    in_memory_stream = pa.input_stream(arrow_path)
+    opened_stream = pa.ipc.open_stream(in_memory_stream)
+    table = opened_stream.read_all()
+
+    # get schema for field names
+    schema = table.schema
+
+    # iterate over each row
+    for row in range(table.num_rows):
+        row_data = {schema.field(col).name: table.column(col)[row].as_py() for col in range(table.num_columns)}
+        yield row_data
 
 
 @register_etl
@@ -122,6 +124,7 @@ def data_ingestion___arrow___hf2raw(
         arrow_paths = np.random.choice(arrow_paths, size=sample_n, replace=False)
 
     rdd = spark.sparkContext.parallelize(arrow_paths)
+    rdd = rdd.repartition(len(arrow_paths))
     rdd = rdd.flatMap(arrow_table_to_dict)
     rdd = rdd.repartition(repartition)
 
