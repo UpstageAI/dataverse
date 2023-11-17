@@ -104,6 +104,7 @@ class ETLPipeline:
             .config("spark.driver.memory", config.spark.driver.memory) \
             .config("spark.executor.memory", config.spark.executor.memory) \
             .config("spark.local.dir", config.spark.local.dir) \
+            .config("spark.ui.port", config.spark.ui.port) \
             .getOrCreate()
 
         sample_etl_class = self.get(key=sample_etl)
@@ -155,6 +156,7 @@ class ETLPipeline:
             .config("spark.driver.memory", config.spark.driver.memory) \
             .config("spark.executor.memory", config.spark.executor.memory) \
             .config("spark.local.dir", config.spark.local.dir) \
+            .config("spark.ui.port", config.spark.ui.port) \
             .getOrCreate()
 
         # ================= [ Run ETL ] ====================

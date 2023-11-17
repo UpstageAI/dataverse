@@ -62,6 +62,7 @@ class Config:
                 'driver': {'memory': '8G'},
                 'executor': {'memory': '1G'},
                 'local': {'dir': local_dir},
+                'ui': {'port': 4040},
             },
             'etl': []
         })
