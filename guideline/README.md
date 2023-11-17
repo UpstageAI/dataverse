@@ -13,3 +13,4 @@
 ## 🗺️ ETL with live examples
 > Showing specific usage examples of ETL
 - `EX_use_common_crawl_data.ipynb`
+- `EX_use_pyspark_ui.ipynb`
