@@ -165,10 +165,6 @@ class ETLPipeline:
             # instantiate etl class
             etl_instance = etl_class()
 
-            # loading data MUST be the first ETL process
-            if etl_i == 0 and etl_category != 'data_ingestion':
-                raise ValueError(f"First ETL process should be data ingestion but got {etl_category}")
-
             # this is middle creator mode
             # if the last ETL process is not data load  
             if etl_i == total_etl_n - 1 and etl_category != 'data_load':
@@ -199,7 +195,7 @@ class ETLPipeline:
                 args['verbose'] = verbose
 
             # `etl_name` is passed to args for tracking
-            if etl_i == 0 and etl_category == 'data_ingestion':
+            if etl_i == 0:
                 data = etl_instance(spark, **args, etl_name=etl_name)
             else:
                 data = etl_instance(spark, data, **args, etl_name=etl_name)
