@@ -71,6 +71,7 @@ class ETLPipeline:
     def sample(
         self,
         n=100,
+        config=None,
         sample_etl="data_ingestion___test___generate_fake_ufl",
         verbose=False,
     ):
@@ -81,16 +82,28 @@ class ETLPipeline:
 
         args:
             n (int): the number of data to generate
+            config (Union[str, dict, OmegaConf]): config for the etl
+                - config is not necessary
             sample_etl (str): the name of the sample ETL process
             verbose (bool): if True, print the status
         """
-        config = Config.default()
+        if config is None:
+            config = Config.default()
+        else:
+            config = Config.load(config)
+            config = Config.set_default(config)
+
+            # remove all the ETL processes
+            config.etl = []
+
         config.etl.append({'name': sample_etl, 'args': {'n': n}})
 
         spark = SparkSession.builder \
             .master(config.spark.master) \
-            .appName('sample') \
+            .appName(config.spark.appname) \
             .config("spark.driver.memory", config.spark.driver.memory) \
+            .config("spark.executor.memory", config.spark.executor.memory) \
+            .config("spark.local.dir", config.spark.local.dir) \
             .getOrCreate()
 
         sample_etl_class = self.get(key=sample_etl)
