@@ -3,6 +3,13 @@
 
 ## 🌌 Installation
 
+### 🌠 Install `dataverse`
+`caveat` - we are installing pyspark with `pip` and this does not guarantee standalone pyspark installation. 
+
+```python
+pip install dataverse
+```
+
 ### 🌠 Install Java
 > user for pyspark
 
@@ -21,10 +28,20 @@ echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 🌠 Install `dataverse`
+### 🌠 Pyspark Environment Setup - `SPARK_HOME` and `PYSPARK_PYTHON`
+> This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
 
+#### using `Makefile`
 ```python
-pip install dataverse
+make pyspark
+```
+
+#### manual setup
+```python
+pyspark_location=$(pip show pyspark | grep Location | cut -d' ' -f2)
+echo "export SPARK_HOME=$pyspark_location/pyspark" >> ~/.bashrc
+echo "export PYSPARK_PYTHON=python3" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## 🌌 Where to start?

@@ -1,5 +1,9 @@
 
-.PHONY: java
+.PHONY: pyspark java 
+
+pyspark:
+	echo "export SPARK_HOME=$(shell pip show pyspark | grep Location | awk '{print $$2 "/pyspark"}')" >> ~/.bashrc
+	echo "export PYSPARK_PYTHON=python3" >> ~/.bashrc
 
 # setting java environment
 java:
