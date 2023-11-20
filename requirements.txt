@@ -9,3 +9,5 @@ scipy
 trafilatura
 html2text
 faker
+awscli
+boto3
