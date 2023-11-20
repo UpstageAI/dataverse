@@ -12,10 +12,12 @@ from omegaconf import DictConfig
 
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
+from pyspark.conf import SparkConf
 from pyspark.sql import SparkSession
 
 from dataverse.config import Config
 from dataverse.etl import ETLRegistry
+from dataverse.utils.setting import SystemSetting
 
 
 class ETLPipeline:
@@ -68,6 +70,18 @@ class ETLPipeline:
         """get ETL class from registry"""
         return self.registry.get(key=key)
 
+    def setup_spark_conf(self, config):
+
+        # TODO: add more spark configurations
+        spark_conf = SparkConf()
+        spark_conf.set('spark.driver.memory', config.spark.driver.memory)
+        spark_conf.set('spark.executor.memory', config.spark.executor.memory)
+        spark_conf.set('spark.local.dir', config.spark.local.dir)
+        spark_conf.set('spark.ui.port', config.spark.ui.port)
+
+        return spark_conf
+
+
     def sample(
         self,
         n=100,
@@ -98,13 +112,11 @@ class ETLPipeline:
 
         config.etl.append({'name': sample_etl, 'args': {'n': n}})
 
+        spark_conf = self.setup_spark_conf(config)
         spark = SparkSession.builder \
             .master(config.spark.master) \
             .appName(config.spark.appname) \
-            .config("spark.driver.memory", config.spark.driver.memory) \
-            .config("spark.executor.memory", config.spark.executor.memory) \
-            .config("spark.local.dir", config.spark.local.dir) \
-            .config("spark.ui.port", config.spark.ui.port) \
+            .config(conf=spark_conf) \
             .getOrCreate()
 
         sample_etl_class = self.get(key=sample_etl)
@@ -149,14 +161,11 @@ class ETLPipeline:
         config = Config.set_default(config)
 
         # ================ [ Set Spark ] ===================
-        # TODO: add more spark configurations
+        spark_conf = self.setup_spark_conf(config)
         spark = SparkSession.builder \
             .master(config.spark.master) \
             .appName(config.spark.appname) \
-            .config("spark.driver.memory", config.spark.driver.memory) \
-            .config("spark.executor.memory", config.spark.executor.memory) \
-            .config("spark.local.dir", config.spark.local.dir) \
-            .config("spark.ui.port", config.spark.ui.port) \
+            .config(conf=spark_conf) \
             .getOrCreate()
 
         # ================= [ Run ETL ] ====================
