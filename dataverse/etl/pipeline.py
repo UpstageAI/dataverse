@@ -79,6 +79,43 @@ class ETLPipeline:
         spark_conf.set('spark.local.dir', config.spark.local.dir)
         spark_conf.set('spark.ui.port', config.spark.ui.port)
 
+        # AWS S3 Support
+        try:
+            import boto3
+
+            session = boto3.Session()
+            credentials = session.get_credentials()
+
+            spark_conf.set('spark.hadoop.fs.s3a.access.key', credentials.access_key)
+            spark_conf.set('spark.hadoop.fs.s3a.secret.key', credentials.secret_key)
+            spark_conf.set('spark.hadoop.fs.s3a.impl', 'org.apache.hadoop.fs.s3a.S3AFileSystem')
+
+            hadoop_ver = SystemSetting().get('HADOOP_VERSION')
+            spark_conf.set(
+                'spark.jars.packages',
+                (
+                    f'org.apache.hadoop:hadoop-aws:{hadoop_ver}'
+                    f',com.amazonaws:aws-java-sdk-bundle:1.12.592'
+                )
+            )
+
+            # check if the credentials are temporary or not
+            try:
+                spark_conf.set('spark.hadoop.fs.s3a.session.token', credentials.token)
+                spark_conf.set(
+                    'spark.hadoop.fs.s3a.aws.credentials.provider',
+                    "org.apache.hadoop.fs.s3a.TemporaryAWSCredentialsProvider"
+                ) # this is for temporary credentials
+                print('spark conf is set with [ temporary ] S3 credentials')
+            except:
+                print('spark conf is set with [ permanent ] S3 credentials')
+
+        except ImportError:
+            raise ImportError('boto3 is not installed. Please install it first.')
+        except Exception as e:
+            print('Failed to set spark conf for S3')
+            print(e)
+
         return spark_conf
 
 
