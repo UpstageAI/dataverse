@@ -55,7 +55,7 @@ echo "export PYSPARK_PYTHON=python3" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## 🌌 AWS Support
+## 🌌 AWS S3 Support
 > This is not mandatory, but if you want to use AWS, this is required
 
 `SPARK_HOME` is required for the following steps. please make sure you have set `SPARK_HOME` before proceeding. If you didn't check the above section.
@@ -80,7 +80,7 @@ version must be compatible with **hadoop-aws** version. Check at Maven [Apache H
 ```python
 
 # using Makefile
-make aws
+make aws_s3
 
 # manually download jar files
 hadoop_aws_jar_url="https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar"
@@ -106,7 +106,7 @@ aws configure
 aws configure set aws_session_token <your_session_token>
 ```
 
-### 🌠 Dataverse is ready to use AWS!
+### 🌠 Dataverse is ready to use AWS S3!
 > now you are ready to use `dataverse` with AWS! Every other details will be handled by `dataverse`!
 
 ```python
