@@ -1,6 +1,17 @@
 # dataverse
 > The Universe of Data. All about data, data science, and data engineering.
 
+
+## 🌌 Where to start?
+
+### 🌠 ETL Guideline
+> recommend starting with ETL guideline. check out below links! It will give you a glimpse of what you can do with `dataverse`.
+
+- [ETL Guideline](https://github.com/UpstageAI/dataverse/tree/main/guideline/etl)
+    - ETL_01_how_to_run.ipynb
+    - etc.
+
+
 ## 🌌 Installation
 
 ### 🌠 Install `dataverse`
@@ -79,9 +90,7 @@ wget -P $SPARK_HOME/jars/ $aws_java_sdk_jar_url
 ```
 
 ### 🌠 Set AWS Credentials
-> Currently we do not support ENV variables for AWS credentials. please use `aws configure` command to set your AWS credentials. But this will be supported in the future. This will set `~/.aws/credentials` file and will be accessible by `boto3`.
-
-you can get your `aws_access_key_id` and `aws_secret_access_key` from your AWS account.
+> Currently we do not support ENV variables for AWS credentials but this will be supported in the future. Please use `aws configure` command to set your AWS credentials and this will set `~/.aws/credentials` file which is accessible by `boto3`.
 
 ```python
 aws configure
@@ -91,9 +100,8 @@ aws configure
 
 
 #### When you have session token
-> This is Temporary Security Credentials. You might have to set with aws configure command again when it expires.
+> When you have temporary security credentials you have to set `session token` too.
 
-you can also submit `aws_session_token` to `aws configure` command. 
 ```python
 aws configure set aws_session_token <your_session_token>
 ```
@@ -109,14 +117,4 @@ data = spark.read.parquet(s3a_src_url)
 data = data.filter(data['awesome'] == True)
 spark.write.parquet(data, s3a_dst_url)
 ```
-
-
-## 🌌 Where to start?
-
-### 🌠 ETL Guideline
-> recommend starting with ETL guideline. check out below links! It will give you a glimpse of what you can do with `dataverse`.
-
-- [ETL Guideline](https://github.com/UpstageAI/dataverse/tree/main/guideline/etl)
-    - ETL_01_how_to_run.ipynb
-    - etc.
 
