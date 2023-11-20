@@ -6,6 +6,8 @@ Interface for system setting
 import os
 import json
 from pathlib import Path
+from pyspark import SparkContext, SparkConf
+
 
 
 class SystemSetting:
@@ -66,6 +68,14 @@ class SystemSetting:
         # HARD CODED DEFAULT SETTING
         self.CACHE_DIR = Path.home().as_posix()
         self.IS_CLI = False
+
+        # SPARK VERSION
+        conf = SparkConf()
+        sc = SparkContext(conf=conf)
+        self.SPARK_VERSION = sc.version
+        self.HADOOP_VERSION = sc._jvm.org.apache.hadoop.util.VersionInfo.getVersion()
+        sc.stop()
+
 
         # TODO: add more default setting here
         ...
