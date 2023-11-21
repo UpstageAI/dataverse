@@ -7,10 +7,24 @@
 ### 🌠 Load pre-built configuration
 > you can load the pre-built configuration from path, or dict, or OmegaConf
 
+#### Load from local path
 ```python
 from dataverse.config import Config
 
 config = Config.load('path/to/config.yaml')
+```
+
+#### Load from AWS S3
+> you need to set aws credential with `aws configure` to use this feature
+
+```python
+from dataverse.config import Config
+
+config = Config.load('s3://path/to/config.yaml')
+```
+
+#### Load from dict
+```python
 config = Config.load({
     "spark": {"appname": "README.md example"}
     "etl": [
