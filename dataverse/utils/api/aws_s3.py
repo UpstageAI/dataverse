@@ -36,6 +36,23 @@ def aws_s3_create_bucket(bucket_name, location='ap-northeast-2'):
         CreateBucketConfiguration={'LocationConstraint': location}
     )
 
+
+def aws_s3_read(bucket_name, key):
+    """
+    Args:
+        bucket_name (str): bucket name
+        key (str): key (aws s3 file path)
+
+    Usage:
+        aws_s3_read('tmp', 'this/is/path.json')
+    """
+    s3 = boto3.client('s3')
+    obj = s3.get_object(Bucket=bucket_name, Key=key)
+    text = obj['Body'].read().decode('utf-8')
+
+    return text
+
+
 def aws_s3_download(bucket_name, key, local_path):
     """
     Args:
