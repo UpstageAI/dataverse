@@ -1,5 +1,8 @@
-# dataverse
-> The Universe of Data. All about data, data science, and data engineering.
+# Dataverse
+> The Universe of Data. All about Data, Data Science, and Data Engineering.
+
+Dataverse, a freely-accessible open-source project on GitHub, offers a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers.
+
 
 
 ## 🌌 Where to start?
@@ -10,7 +13,6 @@
 - [ETL Guideline](https://github.com/UpstageAI/dataverse/tree/main/guideline/etl)
     - ETL_01_how_to_run.ipynb
     - etc.
-
 
 ## 🌌 Installation
 
@@ -118,3 +120,21 @@ data = data.filter(data['awesome'] == True)
 spark.write.parquet(data, s3a_dst_url)
 ```
 
+
+## 🌌 Acknowledgements
+
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+
+
+## 🌌 Citation
+> If you want to cite our 🌌 Dataverse project, feel free to use the following bibtex
+
+```bibtex
+@misc{dataverse,
+  title = {Dataverse},
+  author = {Hyunbyung, Park},
+  year = {2023},
+  publisher = {GitHub, Upstage AI},
+  howpublished = {\url{https://github.com/UpstageAI/dataverse}},
+}
+```
