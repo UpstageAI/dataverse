@@ -5,7 +5,6 @@ base class to support the registration of the ETL classes
 
 import os
 import abc
-import json
 import inspect
 import importlib.util
 
@@ -13,6 +12,7 @@ from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
 from typing import Union
+from dataverse.utils.setting import SystemSetting
 
 
 # TODO: If you add category directories, add them here too
@@ -309,7 +309,15 @@ def register_etl(func):
 
     one downside is that the function cannot leverage the `self`
     if you need to use `self` directly inherit the BaseETL
+
+    About Attributes:
+    - __file_path__ (str): the file path of the function where it is defined
+    - __etl_dir__ (bool): if the file is in the etl directory
+        - if not, it means it's dynamically registered user-defined ETL
     """
+    ETL_DIR = os.path.join(SystemSetting().DATAVERSE_HOME, 'etl')
+    etl_file_path = inspect.getfile(func)
+
     # I know using class name without snake case is awkward
     # but I want to keep the class name as it is and user won't know it
     etl_cls = type(
@@ -317,7 +325,8 @@ def register_etl(func):
         (BaseETL,),
         {
             "run": add_self(func),
-            "__file_path__": inspect.getfile(func),
+            "__file_path__": etl_file_path,
+            "__etl_dir__": etl_file_path.startswith(ETL_DIR),
         }
     )
 
