@@ -6,6 +6,7 @@ base class to support the registration of the ETL classes
 import os
 import abc
 import json
+import inspect
 import importlib.util
 
 from pyspark.rdd import RDD
@@ -309,5 +310,8 @@ def register_etl(func):
     # i know using class name without snake case is awkward
     # but i want to keep the class name as it is and user won't know it
     etl_cls = type(func.__name__, (BaseETL,), {"run": add_self(func)})
+
+    # add file location
+    etl_cls.__file_path__ = inspect.getfile(func)
 
     return etl_cls
