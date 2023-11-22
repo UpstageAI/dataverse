@@ -2,18 +2,17 @@
 > The Universe of Data
 
 
-## Config
-> Config for the project (e.g. ETL, Analyzer, etc.)
-- mainly for ETL
+## 🌌 Config
+> Config for the Dataverse
 
-## API
-> Interface with ease and efficiency
+## 🌌 API
+> Interface of Dataverse for external use
 
-## ETL
+## 🌌 ETL
 > ETL pipeline (Extract, Transform, Load)
 
-## Analyzer
-> Data Analysis and Visualization
+## 🌌 LAB
+> Data Analysis & Visualization
 
-## Utils
-> Common utilities
+## 🌌 Utils
+> Common utilities used internally for Dataverse
