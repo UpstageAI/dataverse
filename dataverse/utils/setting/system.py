@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from pyspark import SparkContext, SparkConf
 
+import dataverse
 
 
 class SystemSetting:
@@ -64,6 +65,9 @@ class SystemSetting:
         - `IS_CLI`: if the program is running in CLI mode
         """
         self.system_setting = {}
+
+        # DATAVERSE
+        self.DATAVERSE_HOME = os.path.dirname(dataverse.__file__)
 
         # HARD CODED DEFAULT SETTING
         self.CACHE_DIR = Path.home().as_posix()
