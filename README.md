@@ -78,13 +78,15 @@ version must be compatible with **hadoop-aws** version. Check at Maven [Apache H
 
 
 ### 🌠 Download `hadoop-aws` & `aws-java-sdk`
-> install `hadoop-aws` and `aws-java-sdk` jar files to `$SPARK_HOME/jars` directory.
+> download `hadoop-aws` and `aws-java-sdk` jar files to `$SPARK_HOME/jars` directory.
+
+#### using `Makefile`
 ```python
-
-# using Makefile
 make aws_s3
+```
 
-# manually download jar files
+#### manual setup
+```python
 hadoop_aws_jar_url="https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar"
 aws_java_sdk_jar_url="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.592/aws-java-sdk-bundle-1.12.592.jar"
 wget -P $SPARK_HOME/jars $hadoop_aws_jar_url
