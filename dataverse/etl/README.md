@@ -188,20 +188,23 @@ First you need to check the category and sub-category of the ETL process you wan
 - `sub-category` is the python file. This is not pre-defined and you have to decide which name could be appropriate for the ETL process you want to add.
 
 Now when you know the category and sub-category, you can add a new ETL process.
-There are 2 ways to add a new ETL process
-1. Inherit `BaseETL` for ETL `class`
-2. Use decorator `@register_etl` to register your ETL `function`
+There are only one way to add a new ETL process
+
+#### Use decorator `@register_etl` to register your ETL `function`
 
 ```python
 # check the __sample/ folder for example
-from dataverse.etl import BaseETL
 from dataverse.etl import register_etl
 
 @register_etl
 def category___subcategory___etl(rdd, config):
     # do something
     return rdd
+```
 
+#### ☣️ Inheriting `BaseETL` is NOT ALLOWED ☣️
+```python
+from dataverse.etl import BaseETL
 class category___subcategory___etl(BaseETL):
     def run(rdd, config):
         # do something

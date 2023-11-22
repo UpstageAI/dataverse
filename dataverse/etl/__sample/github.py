@@ -27,17 +27,6 @@ def __sample___github___config(data: Union[RDD, DataFrame], config: dict = None,
     print("config says", config)
     return data
 
-class __sample___github___inheriting_base_etl(BaseETL):
-    """
-    Inheriting BaseETL class will automatically register the class to the registry
-    but you must overwrite run method unless you will raise NotImplementedError
-    decorator `register_etl` will do this automatically for you
-    """
-    def run(self, data: Union[RDD, DataFrame], *args, **kwargs):
-        print("sample inheriting base etl run")
-        return data
-
-
 if __name__ == "__main__":
     registry = ETLRegistry()
 
@@ -50,11 +39,6 @@ if __name__ == "__main__":
     print("[ Testing ] registry etl using decorator with config")
     etl = __sample___github___config
     etl()(data=None, config={"hello": "world"})
-    print("is subclass of ETLStructure?", issubclass(etl, ETLStructure), "\n")
-
-    print("[ Testing ] registry etl using inheritance with BaseETL")
-    etl = __sample___github___inheriting_base_etl
-    etl()(data=None)
     print("is subclass of ETLStructure?", issubclass(etl, ETLStructure), "\n")
 
     # check is it properly registryed

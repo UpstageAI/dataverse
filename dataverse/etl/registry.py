@@ -267,6 +267,9 @@ class ETLAutoRegistry(abc.ABCMeta, type):
         # the registry will verify the class is subclass of BaseETL and raise error
         # because BaseETL is not initialized yet :)
         if name != 'BaseETL':
+            if "__file_path__" not in attrs:
+                raise TypeError("Direct inheritance from BaseETL not allowed. Use @register_etl decorator.")
+
             registry = ETLRegistry()
             registry.register(key=name, etl=new_class)
 
@@ -307,11 +310,15 @@ def register_etl(func):
     one downside is that the function cannot leverage the `self`
     if you need to use `self` directly inherit the BaseETL
     """
-    # i know using class name without snake case is awkward
-    # but i want to keep the class name as it is and user won't know it
-    etl_cls = type(func.__name__, (BaseETL,), {"run": add_self(func)})
-
-    # add file location
-    etl_cls.__file_path__ = inspect.getfile(func)
+    # I know using class name without snake case is awkward
+    # but I want to keep the class name as it is and user won't know it
+    etl_cls = type(
+        func.__name__,
+        (BaseETL,),
+        {
+            "run": add_self(func),
+            "__file_path__": inspect.getfile(func),
+        }
+    )
 
     return etl_cls

@@ -4,11 +4,31 @@
 ETL is managed by Registry.
 What ever ETL you make, you need to register it to Registry.
 
-## How to register ETL
-1. Inherit `BaseETL` for ETL `class`
-2. Use decorator `@register_etl` to register your ETL `function`
+## 🌌 How to register ETL
 
-## ETL Processor Class Naming Convention
+### 🌠 @register_etl
+> Use decorator `@register_etl` to register your ETL `function`
+
+```python
+from dataverse.etl import register_etl
+
+@register_etl
+def __sample___github___remove_url():
+    pass
+```
+
+### 🌠 ☣️ Inheriting `BaseETL` is NOT ALLOWED ☣️
+
+```python
+from dataverse.etl import BaseETL
+
+class __sample___github___remove_url(BaseETL):
+    def run(self):
+        pass
+```
+
+
+## 🌌 ETL Processor Class Naming Convention
 
 ```python
 [ETL Category]___[ETL Sub-Category]___[ETL Name]
