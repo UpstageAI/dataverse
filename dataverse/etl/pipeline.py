@@ -230,6 +230,7 @@ class ETLPipeline:
         # if not, spark session & data will be returned to continue
         IS_ETL_FINISHED = True
 
+        prev_etl_name = None
         for etl_i, etl_config in enumerate(etl_configs):
             # etl_config.name format
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
@@ -271,9 +272,11 @@ class ETLPipeline:
 
             # `etl_name` is passed to args for tracking
             if etl_i == 0:
-                data = etl_instance(spark, **args, etl_name=etl_name)
+                data = etl_instance(spark, **args, etl_name=etl_name, prev_etl_name=None)
             else:
-                data = etl_instance(spark, data, **args, etl_name=etl_name)
+                data = etl_instance(spark, data, **args, etl_name=etl_name, prev_etl_name=prev_etl_name)
+
+            prev_etl_name = etl_name
 
         # =============== [ Stop Spark ] ==================
         if IS_ETL_FINISHED:
