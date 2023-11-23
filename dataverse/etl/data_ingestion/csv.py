@@ -12,22 +12,23 @@ from typing import Union, List
 @register_etl
 def data_ingestion___csv___csv2raw(
     spark,
-    csv_path,
+    path: Union[str, List[str]],
     repartition=20,
     verbose=True,
     *args,
     **kwargs
 ):
     """
-    convert huggingface dataset to raw format as dict
-
     Args:
         spark (SparkSession): spark session
-        csv_path (str): the path of the csv file
+        path (str or list): csv path
         repartition (int): the number of partitions
         verbose (bool): whether to print the information of the dataset
     """
-    df = spark.read.csv(csv_path, header=True)
+    if isinstance(path, str):
+        path = [path]
+
+    df = spark.read.csv(*path, header=True)
     rdd = df.rdd.repartition(repartition)
     rdd = rdd.map(lambda row: row.asDict())
 
