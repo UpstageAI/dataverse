@@ -150,9 +150,19 @@ class ETLPipeline:
             config.etl = []
 
         config.etl.append({'name': sample_etl, 'args': {'n': n}})
+        if verbose:
+            print('=' * 50)
+            print('[ Configuration ]')
+            print(OmegaConf.to_yaml(config))
+            print('=' * 50)
 
         spark_conf = self.setup_spark_conf(config)
         spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
+        if verbose:
+            print('=' * 50)
+            print('[ Spark Final Configuration ]')
+            print(OmegaConf.to_yaml(spark_conf.getAll()))
+            print('=' * 50)
 
         sample_etl_class = self.get(key=sample_etl)
         data = sample_etl_class()(spark, n=n, etl_name=sample_etl)
@@ -194,10 +204,20 @@ class ETLPipeline:
         # mainly this is to fill the missing config args with default
         config = Config.load(config)
         config = Config.set_default(config)
+        if verbose:
+            print('=' * 50)
+            print('[ Configuration ]')
+            print(OmegaConf.to_yaml(config))
+            print('=' * 50)
 
         # ================ [ Set Spark ] ===================
         spark_conf = self.setup_spark_conf(config)
         spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
+        if verbose:
+            print('=' * 50)
+            print('[ Spark Final Configuration ]')
+            print(OmegaConf.to_yaml(spark_conf.getAll()))
+            print('=' * 50)
 
         # ================= [ Run ETL ] ====================
         # [ Load RDD/DataFrame ] - data ingestion
@@ -258,5 +278,9 @@ class ETLPipeline:
         # =============== [ Stop Spark ] ==================
         if IS_ETL_FINISHED:
             spark.stop()
+            if verbose:
+                print('=' * 50)
+                print('[ Spark Successfully Done ]')
+                print('=' * 50)
 
         return spark, data
