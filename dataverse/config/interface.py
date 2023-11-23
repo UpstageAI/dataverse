@@ -100,7 +100,10 @@ class Config:
             'spark': {
                 'master': 'local[10]',
                 'appname': 'default',
-                'driver': {'memory': '8G'},
+                'driver': {
+                    'memory': '8G',
+                    'maxResultSize': '2G',
+                },
                 'executor': {'memory': '1G'},
                 'local': {'dir': local_dir},
                 'ui': {'port': 4040},

@@ -77,6 +77,7 @@ class ETLPipeline:
         spark_conf.set('spark.master', config.spark.master)
         spark_conf.set('spark.app.name', config.spark.appname)
         spark_conf.set('spark.driver.memory', config.spark.driver.memory)
+        spark_conf.set('spark.driver.maxResultSize', config.spark.driver.maxResultSize)
         spark_conf.set('spark.executor.memory', config.spark.executor.memory)
         spark_conf.set('spark.local.dir', config.spark.local.dir)
         spark_conf.set('spark.ui.port', config.spark.ui.port)
