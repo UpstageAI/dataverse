@@ -4,9 +4,10 @@ Interface for system setting
 """
 
 import os
+import re
 import json
+import pyspark
 from pathlib import Path
-from pyspark import SparkContext, SparkConf
 
 import dataverse
 
@@ -74,12 +75,12 @@ class SystemSetting:
         self.IS_CLI = False
 
         # SPARK VERSION
-        conf = SparkConf()
-        sc = SparkContext(conf=conf)
-        self.SPARK_VERSION = sc.version
-        self.HADOOP_VERSION = sc._jvm.org.apache.hadoop.util.VersionInfo.getVersion()
-        sc.stop()
+        self.SPARK_VERSION = pyspark.__version__
 
+        # HADOOP VERSION
+        jars = Path(pyspark.__file__).parent / "jars"
+        hadoop_jar = list(jars.glob("hadoop-client-runtime*.jar"))
+        self.HADOOP_VERSION = re.findall(r"\d+\.\d+\.\d+", hadoop_jar[0].name)[-1]
 
         # TODO: add more default setting here
         ...

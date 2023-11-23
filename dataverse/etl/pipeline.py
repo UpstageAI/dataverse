@@ -74,6 +74,8 @@ class ETLPipeline:
 
         # TODO: add more spark configurations
         spark_conf = SparkConf()
+        spark_conf.set('spark.master', config.spark.master)
+        spark_conf.set('spark.app.name', config.spark.appname)
         spark_conf.set('spark.driver.memory', config.spark.driver.memory)
         spark_conf.set('spark.executor.memory', config.spark.executor.memory)
         spark_conf.set('spark.local.dir', config.spark.local.dir)
@@ -150,11 +152,7 @@ class ETLPipeline:
         config.etl.append({'name': sample_etl, 'args': {'n': n}})
 
         spark_conf = self.setup_spark_conf(config)
-        spark = SparkSession.builder \
-            .master(config.spark.master) \
-            .appName(config.spark.appname) \
-            .config(conf=spark_conf) \
-            .getOrCreate()
+        spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
 
         sample_etl_class = self.get(key=sample_etl)
         data = sample_etl_class()(spark, n=n, etl_name=sample_etl)
@@ -199,11 +197,7 @@ class ETLPipeline:
 
         # ================ [ Set Spark ] ===================
         spark_conf = self.setup_spark_conf(config)
-        spark = SparkSession.builder \
-            .master(config.spark.master) \
-            .appName(config.spark.appname) \
-            .config(conf=spark_conf) \
-            .getOrCreate()
+        spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
 
         # ================= [ Run ETL ] ====================
         # [ Load RDD/DataFrame ] - data ingestion
