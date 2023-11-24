@@ -188,6 +188,7 @@ class ETLPipeline:
         self,
         config: Union[str, dict, DictConfig, OmegaConf, Path],
         verbose=False,
+        cache=False,
         *args,
         **kwargs,
     ):
@@ -200,6 +201,7 @@ class ETLPipeline:
             verbose (bool): if True, print the status of the etl pipeline
                 - the verbose will be applied to the ETL process as well
                 - ETL process `verbose` takes precedence over this
+            cache (bool): cache every stage of the ETL process
         """
         # =============== [ Set Config ] ==================
         # mainly this is to fill the missing config args with default
@@ -232,6 +234,7 @@ class ETLPipeline:
         IS_ETL_FINISHED = True
 
         prev_etl_name = None
+        prev_data = None # for caching
         for etl_i, etl_config in enumerate(etl_configs):
             # etl_config.name format
             # =====>[ etl_cate___etl_sub_cate___etl_name ]
@@ -277,7 +280,15 @@ class ETLPipeline:
             else:
                 data = etl_instance(spark, data, **args, etl_name=etl_name, prev_etl_name=prev_etl_name)
 
+            # cache the data
+            if cache:
+                if prev_data is not None:
+                    prev_data.unpersist()
+                data.cache()
+                prev_data = data
+
             prev_etl_name = etl_name
+
 
         # =============== [ Stop Spark ] ==================
         if IS_ETL_FINISHED:
