@@ -15,6 +15,7 @@ from omegaconf import DictConfig
 
 from dataverse.utils.setting import SystemSetting
 from dataverse.utils.api import aws_s3_read
+from dataverse.utils.api import aws_s3_write
 from pathlib import Path
 
 
@@ -87,7 +88,15 @@ class Config:
 
     @classmethod
     def save(cls, config, path: Union[str, Path]):
-        OmegaConf.save(config, Path(path))
+        if path.startswith(('s3://', 's3a://', 's3n://')):
+            aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', path)
+            if aws_s3_matched:
+                bucket, key = aws_s3_matched.groups()
+                aws_s3_write(bucket, key, config)
+            else:
+                raise ValueError(f"config path {path} is not a valid s3 path")
+        else:
+            OmegaConf.save(config, Path(path))
 
     @classmethod
     def default(cls):
