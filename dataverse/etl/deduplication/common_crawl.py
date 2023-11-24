@@ -53,6 +53,7 @@ def deduplication___common_crawl___exact_line(spark, data: Union[RDD, DataFrame]
     if isinstance(data, RDD):
         data = data.toDF()
 
+    data = data.cache()
     data = data.withColumn("__id__", F.monotonically_increasing_id())
 
     assert isinstance(data, DataFrame), f"data must be DataFrame, got {type(data)}"
