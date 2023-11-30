@@ -5,11 +5,16 @@ Interface for system setting
 
 import os
 import re
+import uuid
 import json
+import boto3
 import pyspark
 from pathlib import Path
 
 import dataverse
+from dataverse.utils.api import aws_check_credentials
+from dataverse.utils.api import aws_s3_create_bucket
+from dataverse.utils.api import aws_s3_list_buckets
 
 
 class SystemSetting:
@@ -57,15 +62,64 @@ class SystemSetting:
         self.update_by_env()
         self._initialized = True
 
+    def _get_aws_s3_dataverse_bucket(self, verbose=True):
+        """
+        the bucket will be used to store the dataverse info
+        - cache
+        - log
+        - etc
+
+        - format
+            - dataverse-{MAGIC_NUMBER}-{UUID}
+        """
+        # if aws credential is not valid, return None
+        if not aws_check_credentials():
+            return None
+
+        identify_prefix = f'dataverse-{self.MAGIC_NUMBER}-'
+        for bucket in aws_s3_list_buckets():
+            if identify_prefix in bucket:
+
+                # check if the last part is uuid
+                uuid_part = bucket.replace(identify_prefix, "")
+                try:
+                    uuid.UUID(uuid_part)
+
+                    # Use this bucket for your package operations
+                    if verbose:
+                        print("Detected Dataverse Bucket: " + bucket)
+
+                    return bucket
+                except ValueError:
+                    # not a valid UUID, so ignore this bucket
+                    pass 
+
+        # if there is no relevant bucket, create one
+        bucket = f'dataverse-{self.MAGIC_NUMBER}-{uuid.uuid1()}'
+        aws_s3_create_bucket(bucket)
+
+        return bucket
+
+
     def default_setting(self):
         """
         Reset the system setting to default
 
         Default setting:
+        - `MAGIC_NUMBER`: magic number for dataverse
         - `CACHE_DIR`: default cache directory
         - `IS_CLI`: if the program is running in CLI mode
+        - `AWS_BUCKET`: default aws bucket name for dataverse info
+        - `SPARK_VERSION`: spark version
+        - `HADOOP_VERSION`: hadoop version
         """
         self.system_setting = {}
+
+        # MAGIC NUMBER
+        # dv - Dataverse
+        # 42 - (The Hitchhiker's Guide to the Galaxy)
+        #      The Answer to the Ultimate Question of Life, the Universe, and Everything
+        self.MAGIC_NUMBER = "dv42"
 
         # DATAVERSE
         self.DATAVERSE_HOME = os.path.dirname(dataverse.__file__)
@@ -73,6 +127,9 @@ class SystemSetting:
         # HARD CODED DEFAULT SETTING
         self.CACHE_DIR = Path.home().as_posix()
         self.IS_CLI = False
+
+        # AWS SETTING
+        self.AWS_BUCKET = self._get_aws_s3_dataverse_bucket()
 
         # SPARK VERSION
         self.SPARK_VERSION = pyspark.__version__
