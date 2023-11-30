@@ -103,6 +103,64 @@ def aws_set_state(state):
     aws_s3_write(aws_bucket, state_path, json.dumps(state))
 
 
+def aws_vpc_create(cidr_block=None):
+
+    # load all vpcs ids to check if the cidr block is occupied
+    vpcs = AWSClient().ec2.describe_vpcs()
+    second_octets = []
+    for vpc in vpcs['Vpcs']:
+        second_octet = int(vpc['CidrBlock'].split('.')[1])
+        second_octets.append(second_octet)
+
+    # auto generate cidr block if not provided
+    if cidr_block is None:
+        is_network_available = False
+        for octet in range(0, 255):
+            if octet not in second_octets:
+                is_network_available = True
+                break
+
+        if is_network_available:
+            cidr_block = '10.' + str(octet) + '.0.0/16'
+        else:
+            raise Exception('Unable to find an available CIDR block for VPC.')
+
+    # user provided cidr block
+    elif cidr_block.split('.')[1] in second_octets:
+        raise Exception('The CIDR block is already occupied.')
+
+    # create vpc
+    vpc = AWSClient().ec2.create_vpc(CidrBlock=cidr_block)
+    vpc_id = vpc['Vpc']['VpcId']
+    AWSClient().ec2.create_tags(
+        Resources=[vpc_id],
+        Tags=[{'Key':'Name', 'Value':'Dataverse-Temporary-VPC'}]
+    )
+
+    # update state
+    state = aws_get_state()
+    if 'vpc' not in state:
+        state['vpc'] = []
+
+    state['vpc'].append(vpc_id)
+    aws_set_state(state)
+
+    return vpc_id
+
+def aws_vpc_delete(vpc_id):
+    if isinstance(vpc_id, str):
+        vpc_ids = [vpc_id]
+    elif isinstance(vpc_id, list):
+        vpc_ids = vpc_id
+
+    for vpc_id in vpc_ids:
+        AWSClient().ec2.delete_vpc(VpcId=vpc_id)
+        state = aws_get_state()
+        state['vpc'].remove(vpc_id)
+        aws_set_state(state)
+
+
+
 def aws_s3_create_bucket(bucket):
     """
     create aws s3 bucket
