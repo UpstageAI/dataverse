@@ -64,6 +64,44 @@ class AWSClient:
     def __repr__(self) -> str:
         return f"AWSClient(region={self.region}, user_id={self.user_id})"
 
+# AWS State
+"""
+[ What is State? ]
+>>> state management of operating aws services for dataverse
+
+state will be managed by python dictionary and saved as json file in aws s3.
+This will be synced with running AWS services and it will be created for each user.
+
+[ stored information ]
+- cache, meta, config, codes, etc.
+"""
+def aws_get_state():
+    # to avoid circular import
+    from dataverse.utils.setting import SystemSetting
+
+    aws_bucket = SystemSetting()['AWS_BUCKET']
+    state_path = f'{AWSClient().user_id}/state.json'
+
+    # get state from aws s3
+    try:
+        content = aws_s3_read(aws_bucket, state_path)
+        state = json.loads(content)
+
+    # FIXME: exception should distinguish between key not found and other errors
+    except:
+        state = {}
+        aws_s3_write(aws_bucket, state_path, json.dumps(state))
+
+    return state
+
+def aws_set_state(state):
+    # to avoid circular import
+    from dataverse.utils.setting import SystemSetting
+
+    aws_bucket = SystemSetting()['AWS_BUCKET']
+    state_path = f'{AWSClient().user_id}/state.json'
+    aws_s3_write(aws_bucket, state_path, json.dumps(state))
+
 
 def aws_s3_create_bucket(bucket):
     """
