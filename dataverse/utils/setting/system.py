@@ -62,7 +62,7 @@ class SystemSetting:
         self.update_by_env()
         self._initialized = True
 
-    def _get_aws_s3_dataverse_bucket(self, verbose=True):
+    def _get_aws_bucket(self, verbose=True):
         """
         the bucket will be used to store the dataverse info
         - cache
@@ -129,7 +129,7 @@ class SystemSetting:
         self.IS_CLI = False
 
         # AWS SETTING
-        self.AWS_BUCKET = self._get_aws_s3_dataverse_bucket()
+        self.AWS_BUCKET = self._get_aws_bucket()
 
         # SPARK VERSION
         self.SPARK_VERSION = pyspark.__version__

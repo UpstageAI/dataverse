@@ -101,6 +101,8 @@ aws configure
 ```
 - `aws_access_key_id`
 - `aws_secret_access_key`
+- `region`
+    - e.g. `ap-northeast-2`
 
 
 #### When you have session token

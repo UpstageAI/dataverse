@@ -5,6 +5,8 @@ ETL Interface
 user will be interacting with this interface
 """
 
+import boto3
+
 from typing import Union
 from pathlib import Path
 from omegaconf import OmegaConf
@@ -88,8 +90,6 @@ class ETLPipeline:
 
         # AWS S3 Support
         if aws_check_credentials(verbose=verbose):
-            import boto3
-
             session = boto3.Session()
             credentials = session.get_credentials()
 

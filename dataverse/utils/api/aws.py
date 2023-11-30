@@ -11,7 +11,9 @@ aws_s3_list("bucket")
 ```
 """
 
+import json
 import boto3
+
 
 
 def aws_check_credentials(verbose=True):
@@ -30,7 +32,40 @@ def aws_check_credentials(verbose=True):
             print(e)
         return False
 
-def aws_s3_create_bucket(bucket, location='ap-northeast-2'):
+class AWSClient:
+    """
+    AWS Client Information
+    """
+    # Singleton
+    _initialized = False
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(AWSClient, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        if self._initialized:
+            return
+        self.region = boto3.session.Session().region_name
+        if self.region is None:
+            raise Exception("AWS Region is not set. Set the AWS Region with `aws configure`")
+
+        self.iam = boto3.client('iam')
+        self.s3 = boto3.client('s3')
+        self.ec2 = boto3.client('ec2', region_name=self.region)
+        self.sts = boto3.client('sts')
+        self.user_id = self.sts.get_caller_identity()['UserId']
+        self._initialized = True
+
+    def __str__(self) -> str:
+        self.__repr__()
+
+    def __repr__(self) -> str:
+        return f"AWSClient(region={self.region}, user_id={self.user_id})"
+
+
+def aws_s3_create_bucket(bucket):
     """
     create aws s3 bucket
 
@@ -38,10 +73,9 @@ def aws_s3_create_bucket(bucket, location='ap-northeast-2'):
         bucket (str): bucket name (must be unique)
         location (str): aws region name
     """
-    s3 = boto3.client('s3', region_name=location)
-    s3.create_bucket(
+    AWSClient().s3.create_bucket(
         Bucket=bucket,
-        CreateBucketConfiguration={'LocationConstraint': location}
+        CreateBucketConfiguration={'LocationConstraint': AWSClient().region}
     )
 
 
@@ -54,8 +88,7 @@ def aws_s3_read(bucket, key):
     Usage:
         aws_s3_read('tmp', 'this/is/path.json')
     """
-    s3 = boto3.client('s3')
-    obj = s3.get_object(Bucket=bucket, Key=key)
+    obj = AWSClient().s3.get_object(Bucket=bucket, Key=key)
     text = obj['Body'].read().decode('utf-8')
 
     return text
@@ -71,8 +104,7 @@ def aws_s3_download(bucket, key, local_path):
     Usage:
         aws_s3_download('tmp', 'this/is/path.json', 'path.json')
     """
-    s3 = boto3.client('s3')
-    s3.download_file(bucket, key, local_path)
+    AWSClient().s3.download_file(bucket, key, local_path)
 
 def aws_s3_upload(bucket, key, local_path):
     """
@@ -84,8 +116,7 @@ def aws_s3_upload(bucket, key, local_path):
     Usage:
         aws_s3_upload('tmp', 'this/is/path.json', 'path.json')
     """
-    s3 = boto3.client('s3')
-    s3.upload_file(local_path, bucket, key)
+    AWSClient().s3.upload_file(local_path, bucket, key)
 
 def aws_s3_write(bucket, key, obj):
     """
@@ -97,15 +128,13 @@ def aws_s3_write(bucket, key, obj):
     Usage:
         aws_s3_write('tmp', 'this/is/path.json', '{"hello": "world"}')
     """
-    s3 = boto3.client('s3')
-    s3.put_object(Bucket=bucket, Key=key, Body=obj)
+    AWSClient().s3.put_object(Bucket=bucket, Key=key, Body=obj)
 
 def aws_s3_list_buckets():
     """
     get all buckets from aws s3
     """
-    s3 = boto3.client("s3")
-    buckets = s3.list_buckets()['Buckets']
+    buckets = AWSClient().s3.list_buckets()['Buckets']
     bucket_names = []
     for bucket in buckets:
         bucket_names.append(bucket['Name'])
@@ -148,7 +177,6 @@ def aws_s3_ls(query=None):
     - ducky_folder2/
     - ducky_file.txt
     """
-    s3 = boto3.client("s3")
     if query is None or query == "":
         return aws_s3_list_buckets()
     elif len(query.split("/")) > 1:
@@ -160,7 +188,7 @@ def aws_s3_ls(query=None):
     if prefix and not prefix.endswith("/"):
         prefix += "/"
 
-    results = s3.list_objects_v2(
+    results = AWSClient().s3.list_objects_v2(
         Bucket=bucket,
         Prefix=prefix,
         Delimiter="/",
