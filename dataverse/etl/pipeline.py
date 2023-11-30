@@ -18,6 +18,7 @@ from pyspark.sql import SparkSession
 from dataverse.config import Config
 from dataverse.etl import ETLRegistry
 from dataverse.utils.setting import SystemSetting
+from dataverse.utils.api import aws_check_credentials
 
 
 class ETLPipeline:
@@ -70,7 +71,10 @@ class ETLPipeline:
         """get ETL class from registry"""
         return self.registry.get(key=key)
 
-    def setup_spark_conf(self, config):
+    def setup_spark_conf(self, config, verbose=False):
+        """
+        AWS credential setting log is not influenced by the verbose by design
+        """
 
         # TODO: add more spark configurations
         spark_conf = SparkConf()
@@ -83,7 +87,7 @@ class ETLPipeline:
         spark_conf.set('spark.ui.port', config.spark.ui.port)
 
         # AWS S3 Support
-        try:
+        if aws_check_credentials(verbose=verbose):
             import boto3
 
             session = boto3.Session()
@@ -113,11 +117,8 @@ class ETLPipeline:
             except:
                 print('spark conf is set with [ permanent ] S3 credentials')
 
-        except ImportError:
-            raise ImportError('boto3 is not installed. Please install it first.')
-        except Exception as e:
-            print('Failed to set spark conf for S3')
-            print(e)
+        else:
+            print('[ No AWS Credentials Found] - Failed to set spark conf for S3')
 
         return spark_conf
 
@@ -157,7 +158,7 @@ class ETLPipeline:
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
 
-        spark_conf = self.setup_spark_conf(config)
+        spark_conf = self.setup_spark_conf(config, verbose=verbose)
         spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
         if verbose:
             print('=' * 50)
@@ -214,7 +215,7 @@ class ETLPipeline:
             print('=' * 50)
 
         # ================ [ Set Spark ] ===================
-        spark_conf = self.setup_spark_conf(config)
+        spark_conf = self.setup_spark_conf(config, verbose=verbose)
         spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
         if verbose:
             print('=' * 50)

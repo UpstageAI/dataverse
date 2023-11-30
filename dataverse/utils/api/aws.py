@@ -14,13 +14,21 @@ aws_s3_list("bucket")
 import boto3
 
 
-def aws_check_credentials():
+def aws_check_credentials(verbose=True):
     """
     simple check if aws credentials are valid
-    if no error, then credentials are valid
+
+    Returns:
+        bool: True if valid, False if not valid
     """
     sts = boto3.client('sts')
-    sts.get_caller_identity()
+    try:
+        sts.get_caller_identity()
+        return True
+    except Exception as e:
+        if verbose:
+            print(e)
+        return False
 
 def aws_s3_create_bucket(bucket, location='ap-northeast-2'):
     """
