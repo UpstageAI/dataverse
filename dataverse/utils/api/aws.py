@@ -146,7 +146,7 @@ def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
     if 'vpc' not in state:
         state['vpc'] = {}
 
-    state['vpc'][vpc_id] = {}
+    state['vpc'][vpc_id] = {'public_subnet': False}
     aws_set_state(state)
 
     return vpc_id
@@ -361,6 +361,30 @@ def aws_route_table_delete(vpc_id, route_table_id):
         state = aws_get_state()
         state['vpc'][vpc_id]['route_table'].remove(route_table_id)
         aws_set_state(state)
+
+def aws_subnet_publicize(vpc_id, subnet_id, route_table_id):
+    route_table = boto3.resource('ec2').RouteTable(route_table_id)
+    route_table.associate_with_subnet(SubnetId=subnet_id)
+
+    # set state
+    state = aws_get_state()
+    state['vpc'][vpc_id]['public_subnet'] = True
+    aws_set_state(state)
+
+def aws_subnet_privatize(vpc_id, subnet_id, route_table_id):
+    response = AWSClient().ec2.describe_route_tables(RouteTableIds=[route_table_id])
+    for route_table in response['RouteTables']:
+        for association in route_table['Associations']:
+            if association['SubnetId'] == subnet_id:
+                AWSClient().ec2.disassociate_route_table(
+                    AssociationId=association['RouteTableAssociationId']
+                )
+                break
+
+    # set state
+    state = aws_get_state()
+    state['vpc'][vpc_id]['public_subnet'] = False
+    aws_set_state(state)
 
 
 
