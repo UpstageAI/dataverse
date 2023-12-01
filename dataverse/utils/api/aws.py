@@ -105,7 +105,7 @@ def aws_set_state(state):
 
 # --------------------------------------------------------------------------------
 
-def aws_vpc_create(cidr_block=None):
+def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
 
     # load all vpcs ids to check if the cidr block is occupied
     vpcs = AWSClient().ec2.describe_vpcs()
@@ -133,11 +133,13 @@ def aws_vpc_create(cidr_block=None):
 
     # create vpc
     vpc = AWSClient().ec2.create_vpc(CidrBlock=cidr_block)
+    vpc_id = vpc['Vpc']['VpcId']
     AWSClient().ec2.create_tags(
         Resources=[vpc_id],
-        Tags=[{'Key':'Name', 'Value':'Dataverse-Temporary-VPC'}]
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
     )
-    vpc_id = vpc['Vpc']['VpcId']
 
     # update state
     state = aws_get_state()
@@ -167,7 +169,7 @@ def aws_vpc_delete(vpc_id):
         del state['vpc'][vpc_id]
         aws_set_state(state)
 
-def aws_subnet_create(vpc_id, cird_block=None):
+def aws_subnet_create(vpc_id, cird_block=None, tag_name='Dataverse-Temporary-Subnet'):
     if cird_block is None:
         # Get VPC information to determine CIDR block
         vpcs = AWSClient().ec2.describe_vpcs(VpcIds=[vpc_id])
@@ -175,11 +177,13 @@ def aws_subnet_create(vpc_id, cird_block=None):
 
     # create subnet
     subnet = AWSClient().ec2.create_subnet(CidrBlock=str(cird_block), VpcId=vpc_id)
-    AWSClient().ec2.create_tags(
-        Resources=[subnet['Subnet']['SubnetId']],
-        Tags=[{'Key':'Name', 'Value':'Dataverse-Temporary-Subnet'}]
-    )
     subnet_id = subnet['Subnet']['SubnetId']
+    AWSClient().ec2.create_tags(
+        Resources=[subnet_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
 
     # update state
     state = aws_get_state()
