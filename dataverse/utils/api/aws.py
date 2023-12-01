@@ -166,6 +166,8 @@ def aws_vpc_delete(vpc_id):
                 aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
             if 'security_group' in state['vpc'][vpc_id]:
                 aws_security_group_delete(vpc_id, state['vpc'][vpc_id]['security_group'])
+            if 'gateway' in state['vpc'][vpc_id]:
+                aws_gateway_delete(vpc_id, state['vpc'][vpc_id]['gateway'])
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         del state['vpc'][vpc_id]
@@ -208,7 +210,6 @@ def aws_subnet_delete(vpc_id, subnet_id):
         state = aws_get_state()
         state['vpc'][vpc_id]['subnet'].remove(subnet_id)
         aws_set_state(state)
-
 
 def aws_emr_security_group_create(
         vpc_id,
@@ -261,7 +262,6 @@ def aws_emr_security_group_create(
 
     return security_group_id
 
-
 def aws_security_group_delete(vpc_id, security_group_id):
     if isinstance(security_group_id, str):
         security_group_ids = [security_group_id]
@@ -273,6 +273,53 @@ def aws_security_group_delete(vpc_id, security_group_id):
         state = aws_get_state()
         state['vpc'][vpc_id]['security_group'].remove(security_group_id)
         aws_set_state(state)
+
+def aws_gateway_create(vpc_id, tag_name='Dataverse-Gateway'):
+    """
+    Create a gateway for public subnet.
+    """
+    gateway = AWSClient().ec2.create_internet_gateway()
+    gateway_id = gateway['InternetGateway']['InternetGatewayId']
+
+    # attach gateway to vpc
+    AWSClient().ec2.attach_internet_gateway(
+        InternetGatewayId=gateway_id,
+        VpcId=vpc_id
+    )
+    AWSClient().ec2.create_tags(
+        Resources=[gateway_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
+
+    # set state
+    state = aws_get_state()
+    if 'gateway' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['gateway'] = []
+     
+    state['vpc'][vpc_id]['gateway'].append(gateway_id)
+    aws_set_state(state)
+
+    return gateway_id
+
+def aws_gateway_delete(vpc_id, gateway_id):
+    if isinstance(gateway_id, str):
+        gateway_ids = [gateway_id]
+    elif isinstance(gateway_id, list):
+        gateway_ids = gateway_id
+
+    for gateway_id in gateway_ids:
+        # detach gateway from vpc
+        AWSClient().ec2.detach_internet_gateway(
+            InternetGatewayId=gateway_id,
+            VpcId=vpc_id
+        )
+        AWSClient().ec2.delete_internet_gateway(InternetGatewayId=gateway_id)
+        state = aws_get_state()
+        state['vpc'][vpc_id]['gateway'].remove(gateway_id)
+        aws_set_state(state)
+
 
 
 def aws_s3_create_bucket(bucket):
@@ -287,7 +334,6 @@ def aws_s3_create_bucket(bucket):
         Bucket=bucket,
         CreateBucketConfiguration={'LocationConstraint': AWSClient().region}
     )
-
 
 def aws_s3_read(bucket, key):
     """
