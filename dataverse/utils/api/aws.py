@@ -164,6 +164,8 @@ def aws_vpc_delete(vpc_id):
         if state['vpc'][vpc_id]:
             if 'subnet' in state['vpc'][vpc_id]:
                 aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
+            if 'security_group' in state['vpc'][vpc_id]:
+                aws_security_group_delete(vpc_id, state['vpc'][vpc_id]['security_group'])
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         del state['vpc'][vpc_id]
@@ -207,6 +209,70 @@ def aws_subnet_delete(vpc_id, subnet_id):
         state['vpc'][vpc_id]['subnet'].remove(subnet_id)
         aws_set_state(state)
 
+
+def aws_emr_security_group_create(
+        vpc_id,
+        port=4040,
+        group_name='DataverseEMRSecurityGroup',
+        description='Dataverse EMR security group',
+        tag_name='Dataverse-Temporary-EMR-Security-Group'
+    ):
+    """
+    Create a security group for EMR.
+    # TODO: Create a new function for general purpose.
+    ...
+
+    args:
+        vpc_id (str): The VPC ID.
+        port (int): The port to open for pyspark UI
+        group_name (str): The name of the security group.
+        description (str): The description of the security group.
+    """
+    security_group = AWSClient().ec2.create_security_group(
+        GroupName=group_name,
+        Description=description,
+        VpcId=vpc_id,
+    )
+    security_group_id = security_group['GroupId']
+    AWSClient().ec2.authorize_security_group_ingress(
+        GroupId=security_group_id,
+        IpPermissions=[
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': port,
+                'ToPort': port,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
+            },
+        ])
+    AWSClient().ec2.create_tags(
+        Resources=[security_group_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
+
+    # set state
+    state = aws_get_state()
+    if 'security_group' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['security_group'] = []
+
+    state['vpc'][vpc_id]['security_group'].append(security_group_id)
+    aws_set_state(state)
+
+    return security_group_id
+
+
+def aws_security_group_delete(vpc_id, security_group_id):
+    if isinstance(security_group_id, str):
+        security_group_ids = [security_group_id]
+    elif isinstance(security_group_id, list):
+        security_group_ids = security_group_id
+
+    for security_group_id in security_group_ids:
+        AWSClient().ec2.delete_security_group(GroupId=security_group_id)
+        state = aws_get_state()
+        state['vpc'][vpc_id]['security_group'].remove(security_group_id)
+        aws_set_state(state)
 
 
 def aws_s3_create_bucket(bucket):
