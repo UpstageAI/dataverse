@@ -64,6 +64,7 @@ class AWSClient:
     def __repr__(self) -> str:
         return f"AWSClient(region={self.region}, user_id={self.user_id})"
 
+# --------------------------------------------------------------------------------
 # AWS State
 """
 [ What is State? ]
@@ -102,6 +103,7 @@ def aws_set_state(state):
     state_path = f'{AWSClient().user_id}/state.json'
     aws_s3_write(aws_bucket, state_path, json.dumps(state))
 
+# --------------------------------------------------------------------------------
 
 def aws_vpc_create(cidr_block=None):
 
@@ -131,18 +133,18 @@ def aws_vpc_create(cidr_block=None):
 
     # create vpc
     vpc = AWSClient().ec2.create_vpc(CidrBlock=cidr_block)
-    vpc_id = vpc['Vpc']['VpcId']
     AWSClient().ec2.create_tags(
         Resources=[vpc_id],
         Tags=[{'Key':'Name', 'Value':'Dataverse-Temporary-VPC'}]
     )
+    vpc_id = vpc['Vpc']['VpcId']
 
     # update state
     state = aws_get_state()
     if 'vpc' not in state:
-        state['vpc'] = []
+        state['vpc'] = {}
 
-    state['vpc'].append(vpc_id)
+    state['vpc'][vpc_id] = {}
     aws_set_state(state)
 
     return vpc_id
@@ -154,9 +156,51 @@ def aws_vpc_delete(vpc_id):
         vpc_ids = vpc_id
 
     for vpc_id in vpc_ids:
-        AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         state = aws_get_state()
-        state['vpc'].remove(vpc_id)
+
+        # when VPC has dependency, remove dependency first
+        if state['vpc'][vpc_id]:
+            if 'subnet' in state['vpc'][vpc_id]:
+                aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
+
+        AWSClient().ec2.delete_vpc(VpcId=vpc_id)
+        del state['vpc'][vpc_id]
+        aws_set_state(state)
+
+def aws_subnet_create(vpc_id, cird_block=None):
+    if cird_block is None:
+        # Get VPC information to determine CIDR block
+        vpcs = AWSClient().ec2.describe_vpcs(VpcIds=[vpc_id])
+        cird_block = vpcs['Vpcs'][0]['CidrBlock']
+
+    # create subnet
+    subnet = AWSClient().ec2.create_subnet(CidrBlock=str(cird_block), VpcId=vpc_id)
+    AWSClient().ec2.create_tags(
+        Resources=[subnet['Subnet']['SubnetId']],
+        Tags=[{'Key':'Name', 'Value':'Dataverse-Temporary-Subnet'}]
+    )
+    subnet_id = subnet['Subnet']['SubnetId']
+
+    # update state
+    state = aws_get_state()
+    if 'subnet' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['subnet'] = []
+
+    state['vpc'][vpc_id]['subnet'].append(subnet_id)
+    aws_set_state(state)
+
+    return subnet_id
+
+def aws_subnet_delete(vpc_id, subnet_id):
+    if isinstance(subnet_id, str):
+        subnet_ids = [subnet_id]
+    elif isinstance(subnet_id, list):
+        subnet_ids = subnet_id
+
+    for subnet_id in subnet_ids:
+        AWSClient().ec2.delete_subnet(SubnetId=subnet_id)
+        state = aws_get_state()
+        state['vpc'][vpc_id]['subnet'].remove(subnet_id)
         aws_set_state(state)
 
 
