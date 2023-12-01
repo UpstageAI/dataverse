@@ -168,6 +168,8 @@ def aws_vpc_delete(vpc_id):
                 aws_security_group_delete(vpc_id, state['vpc'][vpc_id]['security_group'])
             if 'gateway' in state['vpc'][vpc_id]:
                 aws_gateway_delete(vpc_id, state['vpc'][vpc_id]['gateway'])
+            if 'route_table' in state['vpc'][vpc_id]:
+                aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         del state['vpc'][vpc_id]
@@ -318,6 +320,46 @@ def aws_gateway_delete(vpc_id, gateway_id):
         AWSClient().ec2.delete_internet_gateway(InternetGatewayId=gateway_id)
         state = aws_get_state()
         state['vpc'][vpc_id]['gateway'].remove(gateway_id)
+        aws_set_state(state)
+
+def aws_route_table_create(vpc_id, gateway_id, tag_name='Dataverse-Route-Table'):
+    """
+    Create a route table for public subnet.
+    """
+    route_table = AWSClient().ec2.create_route_table(VpcId=vpc_id)
+    route_table_id = route_table['RouteTable']['RouteTableId']
+    AWSClient().ec2.create_route(
+        DestinationCidrBlock='0.0.0.0/0',
+        RouteTableId=route_table_id,
+        GatewayId=gateway_id,
+    )
+    AWSClient().ec2.create_tags(
+        Resources=[route_table_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
+
+    # set state
+    state = aws_get_state()
+    if 'route_table' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['route_table'] = []
+
+    state['vpc'][vpc_id]['route_table'].append(route_table_id)
+    aws_set_state(state)
+
+    return route_table_id
+
+def aws_route_table_delete(vpc_id, route_table_id):
+    if isinstance(route_table_id, str):
+        route_table_ids = [route_table_id]
+    elif isinstance(route_table_id, list):
+        route_table_ids = route_table_id
+
+    for route_table_id in route_table_ids:
+        AWSClient().ec2.delete_route_table(RouteTableId=route_table_id)
+        state = aws_get_state()
+        state['vpc'][vpc_id]['route_table'].remove(route_table_id)
         aws_set_state(state)
 
 
