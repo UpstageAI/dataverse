@@ -57,6 +57,7 @@ class AWSClient:
         self.ec2 = boto3.client('ec2', region_name=self.region)
         self.emr = boto3.client('emr', region_name=self.region)
         self.user_id = self.sts.get_caller_identity()['UserId']
+        self.account_id = self.sts.get_caller_identity()['Account']
         self._initialized = True
 
     def __str__(self) -> str:
