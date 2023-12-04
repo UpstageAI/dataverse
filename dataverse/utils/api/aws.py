@@ -119,6 +119,17 @@ class EMRManager:
         Args:
             config (OmegaConf): config for the etl
         """
+        if config.emr.id is not None:
+            raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
+
+            # TODO: check if the existing emr cluster is valid and running
+            ...
+
+            # TODO: set vpc, subnet, etc id info from existing emr cluster
+            ...
+
+            return config.emr.id
+
         # create role
         self._role_setup(config)
 
@@ -204,25 +215,32 @@ class EMRManager:
 
     def _vpc_setup(self, config):
         """
+        config will be automatically updated
         """
-        self.vpc_id = aws_vpc_create(
-            cidr_block=config.emr.vpc.cidr,
-            tag_name=config.emr.vpc.tag_name,
-        )
-        self.subnet_id = aws_subnet_create(
-            vpc_id=self.vpc_id,
-            cird_block=config.emr.subnet.cidr,
-            tag_name=config.emr.subnet.tag_name,
-        )
-        self.security_id = aws_emr_security_group_create(
-            vpc_id=self.vpc_id,
+
+        # VPC
+        vpc_id = aws_vpc_create()
+        config.emr.vpc.id = vpc_id
+
+        # Subnet
+        subnet_id = aws_subnet_create(vpc_id=vpc_id)
+        config.emr.subnet.id = subnet_id
+
+        # Security Group
+        security_id = aws_emr_security_group_create(
+            vpc_id=vpc_id,
             port=config.spark.ui.port,
         )
-        if config.emr.subnet.public:
-            self.gateway_id = aws_gateway_create(self.vpc_id)
-            self.route_table_id = aws_route_table_create(self.vpc_id, self.gateway_id)
-            aws_subnet_publicize(self.vpc_id, self.subnet_id, self.route_table_id)
+        config.emr.security_group.id = security_id
 
+        # Public Subnet
+        if config.emr.subnet.public:
+            gateway_id = aws_gateway_create(vpc_id)
+            route_table_id = aws_route_table_create(vpc_id, gateway_id)
+            aws_subnet_publicize(vpc_id, subnet_id, route_table_id)
+
+            config.emr.gateway.id = gateway_id
+            config.emr.route_table.id = route_table_id
 
 
 # --------------------------------------------------------------------------------

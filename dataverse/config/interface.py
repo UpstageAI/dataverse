@@ -123,6 +123,7 @@ class Config:
         if emr:
             default.update({
                 'emr': {
+                    'id': None,
                     'name': 'dataverse_emr',
                     'release': 'emr-6.15.0',
                     'master_instance': {
@@ -132,14 +133,24 @@ class Config:
                         'type': 'm4.large',
                         'count': 3,
                     },
+
+                    # TODO: allow more options to customize e.g. cidr, tag, etc.
+                    #       but make sure vpc is temporary and not shared
                     'vpc': {
-                        'cidr': None,
-                        'tag_name': None,
+                        'id': None,
                     },
                     'subnet': {
-                        'cidr': None,
-                        'tag_name': None,
+                        'id': None,
                         'public': False,
+                    },
+                    'security_group': {
+                        'id': None,
+                    },
+                    'gateway': {
+                        'id': None,
+                    },
+                    'route_table': {
+                        'id': None,
                     },
                 }
             })
