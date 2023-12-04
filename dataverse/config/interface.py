@@ -99,7 +99,7 @@ class Config:
             OmegaConf.save(config, Path(path))
 
     @classmethod
-    def default(cls):
+    def default(cls, emr: bool = False):
         """
         fill the missing config with default
         """
@@ -117,14 +117,38 @@ class Config:
                 'local': {'dir': local_dir},
                 'ui': {'port': 4040},
             },
-            'etl': []
+            'etl': [],
         })
+
+        if emr:
+            default.update({
+                'emr': {
+                    'name': 'dataverse_emr',
+                    'release': 'emr-6.15.0',
+                    'master_instance': {
+                        'type': 'm4.large',
+                    },
+                    'worker_instance': {
+                        'type': 'm4.large',
+                        'count': 3,
+                    },
+                    'vpc': {
+                        'cidr': None,
+                        'tag_name': None,
+                    },
+                    'subnet': {
+                        'cidr': None,
+                        'tag_name': None,
+                        'public': False,
+                    },
+                }
+            })
 
         return default
 
     @classmethod
-    def set_default(cls, config: OmegaConf):
+    def set_default(cls, config: OmegaConf, emr: bool = False):
         """
         set the missing config args with default
         """
-        return OmegaConf.merge(cls.default(), config)
+        return OmegaConf.merge(cls.default(emr=emr), config)
