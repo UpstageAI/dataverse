@@ -135,6 +135,9 @@ class Config:
                         'count': 3,
                     },
 
+                    # EMR cluster created by dataverse or user
+                    'auto_generated': None,
+
                     # TODO: allow more options to customize e.g. cidr, tag, etc.
                     #       but make sure vpc is temporary and not shared
                     'vpc': {

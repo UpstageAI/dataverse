@@ -154,6 +154,8 @@ class EMRManager:
             # TODO: set vpc, subnet, etc id info from existing emr cluster
             ...
 
+            config.emr.auto_generated = False
+
             return config.emr.id
 
         # create role
@@ -167,6 +169,8 @@ class EMRManager:
 
         # create emr cluster
         ...
+
+        config.emr.auto_generated = True
 
         return config.emr.id
 
