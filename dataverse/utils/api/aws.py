@@ -13,7 +13,7 @@ aws_s3_list("bucket")
 
 import json
 import boto3
-
+import datetime
 
 
 def aws_check_credentials(verbose=True):
@@ -51,10 +51,11 @@ class AWSClient:
         if self.region is None:
             raise Exception("AWS Region is not set. Set the AWS Region with `aws configure`")
 
+        self.sts = boto3.client('sts')
         self.iam = boto3.client('iam')
         self.s3 = boto3.client('s3')
         self.ec2 = boto3.client('ec2', region_name=self.region)
-        self.sts = boto3.client('sts')
+        self.emr = boto3.client('emr', region_name=self.region)
         self.user_id = self.sts.get_caller_identity()['UserId']
         self._initialized = True
 
@@ -102,6 +103,50 @@ def aws_set_state(state):
     aws_bucket = SystemSetting()['AWS_BUCKET']
     state_path = f'{AWSClient().user_id}/state.json'
     aws_s3_write(aws_bucket, state_path, json.dumps(state))
+
+# --------------------------------------------------------------------------------
+# AWS EMR
+
+class EMRManager:
+    """
+    one EMR manager per one EMR cluster
+    """
+    def launch(self, config):
+        """
+        """
+        # create vpc
+        self._vpc_setup(config)
+
+        # create aws s3 - emr working directory
+        ...
+
+        # create emr cluster
+        ...
+
+        return None
+
+    def _vpc_setup(self, config):
+        """
+        """
+        self.vpc_id = aws_vpc_create(
+            cidr_block=config.emr.vpc.cidr,
+            tag_name=config.emr.vpc.tag_name,
+        )
+        self.subnet_id = aws_subnet_create(
+            vpc_id=self.vpc_id,
+            cird_block=config.emr.subnet.cidr,
+            tag_name=config.emr.subnet.tag_name,
+        )
+        self.security_id = aws_emr_security_group_create(
+            vpc_id=self.vpc_id,
+            port=config.spark.ui.port,
+        )
+        if config.emr.subnet.public:
+            self.gateway_id = aws_gateway_create(self.vpc_id)
+            self.route_table_id = aws_route_table_create(self.vpc_id, self.gateway_id)
+            aws_subnet_publicize(self.vpc_id, self.subnet_id, self.route_table_id)
+
+
 
 # --------------------------------------------------------------------------------
 
