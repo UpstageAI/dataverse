@@ -21,6 +21,7 @@ from dataverse.config import Config
 from dataverse.etl import ETLRegistry
 from dataverse.utils.setting import SystemSetting
 from dataverse.utils.api import aws_check_credentials
+from dataverse.utils.api import EMRManager
 
 
 class ETLPipeline:
@@ -190,6 +191,7 @@ class ETLPipeline:
         config: Union[str, dict, DictConfig, OmegaConf, Path],
         verbose=False,
         cache=False,
+        emr=False,
         *args,
         **kwargs,
     ):
@@ -203,7 +205,18 @@ class ETLPipeline:
                 - the verbose will be applied to the ETL process as well
                 - ETL process `verbose` takes precedence over this
             cache (bool): cache every stage of the ETL process
+            emr (bool): if True, run the ETL process on EMR
         """
+        # ================ [ EMR ] ===================
+        if emr:
+            return self.run_emr(
+                config,
+                verbose=verbose,
+                cache=cache,
+                *args,
+                **kwargs,
+            )
+
         # =============== [ Set Config ] ==================
         # mainly this is to fill the missing config args with default
         config = Config.load(config)
@@ -300,3 +313,48 @@ class ETLPipeline:
                 print('=' * 50)
 
         return spark, data
+
+    def run_emr(
+        self,
+        config: Union[str, dict, DictConfig, OmegaConf, Path],
+        verbose=False,
+        cache=False,
+        *args,
+        **kwargs,
+    ):
+        """
+        Args:
+            config (Union[str, dict, OmegaConf]): config for the etl
+                - str: path to the config file
+                - dict: config dict
+                - OmegaConf: config object
+            verbose (bool): if True, print the status of the etl pipeline
+                - the verbose will be applied to the ETL process as well
+                - ETL process `verbose` takes precedence over this
+            cache (bool): cache every stage of the ETL process
+        """
+        # =============== [ Set Config ] ==================
+        # mainly this is to fill the missing config args with default
+        config = Config.load(config)
+        config = Config.set_default(config, emr=True)
+
+        # EMR supports yarn
+        config.spark.master = 'yarn'
+
+        if verbose:
+            print('=' * 50)
+            print('[ Configuration ]')
+            print(OmegaConf.to_yaml(config))
+            print('=' * 50)
+
+        # ================ [ EMR ] ===================
+        emr_manager = EMRManager()
+        emr_id = emr_manager.launch(config)
+
+        # TODO: upload source code to s3
+        # TODO: upload config to s3
+        # TODO: upload requirements.txt to s3
+
+        raise NotImplementedError('EMR support is not implemented yet')
+
+        return None, None
