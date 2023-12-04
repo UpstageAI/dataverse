@@ -138,6 +138,30 @@ class EMRManager:
 
         return working_dir
 
+    def clean_unused_vpc(self):
+        """
+        check the AWS state and clean vpc that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all vpc ids that are used by emr
+        used_vpc_ids = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                used_vpc_ids.append(state['emr'][emr_id]['vpc_id'])
+
+        # get all vpc ids that are created
+        all_vpc_ids = []
+        if 'vpc' in state:
+            for vpc_id in state['vpc']:
+                all_vpc_ids.append(vpc_id)
+
+        # clean unused vpc
+        unused_vpc_ids = list(set(all_vpc_ids) - set(used_vpc_ids))
+
+        for vpc_id in unused_vpc_ids:
+            aws_vpc_delete(vpc_id)
+
     def launch(self, config):
         """
         auto setup environments and launch emr cluster
@@ -145,6 +169,9 @@ class EMRManager:
         Args:
             config (OmegaConf): config for the etl
         """
+        # clean the vpc which is not used by any emr cluster
+        self.clean_unused_vpc()
+
         if config.emr.id is not None:
             raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
 
