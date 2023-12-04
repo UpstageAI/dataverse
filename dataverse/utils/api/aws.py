@@ -134,7 +134,7 @@ class EMRManager:
             user_id = AWSClient().user_id
             working_dir_name = datetime.datetime.now().strftime(f"emr_%Y-%m-%d_%H:%M:%S_{config.emr.id}")
 
-            working_dir = f"s3://{bucket}/{user_id}/{working_dir_name}"
+            working_dir = f"s3://{bucket}/{user_id}/emr/{working_dir_name}"
 
         return working_dir
 
