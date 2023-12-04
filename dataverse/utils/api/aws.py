@@ -138,6 +138,29 @@ class EMRManager:
 
         return working_dir
 
+    def clean_stopped_emr(self):
+        """
+        check stopped EMR and update the state
+        """
+        state = aws_get_state()
+
+        # get all emr ids
+        emr_ids = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                emr_ids.append(emr_id)
+
+        # remove stopped emr from state
+        REMOVE_STATES = [
+            'TERMINATED',
+            'TERMINATED_WITH_ERRORS'
+        ]
+        for emr_id in emr_ids:
+            emr_info = AWSClient().emr.describe_cluster(ClusterId=emr_id)
+            if emr_info['Cluster']['Status']['State'] in REMOVE_STATES:
+                del state['emr'][emr_id]
+        aws_set_state(state)
+
     def clean_unused_vpc(self):
         """
         check the AWS state and clean vpc that is not used by any emr cluster
@@ -170,6 +193,7 @@ class EMRManager:
             config (OmegaConf): config for the etl
         """
         # clean the vpc which is not used by any emr cluster
+        self.clean_stopped_emr()
         self.clean_unused_vpc()
 
         if config.emr.id is not None:
