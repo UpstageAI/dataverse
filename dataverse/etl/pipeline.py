@@ -333,12 +333,24 @@ class ETLPipeline:
                 - ETL process `verbose` takes precedence over this
             cache (bool): cache every stage of the ETL process
         """
+        if not aws_check_credentials(verbose=verbose):
+            raise ValueError('AWS EMR requires AWS credentials')
+
         # =============== [ Set Config ] ==================
-        # mainly this is to fill the missing config args with default
         config = Config.load(config)
         config = Config.set_default(config, emr=True)
 
-        # EMR supports yarn
+        # ================ [ EMR ] ===================
+        # NOTE: config will be auto-updated by EMR Manager
+        emr_manager = EMRManager()
+
+        # EMR cluster launch
+        config.emr.id = emr_manager.launch(config)
+
+        # EMR working directory - AWS S3
+        config.emr.working_dir = emr_manager.get_working_dir(config)
+
+        # EMR resource manager - yarn
         config.spark.master = 'yarn'
 
         if verbose:
@@ -347,9 +359,6 @@ class ETLPipeline:
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
 
-        # ================ [ EMR ] ===================
-        emr_manager = EMRManager()
-        emr_id = emr_manager.launch(config)
 
         # TODO: upload source code to s3
         # TODO: upload config to s3

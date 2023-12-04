@@ -124,6 +124,7 @@ class Config:
             default.update({
                 'emr': {
                     'id': None,
+                    'working_dir': None,
                     'name': 'dataverse_emr',
                     'release': 'emr-6.15.0',
                     'master_instance': {

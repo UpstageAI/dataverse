@@ -11,6 +11,7 @@ aws_s3_list("bucket")
 ```
 """
 
+import re
 import json
 import boto3
 import datetime
@@ -112,6 +113,31 @@ class EMRManager:
     """
     one EMR manager per one EMR cluster
     """
+    def get_working_dir(self, config):
+        """
+        get working directory path for the emr cluster
+        if not provided, it will be automatically generated
+        """
+        # to avoid circular import
+        from dataverse.utils.setting import SystemSetting
+
+        if config.emr.working_dir is not None:
+            working_dir = config.emr.working_dir
+            if working_dir.startswith(('s3://', 's3a://', 's3n://')):
+                aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', working_dir)
+                if not aws_s3_matched:
+                    raise ValueError(f"EMR working directory {working_dir} is not a valid s3 path")
+        else:
+            # [ emr versioning ] - emr_YYYY-MM-DD_HH:MM:SS_<emr_id>
+            # datetime first for ascending order
+            bucket = SystemSetting()['AWS_BUCKET']
+            user_id = AWSClient().user_id
+            working_dir_name = datetime.datetime.now().strftime(f"emr_%Y-%m-%d_%H:%M:%S_{config.emr.id}")
+
+            working_dir = f"s3://{bucket}/{user_id}/{working_dir_name}"
+
+        return working_dir
+
     def launch(self, config):
         """
         auto setup environments and launch emr cluster
@@ -136,13 +162,10 @@ class EMRManager:
         # create vpc
         self._vpc_setup(config)
 
-        # create aws s3 - emr working directory
-        ...
-
         # create emr cluster
         ...
 
-        return None
+        return config.emr.id
 
     def _role_setup(self, config):
         """
