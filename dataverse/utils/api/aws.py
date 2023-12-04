@@ -219,11 +219,11 @@ class EMRManager:
         self._vpc_setup(config)
 
         # create emr cluster
-        ...
+        emr_id = self._emr_setup(config)
 
         config.emr.auto_generated = True
 
-        return config.emr.id
+        return emr_id
 
     def _role_setup(self, config):
         """
@@ -338,6 +338,71 @@ class EMRManager:
 
             config.emr.gateway.id = gateway_id
             config.emr.route_table.id = route_table_id
+
+    def _emr_setup(self, config):
+        """
+        create aws emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        # to avoid circular import
+        from dataverse.utils.setting import SystemSetting
+        log_dir = f"s3://{SystemSetting().AWS_BUCKET}/{AWSClient().user_id}/emr/logs"
+
+        # create emr cluster
+        emr_id = AWSClient().emr.run_job_flow(
+            Name=config.emr.name,
+            ReleaseLabel=config.emr.release,
+            Instances={
+                'InstanceGroups': [
+                    {
+                        'Name': 'master nodes',
+                        'Market': 'ON_DEMAND',
+                        'InstanceRole': 'MASTER',
+                        'InstanceType': config.emr.master_instance.type,
+                        'InstanceCount': 1,
+                    },
+                    {
+                        'Name': 'worker nodes',
+                        'Market': 'ON_DEMAND',
+                        'InstanceRole': 'CORE',
+                        'InstanceType': config.emr.worker_instance.type,
+                        'InstanceCount': config.emr.worker_instance.count,
+                    }
+                ],
+                'KeepJobFlowAliveWhenNoSteps': False,
+                'TerminationProtected': False,
+                'Ec2SubnetId': config.emr.subnet.id,
+                'EmrManagedMasterSecurityGroup': config.emr.security_group.id,
+                'EmrManagedSlaveSecurityGroup': config.emr.security_group.id,
+            },
+            Applications=[{'Name': 'Spark'}],
+            VisibleToAllUsers=True,
+            JobFlowRole='Dataverse_EMR_EC2_DefaultRole_InstanceProfile',
+            ServiceRole='Dataverse_EMR_DefaultRole',
+            Tags=[
+                {
+                    'Key': 'Name',
+                    'Value': config.emr.name,
+                },
+            ],
+            LogUri=log_dir,
+        )['JobFlowId']
+
+        # set state
+        state = aws_get_state()
+        if 'emr' not in state:
+            state['emr'] = {}
+
+        state['emr'][emr_id] = {
+            'vpc_id': config.emr.vpc.id
+        }
+        aws_set_state(state)
+
+        return emr_id
+
+
 
 
 # --------------------------------------------------------------------------------
