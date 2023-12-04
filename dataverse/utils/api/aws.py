@@ -114,7 +114,14 @@ class EMRManager:
     """
     def launch(self, config):
         """
+        auto setup environments and launch emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
         """
+        # create role
+        self._role_setup(config)
+
         # create vpc
         self._vpc_setup(config)
 
@@ -125,6 +132,75 @@ class EMRManager:
         ...
 
         return None
+
+    def _role_setup(self, config):
+        """
+        caveat:
+            hard coded trust policies, roles, and policies
+        """
+        emr_ec2_trust_policy = {
+            "Version": "2008-10-17",
+            "Statement": [
+                {
+                    "Sid": "",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ec2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+        emr_trust_policy = {
+            "Version": "2008-10-17",
+            "Statement": [
+                {
+                    "Sid": "",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "elasticmapreduce.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole",
+                    "Condition": {
+                        "StringEquals": {
+                            "aws:SourceAccount": AWSClient().account_id
+                        },
+                        "ArnLike": {
+                            "aws:SourceArn": f"arn:aws:elasticmapreduce:{AWSClient().region}:{AWSClient().account_id}:*"
+                        }
+                    }
+                }
+            ]
+        }
+        trust_policies = [emr_ec2_trust_policy, emr_trust_policy]
+        roles = ['Dataverse_EMR_EC2_DefaultRole', 'Dataverse_EMR_DefaultRole']
+        policies = ['AmazonElasticMapReduceforEC2Role', 'AmazonEMRServicePolicy_v2']
+        descs = ['Role for Dataverse EMR EC2', 'Role for Dataverse EMR']
+
+        # iterate through roles and create if not exist
+        for trust_policy, role, policy, desc in zip(trust_policies, roles, policies, descs):
+            try:
+                # check if role exists
+                AWSClient().iam.get_role(RoleName=role)
+                print(f"{role} already exists.")
+            except AWSClient().iam.exceptions.NoSuchEntityException:
+                print(f"{role} does not exist. Creating...")
+
+                # create role
+                AWSClient().iam.create_role(
+                    RoleName=role,
+                    Description=desc,
+                    AssumeRolePolicyDocument=json.dumps(trust_policy),
+                    MaxSessionDuration=3600,
+                )
+
+                # attach policy
+                AWSClient().iam.attach_role_policy(
+                    RoleName=role,
+                    PolicyArn=f"arn:aws:iam::aws:policy/service-role/{policy}",
+                )
+                print(f"{role} created and {policy} attached.")
+
 
     def _vpc_setup(self, config):
         """
