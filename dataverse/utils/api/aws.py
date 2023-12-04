@@ -159,6 +159,9 @@ class EMRManager:
         # create role
         self._role_setup(config)
 
+        # create instance profile
+        self._instance_profile_setup(config)
+
         # create vpc
         self._vpc_setup(config)
 
@@ -234,6 +237,22 @@ class EMRManager:
                     PolicyArn=f"arn:aws:iam::aws:policy/service-role/{policy}",
                 )
                 print(f"{role} created and {policy} attached.")
+
+    def _instance_profile_setup(self, config):
+        instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
+
+        try:
+            AWSClient().iam.create_instance_profile(
+                InstanceProfileName=instance_profile_name
+            )
+            print(f"Created {instance_profile_name}.")
+        except AWSClient().iam.exceptions.EntityAlreadyExistsException:
+            print(f"{instance_profile_name} already exists.")
+
+        AWSClient().iam.add_role_to_instance_profile(
+            InstanceProfileName=instance_profile_name,
+            RoleName='Dataverse_EMR_EC2_DefaultRole'
+        )
 
 
     def _vpc_setup(self, config):
