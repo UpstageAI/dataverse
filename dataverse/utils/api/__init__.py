@@ -22,6 +22,8 @@ from .aws import aws_route_table_delete
 
 from .aws import aws_iam_role_create
 from .aws import aws_iam_role_delete
+from .aws import aws_iam_instance_profile_create
+from .aws import aws_iam_instance_profile_delete
 
 from .aws import aws_s3_create_bucket
 from .aws import aws_s3_read

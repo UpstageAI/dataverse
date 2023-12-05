@@ -487,6 +487,49 @@ def aws_iam_role_delete(role_name):
             del state['iam']['role'][role_name]
             aws_set_state(state)
 
+def aws_iam_instance_profile_create(instance_profile_name, role_name):
+    try:
+        AWSClient().iam.create_instance_profile(
+            InstanceProfileName=instance_profile_name
+        )
+        AWSClient().iam.add_role_to_instance_profile(
+            InstanceProfileName=instance_profile_name,
+            RoleName=role_name
+        )
+
+        # set state
+        state = aws_get_state()
+        if 'iam' not in state:
+            state['iam'] = {}
+
+        if 'instance_profile' not in state['iam']:
+            state['iam']['instance_profile'] = {}
+
+        state['iam']['instance_profile'][instance_profile_name] = {
+            'role_name': role_name,
+        }
+    except AWSClient().iam.exceptions.EntityAlreadyExistsException:
+        print(f"{instance_profile_name} already exists.")
+
+def aws_iam_instance_profile_delete(instance_profile_name):
+    # remove role from instance profile
+    response = AWSClient().iam.get_instance_profile(InstanceProfileName=instance_profile_name)
+    role_name = response['InstanceProfile']['Roles'][0]['RoleName']
+    AWSClient().iam.remove_role_from_instance_profile(
+        InstanceProfileName=instance_profile_name,
+        RoleName=role_name,
+    )
+
+    # delete instance profile
+    AWSClient().iam.delete_instance_profile(InstanceProfileName=instance_profile_name)
+
+    # set state
+    state = aws_get_state()
+    if 'iam' in state and 'instance_profile' in state['iam']:
+        if instance_profile_name in state['iam']['instance_profile']:
+            del state['iam']['instance_profile'][instance_profile_name]
+            aws_set_state(state)
+
 
 def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
 
