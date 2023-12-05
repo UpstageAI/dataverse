@@ -372,6 +372,10 @@ class EMRManager:
         config.iam.instance_profile.name = instance_profile_name
         config.iam.instance_profile.ec2_role = config.iam.role.ec2.name
 
+        # wait until instance profile is ready
+        waiter = AWSClient().iam.get_waiter('instance_profile_exists')
+        waiter.wait(InstanceProfileName=instance_profile_name)
+
     def _vpc_setup(self, config):
         """
         config will be automatically updated
