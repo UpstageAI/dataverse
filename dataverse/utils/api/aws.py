@@ -211,6 +211,30 @@ class EMRManager:
         for role_name in unused_iam_role_names:
             aws_iam_role_delete(role_name)
 
+    def clean_unused_iam_instance_profile(self):
+        """
+        check the AWS state and clean iam instance profile that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all iam instance profile names that are used by emr
+        used_iam_instance_profile_names = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                used_iam_instance_profile_names.append(state['emr'][emr_id]['instance_profile'])
+
+        # get all iam instance profile names that are created
+        all_iam_instance_profile_names = []
+        if 'iam' in state and 'instance_profile' in state['iam']:
+            for instance_profile_name in state['iam']['instance_profile']:
+                all_iam_instance_profile_names.append(instance_profile_name)
+
+        # clean unused iam instance profile
+        unused_iam_instance_profile_names = list(set(all_iam_instance_profile_names) - set(used_iam_instance_profile_names))
+
+        for instance_profile_name in unused_iam_instance_profile_names:
+            aws_iam_instance_profile_delete(instance_profile_name)
+
     def launch(self, config):
         """
         auto setup environments and launch emr cluster
@@ -221,6 +245,7 @@ class EMRManager:
         # clean the vpc which is not used by any emr cluster
         self.clean_stopped_emr()
         self.clean_unused_vpc()
+        self.clean_unused_iam_instance_profile()
         self.clean_unused_iam_role()
 
         if config.emr.id is not None:
