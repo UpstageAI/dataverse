@@ -186,6 +186,31 @@ class EMRManager:
         for vpc_id in unused_vpc_ids:
             aws_vpc_delete(vpc_id)
 
+    def clean_unused_iam_role(self):
+        """
+        check the AWS state and clean iam role that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all iam role names that are used by emr
+        used_iam_role_names = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                used_iam_role_names.append(state['emr'][emr_id]['role']['ec2'])
+                used_iam_role_names.append(state['emr'][emr_id]['role']['emr'])
+
+        # get all iam role names that are created
+        all_iam_role_names = []
+        if 'iam' in state and 'role' in state['iam']:
+            for role_name in state['iam']['role']:
+                all_iam_role_names.append(role_name)
+
+        # clean unused iam role
+        unused_iam_role_names = list(set(all_iam_role_names) - set(used_iam_role_names))
+
+        for role_name in unused_iam_role_names:
+            aws_iam_role_delete(role_name)
+
     def launch(self, config):
         """
         auto setup environments and launch emr cluster
@@ -196,6 +221,7 @@ class EMRManager:
         # clean the vpc which is not used by any emr cluster
         self.clean_stopped_emr()
         self.clean_unused_vpc()
+        self.clean_unused_iam_role()
 
         if config.emr.id is not None:
             raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
