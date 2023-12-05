@@ -12,7 +12,6 @@ aws_s3_list("bucket")
 """
 
 import re
-import uuid
 import json
 import boto3
 import datetime
@@ -300,8 +299,9 @@ class EMRManager:
         ec2_role = 'Dataverse_EMR_EC2_DefaultRole'
         ec2_policy = 'AmazonElasticMapReduceforEC2Role'
 
-        # add uuid to temporary role name
-        ec2_role = f"{ec2_role}_{uuid.uuid1()}"
+        # add timestamp to temporary role name
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        ec2_role = f"{ec2_role}_{timestamp}"
         ec2_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{ec2_policy}"]
 
         aws_iam_role_create(
@@ -342,8 +342,9 @@ class EMRManager:
         emr_role = 'Dataverse_EMR_DefaultRole'
         emr_policy = 'AmazonEMRServicePolicy_v2'
 
-        # add uuid to temporary role name
-        emr_role = f"{emr_role}_{uuid.uuid1()}"
+        # add timestamp to temporary role name
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        emr_role = f"{emr_role}_{timestamp}"
         emr_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{emr_policy}"]
 
         aws_iam_role_create(
@@ -362,8 +363,9 @@ class EMRManager:
     def _instance_profile_setup(self, config):
         instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
 
-        # add uuid to temporary instance profile name
-        instance_profile_name = f"{instance_profile_name}_{uuid.uuid1()}"
+        # add timestamp to temporary role name
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        instance_profile_name = f"{instance_profile_name}_{timestamp}"
 
         aws_iam_instance_profile_create(
             instance_profile_name=instance_profile_name,
