@@ -313,6 +313,10 @@ class EMRManager:
         config.iam.role.ec2.name = ec2_role
         config.iam.role.ec2.policy_arns = ec2_policy_arns
 
+        # wait until role is ready
+        waiter = AWSClient().iam.get_waiter('role_exists')
+        waiter.wait(RoleName=ec2_role)
+
         # [ EMR ] --------------------------------------------------
         emr_trust_policy = {
             "Version": "2008-10-17",
@@ -350,6 +354,10 @@ class EMRManager:
         )
         config.iam.role.emr.name = emr_role
         config.iam.role.emr.policy_arns = emr_policy_arns
+
+        # wait until role is ready
+        waiter = AWSClient().iam.get_waiter('role_exists')
+        waiter.wait(RoleName=emr_role)
 
     def _instance_profile_setup(self, config):
         instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
