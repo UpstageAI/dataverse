@@ -319,9 +319,17 @@ class EMRManager:
         vpc_id = aws_vpc_create()
         config.emr.vpc.id = vpc_id
 
+        # wait until vpc is ready
+        waiter = AWSClient().ec2.get_waiter('vpc_available')
+        waiter.wait(VpcIds=[vpc_id])
+
         # Subnet
         subnet_id = aws_subnet_create(vpc_id=vpc_id)
         config.emr.subnet.id = subnet_id
+
+        # wait until subnet is ready
+        waiter = AWSClient().ec2.get_waiter('subnet_available')
+        waiter.wait(SubnetIds=[subnet_id])
 
         # Security Group
         security_id = aws_emr_security_group_create(
@@ -329,6 +337,10 @@ class EMRManager:
             port=config.spark.ui.port,
         )
         config.emr.security_group.id = security_id
+
+        # wait until security group is ready
+        waiter = AWSClient().ec2.get_waiter('security_group_exists')
+        waiter.wait(GroupIds=[security_id])
 
         # Public Subnet
         if config.emr.subnet.public:
@@ -338,6 +350,15 @@ class EMRManager:
 
             config.emr.gateway.id = gateway_id
             config.emr.route_table.id = route_table_id
+
+            # wait until gateway is ready
+            waiter = AWSClient().ec2.get_waiter('internet_gateway_available')
+            waiter.wait(InternetGatewayIds=[gateway_id])
+
+            # wait until route table is ready
+            waiter = AWSClient().ec2.get_waiter('route_table_available')
+            waiter.wait(RouteTableIds=[route_table_id])
+
 
     def _emr_setup(self, config):
         """
