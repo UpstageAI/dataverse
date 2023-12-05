@@ -303,17 +303,15 @@ class EMRManager:
     def _instance_profile_setup(self, config):
         instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
 
-        try:
-            AWSClient().iam.create_instance_profile(
-                InstanceProfileName=instance_profile_name
-            )
-            AWSClient().iam.add_role_to_instance_profile(
-                InstanceProfileName=instance_profile_name,
-                RoleName='Dataverse_EMR_EC2_DefaultRole'
-            )
-            print(f"Created {instance_profile_name}.")
-        except AWSClient().iam.exceptions.EntityAlreadyExistsException:
-            print(f"{instance_profile_name} already exists.")
+        # add uuid to temporary instance profile name
+        instance_profile_name = f"{instance_profile_name}_{uuid.uuid1()}"
+
+        aws_iam_instance_profile_create(
+            instance_profile_name=instance_profile_name,
+            role_name=config.iam.role.ec2.name,
+        )
+        config.iam.instance_profile.name = instance_profile_name
+        config.iam.instance_profile.ec2_role = config.iam.role.ec2.name
 
     def _vpc_setup(self, config):
         """
@@ -404,8 +402,8 @@ class EMRManager:
             },
             Applications=[{'Name': 'Spark'}],
             VisibleToAllUsers=True,
-            JobFlowRole='Dataverse_EMR_EC2_DefaultRole_InstanceProfile',
-            ServiceRole=config.iam.role.emr,
+            JobFlowRole=config.iam.instance_profile.name,
+            ServiceRole=config.iam.role.emr.name,
             Tags=[
                 {
                     'Key': 'Name',
@@ -426,6 +424,7 @@ class EMRManager:
                 'ec2': config.iam.role.ec2.name,
                 'emr': config.iam.role.emr.name,
             },
+            'instance_profile': config.iam.instance_profile.name,
         }
         aws_set_state(state)
 
