@@ -122,6 +122,13 @@ class Config:
 
         if emr:
             default.update({
+                'iam': {
+                    'role': {
+                        'ec2': None,
+                        'emr': None,
+                    },
+                    'instance_profile': None,
+                },
                 'emr': {
                     'id': None,
                     'working_dir': None,
