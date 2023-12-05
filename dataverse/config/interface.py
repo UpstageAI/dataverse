@@ -122,7 +122,22 @@ class Config:
 
         if emr:
             default.update({
-                'iam': {
+                'emr': {
+                    'id': None,
+                    'working_dir': None,
+                    'name': 'dataverse_emr',
+                    'release': 'emr-6.15.0',
+                    'master_instance': {
+                        'type': 'm4.large',
+                    },
+                    'worker_instance': {
+                        'type': 'm4.large',
+                        'count': 3,
+                    },
+                    # EMR cluster created by dataverse or user
+                    'auto_generated': None,
+
+                    # iam
                     'role': {
                         'ec2': {
                             'name': None,
@@ -136,23 +151,7 @@ class Config:
                     'instance_profile': {
                         'name': None,
                         'ec2_role': None,
-                    }
-                },
-                'emr': {
-                    'id': None,
-                    'working_dir': None,
-                    'name': 'dataverse_emr',
-                    'release': 'emr-6.15.0',
-                    'master_instance': {
-                        'type': 'm4.large',
                     },
-                    'worker_instance': {
-                        'type': 'm4.large',
-                        'count': 3,
-                    },
-
-                    # EMR cluster created by dataverse or user
-                    'auto_generated': None,
 
                     # TODO: allow more options to customize e.g. cidr, tag, etc.
                     #       but make sure vpc is temporary and not shared

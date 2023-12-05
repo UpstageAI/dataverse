@@ -310,8 +310,8 @@ class EMRManager:
             policy_arns=ec2_policy_arns,
             description='Role for Dataverse EMR EC2',
         )
-        config.iam.role.ec2.name = ec2_role
-        config.iam.role.ec2.policy_arns = ec2_policy_arns
+        config.emr.role.ec2.name = ec2_role
+        config.emr.role.ec2.policy_arns = ec2_policy_arns
 
         # wait until role is ready
         waiter = AWSClient().iam.get_waiter('role_exists')
@@ -353,8 +353,8 @@ class EMRManager:
             policy_arns=emr_policy_arns,
             description='Role for Dataverse EMR',
         )
-        config.iam.role.emr.name = emr_role
-        config.iam.role.emr.policy_arns = emr_policy_arns
+        config.emr.role.emr.name = emr_role
+        config.emr.role.emr.policy_arns = emr_policy_arns
 
         # wait until role is ready
         waiter = AWSClient().iam.get_waiter('role_exists')
@@ -369,10 +369,10 @@ class EMRManager:
 
         aws_iam_instance_profile_create(
             instance_profile_name=instance_profile_name,
-            role_name=config.iam.role.ec2.name,
+            role_name=config.emr.role.ec2.name,
         )
-        config.iam.instance_profile.name = instance_profile_name
-        config.iam.instance_profile.ec2_role = config.iam.role.ec2.name
+        config.emr.instance_profile.name = instance_profile_name
+        config.emr.instance_profile.ec2_role = config.emr.role.ec2.name
 
         # wait until instance profile is ready
         waiter = AWSClient().iam.get_waiter('instance_profile_exists')
@@ -467,8 +467,8 @@ class EMRManager:
             },
             Applications=[{'Name': 'Spark'}],
             VisibleToAllUsers=True,
-            JobFlowRole=config.iam.instance_profile.name,
-            ServiceRole=config.iam.role.emr.name,
+            JobFlowRole=config.emr.instance_profile.name,
+            ServiceRole=config.emr.role.emr.name,
             Tags=[
                 {
                     'Key': 'Name',
