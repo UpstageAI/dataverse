@@ -124,10 +124,19 @@ class Config:
             default.update({
                 'iam': {
                     'role': {
-                        'ec2': None,
-                        'emr': None,
+                        'ec2': {
+                            'name': None,
+                            'policy_arns': None,
+                        },
+                        'emr': {
+                            'name': None,
+                            'policy_arns': None,
+                        }
                     },
-                    'instance_profile': None,
+                    'instance_profile': {
+                        'name': None,
+                        'ec2_role': None,
+                    }
                 },
                 'emr': {
                     'id': None,
