@@ -428,6 +428,66 @@ class EMRManager:
 
 # --------------------------------------------------------------------------------
 
+def aws_iam_role_create(
+    role_name,
+    trust_policy,
+    policy_arns,
+    description='Role for Dataverse',
+    max_session_duration=3600,
+):
+
+    # create role
+    try:
+        AWSClient().iam.create_role(
+            RoleName=role_name,
+            Description=description,
+            AssumeRolePolicyDocument=json.dumps(trust_policy),
+            MaxSessionDuration=max_session_duration,
+        )
+
+        # attach policy
+        for policy_arn in policy_arns:
+            AWSClient().iam.attach_role_policy(
+                RoleName=role_name,
+                PolicyArn=policy_arn,
+            )
+
+        # set state
+        state = aws_get_state()
+        if 'iam' not in state:
+            state['iam'] = {}
+
+        if 'role' not in state['iam']:
+            state['iam']['role'] = {}
+
+        state['iam']['role'][role_name] = {
+            'trust_policy': trust_policy,
+            'policy_arns': policy_arns,
+        }
+        aws_set_state(state)
+    except AWSClient().iam.exceptions.EntityAlreadyExistsException:
+        print(f"{role_name} already exists.")
+
+def aws_iam_role_delete(role_name):
+    # detach policy
+    response = AWSClient().iam.list_attached_role_policies(RoleName=role_name)
+    for policy in response['AttachedPolicies']:
+        AWSClient().iam.detach_role_policy(
+            RoleName=role_name,
+            PolicyArn=policy['PolicyArn'],
+        )
+
+    # delete role
+    AWSClient().iam.delete_role(RoleName=role_name)
+
+    # set state
+    state = aws_get_state()
+    if 'iam' in state and 'role' in state['iam']:
+        if role_name in state['iam']['role']:
+            del state['iam']['role'][role_name]
+            aws_set_state(state)
+
+
 def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
 
     # load all vpcs ids to check if the cidr block is occupied
