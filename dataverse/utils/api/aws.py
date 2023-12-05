@@ -461,7 +461,6 @@ def aws_iam_role_create(
             state['iam']['role'] = {}
 
         state['iam']['role'][role_name] = {
-            'trust_policy': trust_policy,
             'policy_arns': policy_arns,
         }
         aws_set_state(state)
