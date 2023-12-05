@@ -12,6 +12,7 @@ aws_s3_list("bucket")
 """
 
 import re
+import uuid
 import json
 import boto3
 import datetime
@@ -230,7 +231,9 @@ class EMRManager:
         caveat:
             hard coded trust policies, roles, and policies
         """
-        emr_ec2_trust_policy = {
+
+        # [ EC2 ] --------------------------------------------------
+        ec2_trust_policy = {
             "Version": "2008-10-17",
             "Statement": [
                 {
@@ -243,6 +246,23 @@ class EMRManager:
                 }
             ]
         }
+        ec2_role = 'Dataverse_EMR_EC2_DefaultRole'
+        ec2_policy = 'AmazonElasticMapReduceforEC2Role'
+
+        # add uuid to temporary role name
+        ec2_role = f"{ec2_role}_{uuid.uuid1()}"
+        ec2_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{ec2_policy}"]
+
+        aws_iam_role_create(
+            role_name=ec2_role,
+            trust_policy=ec2_trust_policy,
+            policy_arns=ec2_policy_arns,
+            description='Role for Dataverse EMR EC2',
+        )
+        config.iam.role.ec2.name = ec2_role
+        config.iam.role.ec2.policy_arns = ec2_policy_arns
+
+        # [ EMR ] --------------------------------------------------
         emr_trust_policy = {
             "Version": "2008-10-17",
             "Statement": [
@@ -264,34 +284,21 @@ class EMRManager:
                 }
             ]
         }
-        trust_policies = [emr_ec2_trust_policy, emr_trust_policy]
-        roles = ['Dataverse_EMR_EC2_DefaultRole', 'Dataverse_EMR_DefaultRole']
-        policies = ['AmazonElasticMapReduceforEC2Role', 'AmazonEMRServicePolicy_v2']
-        descs = ['Role for Dataverse EMR EC2', 'Role for Dataverse EMR']
+        emr_role = 'Dataverse_EMR_DefaultRole'
+        emr_policy = 'AmazonEMRServicePolicy_v2'
 
-        # iterate through roles and create if not exist
-        for trust_policy, role, policy, desc in zip(trust_policies, roles, policies, descs):
-            try:
-                # check if role exists
-                AWSClient().iam.get_role(RoleName=role)
-                print(f"{role} already exists.")
-            except AWSClient().iam.exceptions.NoSuchEntityException:
-                print(f"{role} does not exist. Creating...")
+        # add uuid to temporary role name
+        emr_role = f"{emr_role}_{uuid.uuid1()}"
+        emr_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{emr_policy}"]
 
-                # create role
-                AWSClient().iam.create_role(
-                    RoleName=role,
-                    Description=desc,
-                    AssumeRolePolicyDocument=json.dumps(trust_policy),
-                    MaxSessionDuration=3600,
-                )
-
-                # attach policy
-                AWSClient().iam.attach_role_policy(
-                    RoleName=role,
-                    PolicyArn=f"arn:aws:iam::aws:policy/service-role/{policy}",
-                )
-                print(f"{role} created and {policy} attached.")
+        aws_iam_role_create(
+            role_name=emr_role,
+            trust_policy=emr_trust_policy,
+            policy_arns=emr_policy_arns,
+            description='Role for Dataverse EMR',
+        )
+        config.iam.role.emr.name = emr_role
+        config.iam.role.emr.policy_arns = emr_policy_arns
 
     def _instance_profile_setup(self, config):
         instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
@@ -307,8 +314,6 @@ class EMRManager:
             print(f"Created {instance_profile_name}.")
         except AWSClient().iam.exceptions.EntityAlreadyExistsException:
             print(f"{instance_profile_name} already exists.")
-
-
 
     def _vpc_setup(self, config):
         """
@@ -359,7 +364,6 @@ class EMRManager:
             waiter = AWSClient().ec2.get_waiter('route_table_available')
             waiter.wait(RouteTableIds=[route_table_id])
 
-
     def _emr_setup(self, config):
         """
         create aws emr cluster
@@ -401,7 +405,7 @@ class EMRManager:
             Applications=[{'Name': 'Spark'}],
             VisibleToAllUsers=True,
             JobFlowRole='Dataverse_EMR_EC2_DefaultRole_InstanceProfile',
-            ServiceRole='Dataverse_EMR_DefaultRole',
+            ServiceRole=config.iam.role.emr,
             Tags=[
                 {
                     'Key': 'Name',
@@ -417,7 +421,11 @@ class EMRManager:
             state['emr'] = {}
 
         state['emr'][emr_id] = {
-            'vpc_id': config.emr.vpc.id
+            'vpc_id': config.emr.vpc.id,
+            'role': {
+                'ec2': config.iam.role.ec2.name,
+                'emr': config.iam.role.emr.name,
+            },
         }
         aws_set_state(state)
 
