@@ -127,13 +127,24 @@ class Config:
                     'working_dir': None,
                     'name': 'dataverse_emr',
                     'release': 'emr-6.15.0',
+
+                    # master (driver)
                     'master_instance': {
                         'type': 'm4.large',
                     },
-                    'worker_instance': {
+
+                    # core (data node)
+                    'core_instance': {
                         'type': 'm4.large',
-                        'count': 3,
+                        'count': 1,
                     },
+
+                    # task (executors)
+                    'task_instance': {
+                        'type': 'm4.large',
+                        'count': 2,
+                    },
+
                     # EMR cluster created by dataverse or user
                     'auto_generated': None,
 

@@ -452,12 +452,19 @@ class EMRManager:
                         'InstanceCount': 1,
                     },
                     {
-                        'Name': 'worker nodes',
+                        'Name': 'core nodes',
                         'Market': 'ON_DEMAND',
                         'InstanceRole': 'CORE',
-                        'InstanceType': config.emr.worker_instance.type,
-                        'InstanceCount': config.emr.worker_instance.count,
-                    }
+                        'InstanceType': config.emr.core_instance.type,
+                        'InstanceCount': config.emr.core_instance.count,
+                    },
+                    {
+                        'Name': 'task nodes',
+                        'Market': 'ON_DEMAND',
+                        'InstanceRole': 'TASK',
+                        'InstanceType': config.emr.task_instance.type,
+                        'InstanceCount': config.emr.task_instance.count,
+                    },
                 ],
                 'KeepJobFlowAliveWhenNoSteps': False,
                 'TerminationProtected': False,
