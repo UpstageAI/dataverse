@@ -420,12 +420,12 @@ class EMRManager:
             config.emr.route_table.id = route_table_id
 
             # wait until gateway is ready
-            waiter = AWSClient().ec2.get_waiter('internet_gateway_available')
+            waiter = AWSClient().ec2.get_waiter('internet_gateway_exists')
             waiter.wait(InternetGatewayIds=[gateway_id])
 
-            # wait until route table is ready
-            waiter = AWSClient().ec2.get_waiter('route_table_available')
-            waiter.wait(RouteTableIds=[route_table_id])
+            # TODO: wait until route table is ready
+            #       didn't found waiter for route table
+            ...
 
     def _emr_setup(self, config):
         """
