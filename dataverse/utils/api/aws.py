@@ -238,6 +238,15 @@ class EMRManager:
         for instance_profile_name in unused_iam_instance_profile_names:
             aws_iam_instance_profile_delete(instance_profile_name)
 
+    def clean(self):
+        """
+        clean unused resources
+        """
+        self.clean_stopped_emr()
+        self.clean_unused_vpc()
+        self.clean_unused_iam_instance_profile()
+        self.clean_unused_iam_role()
+
     def launch(self, config):
         """
         auto setup environments and launch emr cluster
@@ -245,11 +254,8 @@ class EMRManager:
         Args:
             config (OmegaConf): config for the etl
         """
-        # clean the vpc which is not used by any emr cluster
-        self.clean_stopped_emr()
-        self.clean_unused_vpc()
-        self.clean_unused_iam_instance_profile()
-        self.clean_unused_iam_role()
+        # clean unused resources
+        self.clean()
 
         if config.emr.id is not None:
             raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
