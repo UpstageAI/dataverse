@@ -13,6 +13,7 @@ aws_s3_list("bucket")
 
 import re
 import json
+import time
 import boto3
 import datetime
 
@@ -195,8 +196,10 @@ class EMRManager:
         used_iam_role_names = []
         if 'emr' in state:
             for emr_id in state['emr']:
-                used_iam_role_names.append(state['emr'][emr_id]['role']['ec2'])
-                used_iam_role_names.append(state['emr'][emr_id]['role']['emr'])
+                if 'ec2' in state['emr'][emr_id]['role']:
+                    used_iam_role_names.append(state['emr'][emr_id]['role']['ec2'])
+                if 'emr' in state['emr'][emr_id]['role']:
+                    used_iam_role_names.append(state['emr'][emr_id]['role']['emr'])
 
         # get all iam role names that are created
         all_iam_role_names = []
@@ -260,17 +263,16 @@ class EMRManager:
 
             return config.emr.id
 
-        # create role
+        # TODO: modify interface for custom policy
+        # create role & instance profile
         self._role_setup(config)
-
-        # create instance profile
         self._instance_profile_setup(config)
 
         # create vpc
         self._vpc_setup(config)
 
         # create emr cluster
-        emr_id = self._emr_setup(config)
+        emr_id = self._emr_cluster_create(config)
 
         config.emr.auto_generated = True
 
@@ -278,8 +280,7 @@ class EMRManager:
 
     def _role_setup(self, config):
         """
-        caveat:
-            hard coded trust policies, roles, and policies
+        TODO: modify interface for custom policy
         """
 
         # [ EC2 ] --------------------------------------------------
@@ -340,12 +341,13 @@ class EMRManager:
             ]
         }
         emr_role = 'Dataverse_EMR_DefaultRole'
-        emr_policy = 'AmazonEMRServicePolicy_v2'
+        emr_policy = 'AmazonElasticMapReduceRole'
 
         # add timestamp to temporary role name
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         emr_role = f"{emr_role}_{timestamp}"
         emr_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{emr_policy}"]
+
 
         aws_iam_role_create(
             role_name=emr_role,
@@ -361,6 +363,10 @@ class EMRManager:
         waiter.wait(RoleName=emr_role)
 
     def _instance_profile_setup(self, config):
+        """
+        TODO: modify interface for custom policy
+        """
+        ec2_role = config.emr.role.ec2.name
         instance_profile_name = 'Dataverse_EMR_EC2_DefaultRole_InstanceProfile'
 
         # add timestamp to temporary role name
@@ -369,14 +375,22 @@ class EMRManager:
 
         aws_iam_instance_profile_create(
             instance_profile_name=instance_profile_name,
-            role_name=config.emr.role.ec2.name,
+            role_name=ec2_role,
         )
         config.emr.instance_profile.name = instance_profile_name
-        config.emr.instance_profile.ec2_role = config.emr.role.ec2.name
+        config.emr.instance_profile.ec2_role = ec2_role
 
         # wait until instance profile is ready
         waiter = AWSClient().iam.get_waiter('instance_profile_exists')
         waiter.wait(InstanceProfileName=instance_profile_name)
+
+        # FIXME: wait until instance profile is available
+        ...
+
+        # XXX: wait until instance profile is available. MUST BE FIXED
+        #      even instance profile is created, EMR cause invalid instance profile error
+        #      and need to wait until instance profile is available
+        time.sleep(2)
 
     def _vpc_setup(self, config):
         """
@@ -400,15 +414,15 @@ class EMRManager:
         waiter.wait(SubnetIds=[subnet_id])
 
         # Security Group
-        security_id = aws_emr_security_group_create(
-            vpc_id=vpc_id,
-            port=config.spark.ui.port,
-        )
-        config.emr.security_group.id = security_id
+        # security_id = aws_emr_security_group_create(
+        #     vpc_id=vpc_id,
+        #     port=config.spark.ui.port,
+        # )
+        # config.emr.security_group.id = security_id
 
         # wait until security group is ready
-        waiter = AWSClient().ec2.get_waiter('security_group_exists')
-        waiter.wait(GroupIds=[security_id])
+        # waiter = AWSClient().ec2.get_waiter('security_group_exists')
+        # waiter.wait(GroupIds=[security_id])
 
         # Public Subnet
         if config.emr.subnet.public:
@@ -427,7 +441,7 @@ class EMRManager:
             #       didn't found waiter for route table
             ...
 
-    def _emr_setup(self, config):
+    def _emr_cluster_create(self, config):
         """
         create aws emr cluster
 
@@ -469,8 +483,6 @@ class EMRManager:
                 'KeepJobFlowAliveWhenNoSteps': False,
                 'TerminationProtected': False,
                 'Ec2SubnetId': config.emr.subnet.id,
-                'EmrManagedMasterSecurityGroup': config.emr.security_group.id,
-                'EmrManagedSlaveSecurityGroup': config.emr.security_group.id,
             },
             Applications=[{'Name': 'Spark'}],
             VisibleToAllUsers=True,
@@ -492,18 +504,26 @@ class EMRManager:
 
         state['emr'][emr_id] = {
             'vpc_id': config.emr.vpc.id,
-            'role': {
-                'ec2': config.emr.role.ec2.name,
-                'emr': config.emr.role.emr.name,
-            },
-            'instance_profile': config.emr.instance_profile.name,
         }
+
+        # instance profile
+        if config.emr.instance_profile.name is not None:
+            state['emr'][emr_id]['instance_profile'] = config.emr.instance_profile.name
+
+        # role
+        if 'role' not in state['emr'][emr_id]:
+            state['emr'][emr_id]['role'] = {}
+
+        if config.emr.role.emr.name is not None:
+            state['emr'][emr_id]['role']['emr'] = config.emr.role.emr.name
+        if config.emr.role.ec2.name is not None:
+            state['emr'][emr_id]['role']['ec2'] = config.emr.role.ec2.name
+
         aws_set_state(state)
 
         config.emr.id = emr_id
 
         return emr_id
-
 
 
 
@@ -672,6 +692,8 @@ def aws_vpc_delete(vpc_id):
         state = aws_get_state()
 
         # when VPC has dependency, remove dependency first
+
+        # dataverse managed dependency
         if state['vpc'][vpc_id]:
             if 'subnet' in state['vpc'][vpc_id]:
                 aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
@@ -681,6 +703,9 @@ def aws_vpc_delete(vpc_id):
                 aws_gateway_delete(vpc_id, state['vpc'][vpc_id]['gateway'])
             if 'route_table' in state['vpc'][vpc_id]:
                 aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
+
+        # EMR managed dependency
+        ...
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         del state['vpc'][vpc_id]
