@@ -15,7 +15,6 @@ import re
 import json
 import time
 import boto3
-import botocore
 import datetime
 
 
@@ -279,34 +278,14 @@ class EMRManager:
         self._vpc_setup(config)
 
         # create emr cluster
-        # XXX: when instance profile is not ready, wait and retry
-        #      even instance profile is created, EMR cause invalid instance profile error
-        #      and need to wait until instance profile is available
-        #       >>> ClientError: An error occurred (ValidationException) when calling the RunJobFlow operation: Invalid InstanceProfile: Dataverse_EMR_EC2_DefaultRole_InstanceProfile_XXX.
-        MAX_ATTEMPTS = 5
-        DELAY_SECONDS = 2
-        for attempt in range(MAX_ATTEMPTS):
-            try:
-                emr_id = self._emr_cluster_create(config)
+        # XXX: wait until instance profile is ready
+        #      otherwise, emr cluster creation will fail
+        # FIXME: convert to smart solution (e.g. waiter)
+        #        currently AWS doesn't support waiter available option for instance profile
+        # NOTE: I've tried to make waiter using `describe_instance_profile` but it didn't work
+        time.sleep(7)
 
-            # FIXME: this is not a good solution, need to find a better way
-            #        there is no waiter for instance profile.
-            #        I've tried to make it with `describe_instance_profile`, but it doesn't work.
-            except botocore.exceptions.ClientError as e:
-                if attempt == MAX_ATTEMPTS - 1:
-                    raise RuntimeError(f"Failed to create EMR cluster after {MAX_ATTEMPTS} attempts.")
-
-                # Check error message for "Invalid InstanceProfile"
-                if "Invalid InstanceProfile" in str(e):
-                    time.sleep(DELAY_SECONDS)
-                else:
-                    # if error is not 'Invalid InstanceProfile', raise the exception
-                    raise e
-
-            # re-throws any other exceptions
-            except Exception as e:
-                raise e
-
+        emr_id = self._emr_cluster_create(config)
         config.emr.auto_generated = True
 
         return emr_id
