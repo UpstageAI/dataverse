@@ -708,7 +708,8 @@ def aws_vpc_delete(vpc_id):
         ...
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
-        del state['vpc'][vpc_id]
+        if 'vpc' in state and vpc_id in state['vpc']:
+            del state['vpc'][vpc_id]
         aws_set_state(state)
 
 def aws_subnet_create(vpc_id, cird_block=None, tag_name='Dataverse-Temporary-Subnet'):
@@ -746,8 +747,11 @@ def aws_subnet_delete(vpc_id, subnet_id):
     for subnet_id in subnet_ids:
         AWSClient().ec2.delete_subnet(SubnetId=subnet_id)
         state = aws_get_state()
-        state['vpc'][vpc_id]['subnet'].remove(subnet_id)
-        aws_set_state(state)
+
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'subnet' in state['vpc'][vpc_id] and subnet_id in state['vpc'][vpc_id]['subnet']:
+                state['vpc'][vpc_id]['subnet'].remove(subnet_id)
+                aws_set_state(state)
 
 def aws_emr_security_group_create(
         vpc_id,
@@ -809,8 +813,11 @@ def aws_security_group_delete(vpc_id, security_group_id):
     for security_group_id in security_group_ids:
         AWSClient().ec2.delete_security_group(GroupId=security_group_id)
         state = aws_get_state()
-        state['vpc'][vpc_id]['security_group'].remove(security_group_id)
-        aws_set_state(state)
+
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'security_group' in state['vpc'][vpc_id] and security_group_id in state['vpc'][vpc_id]['security_group']:
+                state['vpc'][vpc_id]['security_group'].remove(security_group_id)
+                aws_set_state(state)
 
 def aws_gateway_create(vpc_id, tag_name='Dataverse-Gateway'):
     """
@@ -855,8 +862,10 @@ def aws_gateway_delete(vpc_id, gateway_id):
         )
         AWSClient().ec2.delete_internet_gateway(InternetGatewayId=gateway_id)
         state = aws_get_state()
-        state['vpc'][vpc_id]['gateway'].remove(gateway_id)
-        aws_set_state(state)
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'gateway' in state['vpc'][vpc_id] and gateway_id in state['vpc'][vpc_id]['gateway']:
+                state['vpc'][vpc_id]['gateway'].remove(gateway_id)
+                aws_set_state(state)
 
 def aws_route_table_create(vpc_id, gateway_id, tag_name='Dataverse-Route-Table'):
     """
@@ -895,8 +904,10 @@ def aws_route_table_delete(vpc_id, route_table_id):
     for route_table_id in route_table_ids:
         AWSClient().ec2.delete_route_table(RouteTableId=route_table_id)
         state = aws_get_state()
-        state['vpc'][vpc_id]['route_table'].remove(route_table_id)
-        aws_set_state(state)
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'route_table' in state['vpc'][vpc_id] and route_table_id in state['vpc'][vpc_id]['route_table']:
+                state['vpc'][vpc_id]['route_table'].remove(route_table_id)
+                aws_set_state(state)
 
 def aws_subnet_publicize(vpc_id, subnet_id, route_table_id):
     route_table = boto3.resource('ec2').RouteTable(route_table_id)
