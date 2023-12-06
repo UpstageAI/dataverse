@@ -486,12 +486,14 @@ class EMRManager:
         state['emr'][emr_id] = {
             'vpc_id': config.emr.vpc.id,
             'role': {
-                'ec2': config.iam.role.ec2.name,
-                'emr': config.iam.role.emr.name,
+                'ec2': config.emr.role.ec2.name,
+                'emr': config.emr.role.emr.name,
             },
-            'instance_profile': config.iam.instance_profile.name,
+            'instance_profile': config.emr.instance_profile.name,
         }
         aws_set_state(state)
+
+        config.emr.id = emr_id
 
         return emr_id
 
