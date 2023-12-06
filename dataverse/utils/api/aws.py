@@ -538,6 +538,8 @@ def aws_iam_role_create(
         aws_set_state(state)
     except AWSClient().iam.exceptions.EntityAlreadyExistsException:
         print(f"{role_name} already exists.")
+    except Exception as e:
+        raise e
 
 def aws_iam_role_delete(role_name):
     # detach policy
@@ -579,8 +581,11 @@ def aws_iam_instance_profile_create(instance_profile_name, role_name):
         state['iam']['instance_profile'][instance_profile_name] = {
             'role_name': role_name,
         }
+        aws_set_state(state)
     except AWSClient().iam.exceptions.EntityAlreadyExistsException:
         print(f"{instance_profile_name} already exists.")
+    except Exception as e:
+        raise e
 
 def aws_iam_instance_profile_delete(instance_profile_name):
     # remove role from instance profile
