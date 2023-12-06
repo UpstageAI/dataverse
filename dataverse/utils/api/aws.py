@@ -691,8 +691,8 @@ def aws_vpc_delete(vpc_id):
     for vpc_id in vpc_ids:
         state = aws_get_state()
 
-        # when VPC has dependency, remove dependency first
-
+        # [ DEPENDENCY ] remove all dependencies
+        # ------------------------------------------------------------
         # dataverse managed dependency
         if state['vpc'][vpc_id]:
             if 'subnet' in state['vpc'][vpc_id]:
@@ -705,7 +705,18 @@ def aws_vpc_delete(vpc_id):
                 aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
 
         # EMR managed dependency
-        ...
+        vpc = boto3.resource('ec2').Vpc(vpc_id)
+
+        # NOTE: self-referencing happens for EMR managed security group
+        # remove self-referencing security group
+        for security_group in vpc.security_groups.all():
+            aws_security_group_self_ref_delete(security_group.id)
+
+        for security_group in vpc.security_groups.all():
+            if security_group.group_name == "default":
+                continue
+            aws_security_group_delete(vpc_id, security_group.id)
+        # ------------------------------------------------------------
 
         AWSClient().ec2.delete_vpc(VpcId=vpc_id)
         if 'vpc' in state and vpc_id in state['vpc']:
@@ -818,6 +829,30 @@ def aws_security_group_delete(vpc_id, security_group_id):
             if 'security_group' in state['vpc'][vpc_id] and security_group_id in state['vpc'][vpc_id]['security_group']:
                 state['vpc'][vpc_id]['security_group'].remove(security_group_id)
                 aws_set_state(state)
+
+def aws_security_group_self_ref_delete(security_group_id):
+    """
+    Delete self-referencing security group rules
+    """
+    response = AWSClient().ec2.describe_security_groups(
+        GroupIds=[security_group_id]
+    )
+    sg = response["SecurityGroups"][0]
+
+    # init a list to keep permissions we want to remove
+    permissions_for_removal = []
+    for ip_perm in sg['IpPermissions']:
+        for each in ip_perm['UserIdGroupPairs']:
+            if each['GroupId'] == security_group_id:
+                # add the permission to our list
+                permissions_for_removal.append(ip_perm)
+
+    # there is self-referencing
+    if permissions_for_removal:
+        AWSClient().ec2.revoke_security_group_ingress(
+            GroupId=security_group_id,
+            IpPermissions=permissions_for_removal
+        )
 
 def aws_gateway_create(vpc_id, tag_name='Dataverse-Gateway'):
     """
