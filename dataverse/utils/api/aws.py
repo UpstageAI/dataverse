@@ -700,6 +700,8 @@ def aws_vpc_delete(vpc_id):
                 aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
             if 'elastic_ip' in state['vpc'][vpc_id]:
                 aws_elastic_ip_release(state['vpc'][vpc_id]['elastic_ip'])
+            if 'nat_gateway' in state['vpc'][vpc_id]:
+                aws_nat_gateway_delete(state['vpc'][vpc_id]['nat_gateway'])
 
         # EMR managed dependency
         vpc = boto3.resource('ec2').Vpc(vpc_id)
@@ -953,6 +955,63 @@ def aws_elastic_ip_release(elastic_ip_id):
         if 'elastic_ip' in state and elastic_ip_id in state['elastic_ip']:
             state['elastic_ip'].remove(elastic_ip_id)
             aws_set_state(state)
+
+def aws_nat_gateway_create(
+    subnet_id,
+    elastic_ip_id,
+    tag_name='Dataverse-NAT-Gateway'
+):
+    """
+    Create a NAT gateway for private subnet.
+    """
+    # create NAT gateway
+    nat_gateway = AWSClient().ec2.create_nat_gateway(
+        AllocationId=elastic_ip_id,
+        SubnetId=subnet_id,
+    )
+    nat_gateway_id = nat_gateway['NatGateway']['NatGatewayId']
+
+    # set tag
+    AWSClient().ec2.create_tags(
+        Resources=[nat_gateway_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
+
+    # set state
+    state = aws_get_state()
+    if 'nat_gateway' not in state:
+        state['nat_gateway'] = []
+
+    state['nat_gateway'].append(nat_gateway_id)
+    aws_set_state(state)
+
+    # wait until NAT gateway is ready
+    waiter = AWSClient().ec2.get_waiter('nat_gateway_available')
+    waiter.wait(NatGatewayIds=[nat_gateway_id])
+
+    return nat_gateway_id
+
+def aws_nat_gateway_delete(nat_gateway_id):
+    if isinstance(nat_gateway_id, str):
+        nat_gateway_ids = [nat_gateway_id]
+    elif isinstance(nat_gateway_id, list):
+        nat_gateway_ids = nat_gateway_id
+
+    for nat_gateway_id in nat_gateway_ids:
+        # delete NAT gateway
+        AWSClient().ec2.delete_nat_gateway(NatGatewayId=nat_gateway_id)
+
+        # set state
+        state = aws_get_state()
+        if 'nat_gateway' in state and nat_gateway_id in state['nat_gateway']:
+            state['nat_gateway'].remove(nat_gateway_id)
+            aws_set_state(state)
+
+        # wait until NAT gateway is deleted
+        waiter = AWSClient().ec2.get_waiter('nat_gateway_deleted')
+        waiter.wait(NatGatewayIds=[nat_gateway_id])
 
 def aws_route_table_create(
     vpc_id,
