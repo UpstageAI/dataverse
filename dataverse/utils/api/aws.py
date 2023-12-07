@@ -326,10 +326,6 @@ class EMRManager:
         config.emr.role.ec2.name = ec2_role
         config.emr.role.ec2.policy_arns = ec2_policy_arns
 
-        # wait until role is ready
-        waiter = AWSClient().iam.get_waiter('role_exists')
-        waiter.wait(RoleName=ec2_role)
-
         # [ EMR ] --------------------------------------------------
         emr_trust_policy = {
             "Version": "2008-10-17",
@@ -360,7 +356,6 @@ class EMRManager:
         emr_role = f"{emr_role}_{timestamp}"
         emr_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{emr_policy}"]
 
-
         aws_iam_role_create(
             role_name=emr_role,
             trust_policy=emr_trust_policy,
@@ -369,10 +364,6 @@ class EMRManager:
         )
         config.emr.role.emr.name = emr_role
         config.emr.role.emr.policy_arns = emr_policy_arns
-
-        # wait until role is ready
-        waiter = AWSClient().iam.get_waiter('role_exists')
-        waiter.wait(RoleName=emr_role)
 
     def _instance_profile_setup(self, config):
         """
@@ -392,13 +383,6 @@ class EMRManager:
         config.emr.instance_profile.name = instance_profile_name
         config.emr.instance_profile.ec2_role = ec2_role
 
-        # wait until instance profile is ready
-        waiter = AWSClient().iam.get_waiter('instance_profile_exists')
-        waiter.wait(InstanceProfileName=instance_profile_name)
-
-        # FIXME: wait until instance profile is available
-        ...
-
 
     def _vpc_setup(self, config):
         """
@@ -409,18 +393,10 @@ class EMRManager:
         vpc_id = aws_vpc_create()
         config.emr.vpc.id = vpc_id
 
-        # wait until vpc is ready
-        waiter = AWSClient().ec2.get_waiter('vpc_available')
-        waiter.wait(VpcIds=[vpc_id])
-
         # Subnet
         subnet_id = aws_subnet_create(vpc_id=vpc_id)
         config.emr.subnet.id = subnet_id
         config.emr.subnet.public_id = subnet_id
-
-        # wait until subnet is ready
-        waiter = AWSClient().ec2.get_waiter('subnet_available')
-        waiter.wait(SubnetIds=[subnet_id])
 
         # Internet Gateway
         gateway_id = aws_gateway_create(vpc_id)
@@ -435,14 +411,6 @@ class EMRManager:
 
         config.emr.gateway.id = gateway_id
         config.emr.route_table.id = route_table_id
-
-        # wait until gateway is ready
-        waiter = AWSClient().ec2.get_waiter('internet_gateway_exists')
-        waiter.wait(InternetGatewayIds=[gateway_id])
-
-        # TODO: wait until route table is ready
-        #       didn't found waiter for route table
-        ...
 
         if not config.emr.subnet.public:
             raise NotImplementedError("Private subnet is not implemented yet.")
@@ -582,6 +550,10 @@ def aws_iam_role_create(
     except Exception as e:
         raise e
 
+    # wait until role is ready
+    waiter = AWSClient().iam.get_waiter('role_exists')
+    waiter.wait(RoleName=role_name)
+
 def aws_iam_role_delete(role_name):
     # detach policy
     response = AWSClient().iam.list_attached_role_policies(RoleName=role_name)
@@ -627,6 +599,13 @@ def aws_iam_instance_profile_create(instance_profile_name, role_name):
         print(f"{instance_profile_name} already exists.")
     except Exception as e:
         raise e
+
+    # wait until instance profile is ready
+    waiter = AWSClient().iam.get_waiter('instance_profile_exists')
+    waiter.wait(InstanceProfileName=instance_profile_name)
+
+    # FIXME: wait until instance profile is available
+    ...
 
 def aws_iam_instance_profile_delete(instance_profile_name):
     # remove role from instance profile
@@ -691,6 +670,10 @@ def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
 
     state['vpc'][vpc_id] = {'public_subnet': False}
     aws_set_state(state)
+
+    # wait until vpc is ready
+    waiter = AWSClient().ec2.get_waiter('vpc_available')
+    waiter.wait(VpcIds=[vpc_id])
 
     return vpc_id
 
@@ -767,6 +750,10 @@ def aws_subnet_create(vpc_id, cird_block=None, tag_name='Dataverse-Temporary-Sub
 
     state['vpc'][vpc_id]['subnet'].append(subnet_id)
     aws_set_state(state)
+
+    # wait until subnet is ready
+    waiter = AWSClient().ec2.get_waiter('subnet_available')
+    waiter.wait(SubnetIds=[subnet_id])
 
     return subnet_id
 
@@ -902,6 +889,10 @@ def aws_gateway_create(vpc_id, tag_name='Dataverse-Gateway'):
     state['vpc'][vpc_id]['gateway'].append(gateway_id)
     aws_set_state(state)
 
+    # wait until gateway is ready
+    waiter = AWSClient().ec2.get_waiter('internet_gateway_exists')
+    waiter.wait(InternetGatewayIds=[gateway_id])
+
     return gateway_id
 
 def aws_gateway_delete(vpc_id, gateway_id):
@@ -959,6 +950,10 @@ def aws_route_table_create(
 
     state['vpc'][vpc_id]['route_table'].append(route_table_id)
     aws_set_state(state)
+
+    # TODO: wait until route table is ready
+    #       didn't found waiter for route table
+    ...
 
     return route_table_id
 
