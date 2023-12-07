@@ -137,6 +137,15 @@ def aws_ec2_instance_info():
 
     return instance_info
 
+def aws_ec2_get_price(instance_type):
+    response = AWSClient().ec2.describe_spot_price_history(
+        InstanceTypes=[instance_type],
+        ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
+        StartTime=datetime.datetime.now(),
+        MaxResults=1,
+    )
+
+    return response['SpotPriceHistory'][0]['SpotPrice']
 
 
 # --------------------------------------------------------------------------------
