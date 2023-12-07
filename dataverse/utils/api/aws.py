@@ -908,17 +908,28 @@ def aws_gateway_delete(vpc_id, gateway_id):
                 state['vpc'][vpc_id]['gateway'].remove(gateway_id)
                 aws_set_state(state)
 
-def aws_route_table_create(vpc_id, gateway_id, tag_name='Dataverse-Route-Table'):
+def aws_route_table_create(
+    vpc_id,
+    gateway_id=None,
+    nat_gateway_id=None,
+    tag_name='Dataverse-Route-Table',
+    destination_cidr_block='0.0.0.0/0',
+):
     """
-    Create a route table for public subnet.
+    Create a route table for subnet.
     """
     route_table = AWSClient().ec2.create_route_table(VpcId=vpc_id)
     route_table_id = route_table['RouteTable']['RouteTableId']
-    AWSClient().ec2.create_route(
-        DestinationCidrBlock='0.0.0.0/0',
-        RouteTableId=route_table_id,
-        GatewayId=gateway_id,
-    )
+    args = {
+        'DestinationCidrBlock': destination_cidr_block,
+        'RouteTableId': route_table_id,
+    }
+    if gateway_id is not None:
+        args['GatewayId'] = gateway_id
+    if nat_gateway_id is not None:
+        args['NatGatewayId'] = nat_gateway_id
+
+    AWSClient().ec2.create_route(**args)
     AWSClient().ec2.create_tags(
         Resources=[route_table_id],
         Tags=[
