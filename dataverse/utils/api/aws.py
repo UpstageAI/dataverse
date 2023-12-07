@@ -735,10 +735,10 @@ def aws_vpc_delete(vpc_id):
         # ------------------------------------------------------------
         # dataverse managed dependency
         if state['vpc'][vpc_id]:
-            if 'elastic_ip' in state['vpc'][vpc_id]:
-                aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip_id'])
             if 'nat_gateway' in state['vpc'][vpc_id]:
                 aws_nat_gateway_delete(vpc_id, state['vpc'][vpc_id]['nat_gateway'])
+            if 'elastic_ip' in state['vpc'][vpc_id]:
+                aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip'])
             if 'subnet' in state['vpc'][vpc_id]:
                 aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
             if 'security_group' in state['vpc'][vpc_id]:
