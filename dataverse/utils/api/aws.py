@@ -712,7 +712,7 @@ def aws_vpc_delete(vpc_id):
         # dataverse managed dependency
         if state['vpc'][vpc_id]:
             if 'elastic_ip' in state['vpc'][vpc_id]:
-                aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip'])
+                aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip_id'])
             if 'nat_gateway' in state['vpc'][vpc_id]:
                 aws_nat_gateway_delete(vpc_id, state['vpc'][vpc_id]['nat_gateway'])
             if 'subnet' in state['vpc'][vpc_id]:
@@ -939,7 +939,7 @@ def aws_gateway_delete(vpc_id, gateway_id):
                 state['vpc'][vpc_id]['gateway'].remove(gateway_id)
                 aws_set_state(state)
 
-def aws_elastic_ip_allocate(tag_name='Dataverse-Elastic-IP'):
+def aws_elastic_ip_allocate(vpc_id, tag_name='Dataverse-Elastic-IP'):
     """
     Allocate an elastic ip.
     """
@@ -954,9 +954,14 @@ def aws_elastic_ip_allocate(tag_name='Dataverse-Elastic-IP'):
 
     # set state
     state = aws_get_state()
-    if 'elastic_ip' not in state:
-        state['elastic_ip'] = []
-    state['elastic_ip'].append(elastic_ip_id)
+    if 'vpc' not in state:
+        state['vpc'] = {}
+    if vpc_id not in state['vpc']:
+        state['vpc'][vpc_id] = {}
+    if 'elastic_ip' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['elastic_ip_id'] = []
+
+    state['vpc'][vpc_id]['elastic_ip_id'].append(elastic_ip_id)
     aws_set_state(state)
 
     # TODO: wait until elastic ip is ready
@@ -964,20 +969,29 @@ def aws_elastic_ip_allocate(tag_name='Dataverse-Elastic-IP'):
 
     return elastic_ip_id
 
-def aws_elastic_ip_release(elastic_ip_id):
+def aws_elastic_ip_release(vpc_id, elastic_ip_id):
     if isinstance(elastic_ip_id, str):
         elastic_ip_ids = [elastic_ip_id]
     elif isinstance(elastic_ip_id, list):
         elastic_ip_ids = elastic_ip_id
 
     for elastic_ip_id in elastic_ip_ids:
-        AWSClient().ec2.release_address(AllocationId=elastic_ip_id)
+        try:
+            AWSClient().ec2.release_address(AllocationId=elastic_ip_id)
+        except AWSClient().ec2.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
+                print(f"Elastic IP id {elastic_ip_id} doesn't exist.")
+        except Exception as e:
+            raise e
+
         state = aws_get_state()
-        if 'elastic_ip' in state and elastic_ip_id in state['elastic_ip']:
-            state['elastic_ip'].remove(elastic_ip_id)
-            aws_set_state(state)
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'elastic_ip' in state['vpc'][vpc_id] and elastic_ip_id in state['vpc'][vpc_id]['elastic_ip_id']:
+                state['vpc'][vpc_id]['elastic_ip_id'].remove(elastic_ip_id)
+                aws_set_state(state)
 
 def aws_nat_gateway_create(
+    vpc_id,
     subnet_id,
     elastic_ip_id,
     tag_name='Dataverse-NAT-Gateway'
@@ -1002,10 +1016,14 @@ def aws_nat_gateway_create(
 
     # set state
     state = aws_get_state()
-    if 'nat_gateway' not in state:
-        state['nat_gateway'] = []
+    if 'vpc' not in state:
+        state['vpc'] = {}
+    if vpc_id not in state['vpc']:
+        state['vpc'][vpc_id] = {}
+    if 'nat_gateway' not in state['vpc'][vpc_id]:
+        state['vpc'][vpc_id]['nat_gateway'] = []
 
-    state['nat_gateway'].append(nat_gateway_id)
+    state['vpc'][vpc_id]['nat_gateway'].append(nat_gateway_id)
     aws_set_state(state)
 
     # wait until NAT gateway is ready
@@ -1014,7 +1032,7 @@ def aws_nat_gateway_create(
 
     return nat_gateway_id
 
-def aws_nat_gateway_delete(nat_gateway_id):
+def aws_nat_gateway_delete(vpc_id, nat_gateway_id):
     if isinstance(nat_gateway_id, str):
         nat_gateway_ids = [nat_gateway_id]
     elif isinstance(nat_gateway_id, list):
@@ -1026,9 +1044,10 @@ def aws_nat_gateway_delete(nat_gateway_id):
 
         # set state
         state = aws_get_state()
-        if 'nat_gateway' in state and nat_gateway_id in state['nat_gateway']:
-            state['nat_gateway'].remove(nat_gateway_id)
-            aws_set_state(state)
+        if 'vpc' in state and vpc_id in state['vpc']:
+            if 'nat_gateway' in state['vpc'][vpc_id] and nat_gateway_id in state['vpc'][vpc_id]['nat_gateway']:
+                state['vpc'][vpc_id]['nat_gateway'].remove(nat_gateway_id)
+                aws_set_state(state)
 
         # wait until NAT gateway is deleted
         waiter = AWSClient().ec2.get_waiter('nat_gateway_deleted')
