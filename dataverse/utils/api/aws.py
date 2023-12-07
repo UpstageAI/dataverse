@@ -421,17 +421,6 @@ class EMRManager:
         waiter = AWSClient().ec2.get_waiter('subnet_available')
         waiter.wait(SubnetIds=[subnet_id])
 
-        # Security Group
-        # security_id = aws_emr_security_group_create(
-        #     vpc_id=vpc_id,
-        #     port=config.spark.ui.port,
-        # )
-        # config.emr.security_group.id = security_id
-
-        # wait until security group is ready
-        # waiter = AWSClient().ec2.get_waiter('security_group_exists')
-        # waiter.wait(GroupIds=[security_id])
-
         # Public Subnet
         if config.emr.subnet.public:
             gateway_id = aws_gateway_create(vpc_id)
