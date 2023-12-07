@@ -745,7 +745,7 @@ def aws_vpc_delete(vpc_id):
         # NOTE: self-referencing happens for EMR managed security group
         # remove self-referencing security group
         for security_group in vpc.security_groups.all():
-            aws_security_group_self_ref_delete(security_group.id)
+            aws_security_group_remove_dependency(security_group.id)
 
         for security_group in vpc.security_groups.all():
             if security_group.group_name == "default":
@@ -878,28 +878,27 @@ def aws_security_group_delete(vpc_id, security_group_id):
                 state['vpc'][vpc_id]['security_group'].remove(security_group_id)
                 aws_set_state(state)
 
-def aws_security_group_self_ref_delete(security_group_id):
+def aws_security_group_remove_dependency(security_group_id):
     """
-    Delete self-referencing security group rules
     """
     response = AWSClient().ec2.describe_security_groups(
         GroupIds=[security_group_id]
     )
-    sg = response["SecurityGroups"][0]
 
-    # init a list to keep permissions we want to remove
-    permissions_for_removal = []
-    for ip_perm in sg['IpPermissions']:
-        for each in ip_perm['UserIdGroupPairs']:
-            if each['GroupId'] == security_group_id:
-                # add the permission to our list
-                permissions_for_removal.append(ip_perm)
-
-    # there is self-referencing
-    if permissions_for_removal:
+    # Removing inbound rules
+    inbound_rules = response['SecurityGroups'][0]['IpPermissions']
+    if inbound_rules:
         AWSClient().ec2.revoke_security_group_ingress(
             GroupId=security_group_id,
-            IpPermissions=permissions_for_removal
+            IpPermissions=inbound_rules
+        )
+
+    # Removing outbound rules
+    outbound_rules = response['SecurityGroups'][0]['IpPermissionsEgress']
+    if outbound_rules:
+        AWSClient().ec2.revoke_security_group_egress(
+            GroupId=security_group_id,
+            IpPermissions=outbound_rules
         )
 
 def aws_gateway_create(vpc_id, tag_name='Dataverse-Gateway'):

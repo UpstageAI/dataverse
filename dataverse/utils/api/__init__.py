@@ -13,7 +13,7 @@ from .aws import aws_subnet_create
 from .aws import aws_subnet_delete
 from .aws import aws_emr_security_group_create
 from .aws import aws_security_group_delete
-from .aws import aws_security_group_self_ref_delete
+from .aws import aws_security_group_remove_dependency
 from .aws import aws_gateway_create
 from .aws import aws_gateway_delete
 from .aws import aws_route_table_create
