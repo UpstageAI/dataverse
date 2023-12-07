@@ -184,6 +184,12 @@ class Config:
                     'route_table': {
                         'id': None,
                     },
+                    'elastic_ip': {
+                        'id': None,
+                    },
+                    'nat_gateway': {
+                        'id': None,
+                    },
                 }
             })
 

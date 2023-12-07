@@ -400,6 +400,7 @@ class EMRManager:
 
         # Internet Gateway
         gateway_id = aws_gateway_create(vpc_id)
+        config.emr.gateway.id = gateway_id
 
         # Route Table
         route_table_id = aws_route_table_create(
@@ -408,12 +409,32 @@ class EMRManager:
             destination_cidr_block='0.0.0.0/0',
         )
         aws_route_table_asscociate_subnet(subnet_id, route_table_id)
-
-        config.emr.gateway.id = gateway_id
         config.emr.route_table.id = route_table_id
 
         if not config.emr.subnet.public:
-            raise NotImplementedError("Private subnet is not implemented yet.")
+            # add NAT Gateway to public subnet
+            elastic_ip_id = aws_elastic_ip_allocate(vpc_id=vpc_id)
+            config.emr.elastic_ip.id = elastic_ip_id
+
+            nat_gateway_id = aws_nat_gateway_create(
+                vpc_id=vpc_id,
+                subnet_id=subnet_id,
+                elastic_ip_id=elastic_ip_id,
+            )
+            config.emr.nat_gateway.id = nat_gateway_id
+
+            # create private subnet
+            private_subnet_id = aws_subnet_create(vpc_id=vpc_id)
+            config.emr.subnet.id = private_subnet_id
+            config.emr.subnet.private_id = private_subnet_id
+
+            # add NAT Gateway to private subnet
+            aws_route_table_create(
+                vpc_id=vpc_id,
+                gateway_id=nat_gateway_id,
+                destination_cidr_block='0.0.0.0/0',
+            )
+            aws_route_table_asscociate_subnet(private_subnet_id, route_table_id)
 
         # set state
         state = aws_get_state()
@@ -690,6 +711,10 @@ def aws_vpc_delete(vpc_id):
         # ------------------------------------------------------------
         # dataverse managed dependency
         if state['vpc'][vpc_id]:
+            if 'elastic_ip' in state['vpc'][vpc_id]:
+                aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip'])
+            if 'nat_gateway' in state['vpc'][vpc_id]:
+                aws_nat_gateway_delete(vpc_id, state['vpc'][vpc_id]['nat_gateway'])
             if 'subnet' in state['vpc'][vpc_id]:
                 aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
             if 'security_group' in state['vpc'][vpc_id]:
@@ -698,10 +723,6 @@ def aws_vpc_delete(vpc_id):
                 aws_gateway_delete(vpc_id, state['vpc'][vpc_id]['gateway'])
             if 'route_table' in state['vpc'][vpc_id]:
                 aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
-            if 'elastic_ip' in state['vpc'][vpc_id]:
-                aws_elastic_ip_release(state['vpc'][vpc_id]['elastic_ip'])
-            if 'nat_gateway' in state['vpc'][vpc_id]:
-                aws_nat_gateway_delete(state['vpc'][vpc_id]['nat_gateway'])
 
         # EMR managed dependency
         vpc = boto3.resource('ec2').Vpc(vpc_id)
