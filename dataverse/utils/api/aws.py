@@ -16,6 +16,7 @@ import json
 import time
 import boto3
 import datetime
+import ipaddress
 
 
 def aws_check_credentials(verbose=True):
@@ -393,8 +394,19 @@ class EMRManager:
         vpc_id = aws_vpc_create()
         config.emr.vpc.id = vpc_id
 
+        # if private subnet is required
+        subnet_args = {'vpc_id': vpc_id}
+        if not config.emr.subnet.public:
+            vpcs = AWSClient().ec2.describe_vpcs(VpcIds=[vpc_id])
+            cidr_block = vpcs['Vpcs'][0]['CidrBlock']
+            ip_net = ipaddress.ip_network(cidr_block)
+
+            # split the network into two subnets
+            public_subnet, private_subnet = list(ip_net.subnets())
+            subnet_args['cird_block'] = str(public_subnet)
+
         # Subnet
-        subnet_id = aws_subnet_create(vpc_id=vpc_id)
+        subnet_id = aws_subnet_create(**subnet_args)
         config.emr.subnet.id = subnet_id
         config.emr.subnet.public_id = subnet_id
 
@@ -424,7 +436,10 @@ class EMRManager:
             config.emr.nat_gateway.id = nat_gateway_id
 
             # create private subnet
-            private_subnet_id = aws_subnet_create(vpc_id=vpc_id)
+            private_subnet_id = aws_subnet_create(
+                vpc_id=vpc_id,
+                cird_block=str(private_subnet),
+            )
             config.emr.subnet.id = private_subnet_id
             config.emr.subnet.private_id = private_subnet_id
 
