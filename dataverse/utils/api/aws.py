@@ -715,7 +715,16 @@ def aws_vpc_delete(vpc_id):
             aws_security_group_delete(vpc_id, security_group.id)
         # ------------------------------------------------------------
 
-        AWSClient().ec2.delete_vpc(VpcId=vpc_id)
+        try:
+            AWSClient().ec2.delete_vpc(VpcId=vpc_id)
+        # when vpc doesn't exist
+        except AWSClient().ec2.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidVpcID.NotFound':
+                print(f"VPC {vpc_id} doesn't exist.")
+        # re-thrown other exceptions
+        except Exception as e:
+            raise e
+
         if 'vpc' in state and vpc_id in state['vpc']:
             del state['vpc'][vpc_id]
         aws_set_state(state)
