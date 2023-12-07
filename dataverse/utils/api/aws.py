@@ -446,7 +446,7 @@ class EMRManager:
             # add NAT Gateway to private subnet
             aws_route_table_create(
                 vpc_id=vpc_id,
-                gateway_id=nat_gateway_id,
+                nat_gateway_id=nat_gateway_id,
                 destination_cidr_block='0.0.0.0/0',
             )
             aws_route_table_asscociate_subnet(private_subnet_id, route_table_id)
