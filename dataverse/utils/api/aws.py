@@ -69,6 +69,7 @@ class AWSClient:
     def __repr__(self) -> str:
         return f"AWSClient(region={self.region}, user_id={self.user_id})"
 
+
 # --------------------------------------------------------------------------------
 # AWS State
 """
@@ -107,6 +108,36 @@ def aws_set_state(state):
     aws_bucket = SystemSetting()['AWS_BUCKET']
     state_path = f'{AWSClient().user_id}/state.json'
     aws_s3_write(aws_bucket, state_path, json.dumps(state))
+
+
+# --------------------------------------------------------------------------------
+# AWS EC2 Resource
+def aws_ec2_instance_info():
+    """
+    get all instance types information
+    """
+    instance_info = {}
+    token = ''
+    while True:
+        if token == '':
+            response = AWSClient().ec2.describe_instance_types()
+        else:
+            response = AWSClient().ec2.describe_instance_types(NextToken=token)
+
+        for instance_type in response['InstanceTypes']:
+            instance_info[instance_type['InstanceType']] = {
+                'vcpu': instance_type['VCpuInfo']['DefaultVCpus'],
+                'memory': instance_type['MemoryInfo']['SizeInMiB']
+            }
+
+        if 'NextToken' in response:
+            token = response['NextToken']
+        else:
+            break
+
+    return instance_info
+
+
 
 # --------------------------------------------------------------------------------
 # AWS EMR

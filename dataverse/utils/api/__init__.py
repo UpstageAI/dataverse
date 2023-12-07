@@ -7,6 +7,10 @@ from .aws import aws_check_credentials
 from .aws import aws_get_state
 from .aws import aws_set_state
 
+# EC2
+from .aws import aws_ec2_instance_info
+
+# VPC
 from .aws import aws_vpc_create
 from .aws import aws_vpc_delete
 from .aws import aws_subnet_create
@@ -30,6 +34,7 @@ from .aws import aws_iam_role_delete
 from .aws import aws_iam_instance_profile_create
 from .aws import aws_iam_instance_profile_delete
 
+# S3
 from .aws import aws_s3_create_bucket
 from .aws import aws_s3_read
 from .aws import aws_s3_download
