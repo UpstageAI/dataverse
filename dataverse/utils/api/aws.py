@@ -395,7 +395,10 @@ class EMRManager:
         config.emr.vpc.id = vpc_id
 
         # if private subnet is required
-        subnet_args = {'vpc_id': vpc_id}
+        subnet_args = {
+            'vpc_id': vpc_id,
+            'tag_name': 'Dataverse-Temporary-Subnet-Public',
+        }
         if not config.emr.subnet.public:
             vpcs = AWSClient().ec2.describe_vpcs(VpcIds=[vpc_id])
             cidr_block = vpcs['Vpcs'][0]['CidrBlock']
@@ -419,6 +422,7 @@ class EMRManager:
             vpc_id=vpc_id,
             gateway_id=gateway_id,
             destination_cidr_block='0.0.0.0/0',
+            tag_name='Dataverse-Route-Table-Public',
         )
         aws_route_table_asscociate_subnet(subnet_id, route_table_id)
         config.emr.route_table.id = route_table_id
@@ -439,17 +443,22 @@ class EMRManager:
             private_subnet_id = aws_subnet_create(
                 vpc_id=vpc_id,
                 cird_block=str(private_subnet),
+                tag_name='Dataverse-Temporary-Subnet-Private',
             )
             config.emr.subnet.id = private_subnet_id
             config.emr.subnet.private_id = private_subnet_id
 
             # add NAT Gateway to private subnet
-            aws_route_table_create(
+            private_route_table_id = aws_route_table_create(
                 vpc_id=vpc_id,
                 nat_gateway_id=nat_gateway_id,
                 destination_cidr_block='0.0.0.0/0',
+                tag_name='Dataverse-Route-Table-Private',
             )
-            aws_route_table_asscociate_subnet(private_subnet_id, route_table_id)
+            aws_route_table_asscociate_subnet(
+                subnet_id=private_subnet_id,
+                route_table_id=private_route_table_id,
+            )
 
         # set state
         state = aws_get_state()
