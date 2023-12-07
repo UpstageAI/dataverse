@@ -982,9 +982,9 @@ def aws_elastic_ip_allocate(vpc_id, tag_name='Dataverse-Elastic-IP'):
     if vpc_id not in state['vpc']:
         state['vpc'][vpc_id] = {}
     if 'elastic_ip' not in state['vpc'][vpc_id]:
-        state['vpc'][vpc_id]['elastic_ip_id'] = []
+        state['vpc'][vpc_id]['elastic_ip'] = []
 
-    state['vpc'][vpc_id]['elastic_ip_id'].append(elastic_ip_id)
+    state['vpc'][vpc_id]['elastic_ip'].append(elastic_ip_id)
     aws_set_state(state)
 
     # TODO: wait until elastic ip is ready
@@ -1001,17 +1001,18 @@ def aws_elastic_ip_release(vpc_id, elastic_ip_id):
     for elastic_ip_id in elastic_ip_ids:
         try:
             AWSClient().ec2.release_address(AllocationId=elastic_ip_id)
+            state = aws_get_state()
+            if 'vpc' in state and vpc_id in state['vpc']:
+                if 'elastic_ip' in state['vpc'][vpc_id] and elastic_ip_id in state['vpc'][vpc_id]['elastic_ip']:
+                    state['vpc'][vpc_id]['elastic_ip'].remove(elastic_ip_id)
+                    aws_set_state(state)
         except AWSClient().ec2.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
                 print(f"Elastic IP id {elastic_ip_id} doesn't exist.")
+            else:
+                raise e
         except Exception as e:
             raise e
-
-        state = aws_get_state()
-        if 'vpc' in state and vpc_id in state['vpc']:
-            if 'elastic_ip' in state['vpc'][vpc_id] and elastic_ip_id in state['vpc'][vpc_id]['elastic_ip_id']:
-                state['vpc'][vpc_id]['elastic_ip_id'].remove(elastic_ip_id)
-                aws_set_state(state)
 
 def aws_nat_gateway_create(
     vpc_id,
