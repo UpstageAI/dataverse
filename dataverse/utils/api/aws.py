@@ -416,27 +416,42 @@ class EMRManager:
         # Subnet
         subnet_id = aws_subnet_create(vpc_id=vpc_id)
         config.emr.subnet.id = subnet_id
+        config.emr.subnet.public_id = subnet_id
 
         # wait until subnet is ready
         waiter = AWSClient().ec2.get_waiter('subnet_available')
         waiter.wait(SubnetIds=[subnet_id])
 
-        # Public Subnet
-        if config.emr.subnet.public:
-            gateway_id = aws_gateway_create(vpc_id)
-            route_table_id = aws_route_table_create(vpc_id, gateway_id)
-            aws_subnet_publicize(vpc_id, subnet_id, route_table_id)
+        # Internet Gateway
+        gateway_id = aws_gateway_create(vpc_id)
 
-            config.emr.gateway.id = gateway_id
-            config.emr.route_table.id = route_table_id
+        # Route Table
+        route_table_id = aws_route_table_create(
+            vpc_id=vpc_id,
+            gateway_id=gateway_id,
+            destination_cidr_block='0.0.0.0/0',
+        )
+        aws_route_table_asscociate_subnet(subnet_id, route_table_id)
 
-            # wait until gateway is ready
-            waiter = AWSClient().ec2.get_waiter('internet_gateway_exists')
-            waiter.wait(InternetGatewayIds=[gateway_id])
+        config.emr.gateway.id = gateway_id
+        config.emr.route_table.id = route_table_id
 
-            # TODO: wait until route table is ready
-            #       didn't found waiter for route table
-            ...
+        # wait until gateway is ready
+        waiter = AWSClient().ec2.get_waiter('internet_gateway_exists')
+        waiter.wait(InternetGatewayIds=[gateway_id])
+
+        # TODO: wait until route table is ready
+        #       didn't found waiter for route table
+        ...
+
+        if not config.emr.subnet.public:
+            raise NotImplementedError("Private subnet is not implemented yet.")
+
+        # set state
+        state = aws_get_state()
+        state['vpc'][vpc_id]['public_subnet'] = config.emr.subnet.public
+        aws_set_state(state)
+
 
     def _emr_cluster_create(self, config):
         """
@@ -961,30 +976,9 @@ def aws_route_table_delete(vpc_id, route_table_id):
                 state['vpc'][vpc_id]['route_table'].remove(route_table_id)
                 aws_set_state(state)
 
-def aws_subnet_publicize(vpc_id, subnet_id, route_table_id):
+def aws_route_table_asscociate_subnet(subnet_id, route_table_id):
     route_table = boto3.resource('ec2').RouteTable(route_table_id)
     route_table.associate_with_subnet(SubnetId=subnet_id)
-
-    # set state
-    state = aws_get_state()
-    state['vpc'][vpc_id]['public_subnet'] = True
-    aws_set_state(state)
-
-def aws_subnet_privatize(vpc_id, subnet_id, route_table_id):
-    response = AWSClient().ec2.describe_route_tables(RouteTableIds=[route_table_id])
-    for route_table in response['RouteTables']:
-        for association in route_table['Associations']:
-            if association['SubnetId'] == subnet_id:
-                AWSClient().ec2.disassociate_route_table(
-                    AssociationId=association['RouteTableAssociationId']
-                )
-                break
-
-    # set state
-    state = aws_get_state()
-    state['vpc'][vpc_id]['public_subnet'] = False
-    aws_set_state(state)
-
 
 
 def aws_s3_create_bucket(bucket):

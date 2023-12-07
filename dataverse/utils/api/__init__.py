@@ -11,8 +11,6 @@ from .aws import aws_vpc_create
 from .aws import aws_vpc_delete
 from .aws import aws_subnet_create
 from .aws import aws_subnet_delete
-from .aws import aws_subnet_publicize
-from .aws import aws_subnet_privatize
 from .aws import aws_emr_security_group_create
 from .aws import aws_security_group_delete
 from .aws import aws_security_group_self_ref_delete
@@ -20,6 +18,7 @@ from .aws import aws_gateway_create
 from .aws import aws_gateway_delete
 from .aws import aws_route_table_create
 from .aws import aws_route_table_delete
+from .aws import aws_route_table_asscociate_subnet
 
 from .aws import aws_iam_role_create
 from .aws import aws_iam_role_delete

@@ -171,7 +171,9 @@ class Config:
                     },
                     'subnet': {
                         'id': None,
-                        'public': False,
+                        'public_id': None,
+                        'private_id': None,
+                        'public': True,
                     },
                     'security_group': {
                         'id': None,
