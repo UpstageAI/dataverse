@@ -20,6 +20,9 @@ from .aws import aws_route_table_create
 from .aws import aws_route_table_delete
 from .aws import aws_route_table_asscociate_subnet
 
+from .aws import aws_elastic_ip_allocate
+from .aws import aws_elastic_ip_release
+
 from .aws import aws_iam_role_create
 from .aws import aws_iam_role_delete
 from .aws import aws_iam_instance_profile_create

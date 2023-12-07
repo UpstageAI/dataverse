@@ -698,6 +698,8 @@ def aws_vpc_delete(vpc_id):
                 aws_gateway_delete(vpc_id, state['vpc'][vpc_id]['gateway'])
             if 'route_table' in state['vpc'][vpc_id]:
                 aws_route_table_delete(vpc_id, state['vpc'][vpc_id]['route_table'])
+            if 'elastic_ip' in state['vpc'][vpc_id]:
+                aws_elastic_ip_release(state['vpc'][vpc_id]['elastic_ip'])
 
         # EMR managed dependency
         vpc = boto3.resource('ec2').Vpc(vpc_id)
@@ -913,6 +915,44 @@ def aws_gateway_delete(vpc_id, gateway_id):
             if 'gateway' in state['vpc'][vpc_id] and gateway_id in state['vpc'][vpc_id]['gateway']:
                 state['vpc'][vpc_id]['gateway'].remove(gateway_id)
                 aws_set_state(state)
+
+def aws_elastic_ip_allocate(tag_name='Dataverse-Elastic-IP'):
+    """
+    Allocate an elastic ip.
+    """
+    elastic_ip = AWSClient().ec2.allocate_address(Domain='vpc')
+    elastic_ip_id = elastic_ip['AllocationId']
+    AWSClient().ec2.create_tags(
+        Resources=[elastic_ip_id],
+        Tags=[
+            {'Key': 'Name', 'Value': tag_name},
+        ]
+    )
+
+    # set state
+    state = aws_get_state()
+    if 'elastic_ip' not in state:
+        state['elastic_ip'] = []
+    state['elastic_ip'].append(elastic_ip_id)
+    aws_set_state(state)
+
+    # TODO: wait until elastic ip is ready
+    ...
+
+    return elastic_ip_id
+
+def aws_elastic_ip_release(elastic_ip_id):
+    if isinstance(elastic_ip_id, str):
+        elastic_ip_ids = [elastic_ip_id]
+    elif isinstance(elastic_ip_id, list):
+        elastic_ip_ids = elastic_ip_id
+
+    for elastic_ip_id in elastic_ip_ids:
+        AWSClient().ec2.release_address(AllocationId=elastic_ip_id)
+        state = aws_get_state()
+        if 'elastic_ip' in state and elastic_ip_id in state['elastic_ip']:
+            state['elastic_ip'].remove(elastic_ip_id)
+            aws_set_state(state)
 
 def aws_route_table_create(
     vpc_id,
