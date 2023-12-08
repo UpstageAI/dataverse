@@ -231,6 +231,31 @@ class EMRManager:
 
         return emr_id
 
+    def terminate(self, config):
+        """
+        terminate emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        if config.emr.id is None:
+            raise ValueError("EMR cluster is not running.")
+
+        AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
+
+        # wait until emr cluster is terminated
+        waiter = AWSClient().emr.get_waiter('cluster_terminated')
+        waiter.wait(ClusterId=config.emr.id)
+
+        # set state
+        state = aws_get_state()
+        if 'emr' in state and config.emr.id in state['emr']:
+            del state['emr'][config.emr.id]
+            aws_set_state(state)
+
+        # clean unused resources
+        self.clean()
+
     def set_default_instance(
         self,
         config,
