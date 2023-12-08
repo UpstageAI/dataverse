@@ -247,6 +247,7 @@ class ETLPipeline:
         # if not, spark session & data will be returned to continue
         IS_ETL_FINISHED = True
 
+        data = None
         prev_etl_name = None
         prev_data = None # for caching
         for etl_i, etl_config in enumerate(etl_configs):
