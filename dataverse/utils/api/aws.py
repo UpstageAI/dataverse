@@ -184,6 +184,59 @@ class EMRManager:
     """
     one EMR manager per one EMR cluster
     """
+    def set_default_instance(
+        self,
+        config,
+        min_memory=2048,
+        max_memory=4096,
+    ):
+        """
+        choose default instance type by memory
+
+        args:
+            config (OmegaConf): config for the etl
+            min_memory (int): minimum memory size (MiB)
+            max_memory (int): maximum memory size (MiB)
+        """
+        subnet_id = config.emr.subnet.id
+        az = aws_subnet_az(subnet_id)
+        instances = aws_ec2_instance_at_az(az=az)
+
+        # find memory size is bigger specified min/max memory
+        candidate = None
+        _min_candidate_memory = float('inf')
+        for instance in instances:
+            instance_info = aws_ec2_instance_info(instance)
+            memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
+            if min_memory < memory < max_memory:
+                if memory < _min_candidate_memory:
+                    candidate = instance
+                    _min_candidate_memory = memory
+
+        if candidate is None:
+            raise Exception(f"Unable to find instance type with memory between {min_memory} and {max_memory}")
+
+
+        instance_info = aws_ec2_instance_info(candidate)
+        vcpu = instance_info['InstanceTypes'][0]['VCpuInfo']['DefaultVCpus']
+        memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
+        print(
+            f"{'=' * 80}\n"
+            f"Default instance type is [ {candidate} ]\n"
+            f"{'=' * 80}\n"
+            f" vCPU: {vcpu}\n"
+            f" Memory: {memory}\n"
+            f" Price: {aws_ec2_get_price(candidate)}\n"
+            f"{'=' * 80}\n"
+        )
+
+        if config.emr.master_instance.type is None:
+            config.emr.master_instance.type = candidate
+        if config.emr.core_instance.type is None:
+            config.emr.core_instance.type = candidate
+        if config.emr.task_instance.type is None:
+            config.emr.task_instance.type = candidate
+
     def get_working_dir(self, config):
         """
         get working directory path for the emr cluster

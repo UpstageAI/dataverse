@@ -130,18 +130,18 @@ class Config:
 
                     # master (driver)
                     'master_instance': {
-                        'type': 'm4.large',
+                        'type': None,
                     },
 
                     # core (data node)
                     'core_instance': {
-                        'type': 'm4.large',
+                        'type': None,
                         'count': 1,
                     },
 
                     # task (executors)
                     'task_instance': {
-                        'type': 'm4.large',
+                        'type': None,
                         'count': 2,
                     },
 
