@@ -112,6 +112,25 @@ def aws_set_state(state):
 
 # --------------------------------------------------------------------------------
 # AWS EC2 Resource
+def aws_ec2_instance_at_az(az):
+    """
+    get all instance info at the given AZ
+    """
+    response = AWSClient().ec2.describe_instance_type_offerings(
+        LocationType='availability-zone',
+        Filters=[
+            {
+                'Name': 'location',
+                'Values': [
+                    az,
+                ]
+            },
+        ]
+    )
+    instances = [inst['InstanceType'] for inst in response['InstanceTypeOfferings']]
+
+    return instances
+
 def aws_ec2_all_instance_info():
     """
     get all instance types information
