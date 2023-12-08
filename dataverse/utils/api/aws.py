@@ -131,6 +131,16 @@ def aws_ec2_instance_at_az(az):
 
     return instances
 
+def aws_ec2_instance_info(instance):
+    """
+    get instance info from aws
+    """
+    response = AWSClient().ec2.describe_instance_types(
+        InstanceTypes=[instance],
+    )
+
+    return response
+
 def aws_ec2_all_instance_info():
     """
     get all instance types information
