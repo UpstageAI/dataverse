@@ -127,6 +127,7 @@ class Config:
                     'working_dir': None,
                     'name': 'dataverse_emr',
                     'release': 'emr-6.15.0',
+                    'idle_timeout': 3600,
 
                     # master (driver)
                     'master_instance': {

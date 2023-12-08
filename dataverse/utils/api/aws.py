@@ -606,6 +606,9 @@ class EMRManager:
         emr_id = AWSClient().emr.run_job_flow(
             Name=config.emr.name,
             ReleaseLabel=config.emr.release,
+            AutoTerminationPolicy={
+                "IdleTimeout": config.emr.idle_timeout,
+            },
             Instances={
                 'InstanceGroups': [
                     {
