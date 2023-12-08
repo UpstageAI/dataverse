@@ -112,7 +112,7 @@ def aws_set_state(state):
 
 # --------------------------------------------------------------------------------
 # AWS EC2 Resource
-def aws_ec2_instance_info():
+def aws_ec2_all_instance_info():
     """
     get all instance types information
     """

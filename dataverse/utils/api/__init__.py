@@ -8,7 +8,7 @@ from .aws import aws_get_state
 from .aws import aws_set_state
 
 # EC2
-from .aws import aws_ec2_instance_info
+from .aws import aws_ec2_all_instance_info
 from .aws import aws_ec2_get_price
 
 # VPC
