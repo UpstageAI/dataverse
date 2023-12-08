@@ -184,6 +184,53 @@ class EMRManager:
     """
     one EMR manager per one EMR cluster
     """
+    def launch(self, config):
+        """
+        auto setup environments and launch emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        # clean unused resources
+        self.clean()
+
+        if config.emr.id is not None:
+            raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
+
+            # TODO: check if the existing emr cluster is valid and running
+            ...
+
+            # TODO: set vpc, subnet, etc id info from existing emr cluster
+            ...
+
+            config.emr.auto_generated = False
+
+            return config.emr.id
+
+        # TODO: modify interface for custom policy
+        # create role & instance profile
+        self._role_setup(config)
+        self._instance_profile_setup(config)
+
+        # create vpc
+        self._vpc_setup(config)
+
+        # create emr cluster
+        # XXX: wait until instance profile is ready
+        #      otherwise, emr cluster creation will fail
+        # FIXME: convert to smart solution (e.g. waiter)
+        #        currently AWS doesn't support waiter available option for instance profile
+        # NOTE: I've tried to make waiter using `describe_instance_profile` but it didn't work
+        time.sleep(7)
+
+        # set default instance type
+        self.set_default_instance(config)
+
+        emr_id = self._emr_cluster_create(config)
+        config.emr.auto_generated = True
+
+        return emr_id
+
     def set_default_instance(
         self,
         config,
@@ -368,50 +415,6 @@ class EMRManager:
         self.clean_unused_vpc()
         self.clean_unused_iam_instance_profile()
         self.clean_unused_iam_role()
-
-    def launch(self, config):
-        """
-        auto setup environments and launch emr cluster
-
-        Args:
-            config (OmegaConf): config for the etl
-        """
-        # clean unused resources
-        self.clean()
-
-        if config.emr.id is not None:
-            raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
-
-            # TODO: check if the existing emr cluster is valid and running
-            ...
-
-            # TODO: set vpc, subnet, etc id info from existing emr cluster
-            ...
-
-            config.emr.auto_generated = False
-
-            return config.emr.id
-
-        # TODO: modify interface for custom policy
-        # create role & instance profile
-        self._role_setup(config)
-        self._instance_profile_setup(config)
-
-        # create vpc
-        self._vpc_setup(config)
-
-        # create emr cluster
-        # XXX: wait until instance profile is ready
-        #      otherwise, emr cluster creation will fail
-        # FIXME: convert to smart solution (e.g. waiter)
-        #        currently AWS doesn't support waiter available option for instance profile
-        # NOTE: I've tried to make waiter using `describe_instance_profile` but it didn't work
-        time.sleep(7)
-
-        emr_id = self._emr_cluster_create(config)
-        config.emr.auto_generated = True
-
-        return emr_id
 
     def _role_setup(self, config):
         """
