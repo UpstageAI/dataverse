@@ -630,7 +630,7 @@ class EMRManager:
                         'InstanceCount': config.emr.task_instance.count,
                     },
                 ],
-                'KeepJobFlowAliveWhenNoSteps': False,
+                'KeepJobFlowAliveWhenNoSteps': True,
                 'TerminationProtected': False,
                 'Ec2SubnetId': config.emr.subnet.id,
             },
