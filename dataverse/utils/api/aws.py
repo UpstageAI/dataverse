@@ -861,6 +861,15 @@ def aws_subnet_delete(vpc_id, subnet_id):
                 state['vpc'][vpc_id]['subnet'].remove(subnet_id)
                 aws_set_state(state)
 
+def aws_subnet_az(subnet_id):
+    """
+    when subnet id is give find the AZ
+    """
+    response = AWSClient().ec2.describe_subnets(SubnetIds=[subnet_id])
+    az = response['Subnets'][0]['AvailabilityZone']
+
+    return az
+
 def aws_emr_security_group_create(
         vpc_id,
         port=4040,

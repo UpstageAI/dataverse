@@ -16,6 +16,7 @@ from .aws import aws_vpc_create
 from .aws import aws_vpc_delete
 from .aws import aws_subnet_create
 from .aws import aws_subnet_delete
+from .aws import aws_subnet_az
 from .aws import aws_emr_security_group_create
 from .aws import aws_security_group_delete
 from .aws import aws_security_group_remove_dependency
