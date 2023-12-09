@@ -253,6 +253,11 @@ class ETLRegistry:
 
         return self._registry[key]
 
+    def get_all(self):
+        """
+        get all the etls
+        """
+        return list(self._registry.values())
 
 class ETLAutoRegistry(abc.ABCMeta, type):
     def __new__(cls, name, bases, attrs):
