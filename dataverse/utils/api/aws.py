@@ -26,6 +26,30 @@ import pkg_resources
 from omegaconf import OmegaConf
 
 
+
+# TODO: get the information from AWS when it's supported someday
+EMR_SUPPORTED_EC2_INSTANCES = [
+    "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m3.xlarge", "m3.2xlarge",
+    "c1.medium", "c1.xlarge", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge",
+    "cc1.4xlarge", "cc2.8xlarge",
+    "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge",
+    "c5.xlarge", "c5.9xlarge", "c5.2xlarge", "c5.4xlarge", "c5.9xlarge", "c5.18xlarge",
+    "c5d.xlarge", "c5d.2xlarge", "c5d.4xlarge", "c5d.9xlarge", "c5d.18xlarge",
+    "m2.xlarge", "m2.2xlarge", "m2.4xlarge",
+    "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge",
+    "cr1.8xlarge",
+    "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "m4.16large",
+    "m5.xlarge", "m5.2xlarge", "m5.4xlarge", "m5.12xlarge", "m5.24xlarge",
+    "m5d.xlarge", "m5d.2xlarge", "m5d.4xlarge", "m5d.12xlarge", "m5d.24xlarge",
+    "r4.large", "r4.xlarge", "r4.2xlarge", "r4.4xlarge", "r4.8xlarge", "r4.16xlarge",
+    "h1.4xlarge",
+    "hs1.2xlarge", "hs1.4xlarge", "hs1.8xlarge",
+    "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge",
+    "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge",
+    "g2.2xlarge",
+    "cg1.4xlarge"
+]
+
 def aws_check_credentials(verbose=True):
     """
     simple check if aws credentials are valid
@@ -433,6 +457,11 @@ class EMRManager:
         candidate = None
         _min_candidate_memory = float('inf')
         for instance in instances:
+
+            # check if instance is supported by EMR
+            if instance not in EMR_SUPPORTED_EC2_INSTANCES:
+                continue
+
             instance_info = aws_ec2_instance_info(instance)
             memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
             if min_memory <= memory <= max_memory:
