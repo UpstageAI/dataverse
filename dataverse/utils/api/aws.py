@@ -1300,6 +1300,18 @@ def aws_route_table_asscociate_subnet(subnet_id, route_table_id):
     route_table = boto3.resource('ec2').RouteTable(route_table_id)
     route_table.associate_with_subnet(SubnetId=subnet_id)
 
+def aws_s3_path_parse(path):
+    """
+    parse aws s3 path to bucket and key
+    """
+    aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', path)
+    if aws_s3_matched:
+        bucket = aws_s3_matched.group(1)
+        path = aws_s3_matched.group(2)
+    else:
+        raise Exception(f"Invalid S3 path: {path}")
+
+    return bucket, path
 
 def aws_s3_create_bucket(bucket):
     """
