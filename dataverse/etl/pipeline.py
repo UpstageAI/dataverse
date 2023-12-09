@@ -363,9 +363,8 @@ class ETLPipeline:
         # EMR cluster environment setup
         emr_manager.setup(config)
 
-        # TODO: upload source code to s3
-        # TODO: upload config to s3
-        # TODO: upload requirements.txt to s3
+        # EMR Cluster terminate
+        emr_manager.terminate(config)
 
         raise NotImplementedError('EMR support is not implemented yet')
 
