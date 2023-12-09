@@ -414,7 +414,7 @@ class EMRManager:
         self,
         config,
         min_memory=2048,
-        max_memory=4096,
+        max_memory=8192,
     ):
         """
         choose default instance type by memory
@@ -434,7 +434,7 @@ class EMRManager:
         for instance in instances:
             instance_info = aws_ec2_instance_info(instance)
             memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
-            if min_memory < memory < max_memory:
+            if min_memory <= memory <= max_memory:
                 if memory < _min_candidate_memory:
                     candidate = instance
                     _min_candidate_memory = memory
