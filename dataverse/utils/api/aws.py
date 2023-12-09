@@ -225,240 +225,12 @@ class EMRManager:
         time.sleep(7)
 
         # set default instance type
-        self.set_default_instance(config)
+        self._set_default_instance(config)
 
         emr_id = self._emr_cluster_create(config)
         config.emr.auto_generated = True
 
         return emr_id
-
-    def terminate(self, config):
-        """
-        terminate emr cluster
-
-        Args:
-            config (OmegaConf): config for the etl
-        """
-        if config.emr.id is None:
-            raise ValueError("EMR cluster is not running.")
-
-        AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
-
-        # wait until emr cluster is terminated
-        waiter = AWSClient().emr.get_waiter('cluster_terminated')
-        waiter.wait(ClusterId=config.emr.id)
-
-        # set state
-        state = aws_get_state()
-        if 'emr' in state and config.emr.id in state['emr']:
-            del state['emr'][config.emr.id]
-            aws_set_state(state)
-
-        # clean unused resources
-        self.clean()
-
-    def setup(self, config):
-        """
-        [ upload to S3 ]
-        - config for `dataverse`
-        - dataverse site-packages source code
-        - requirements.txt
-
-        [ setup environment on EMR cluster ]
-        - install pip dependencies for `dataverse`
-        - set `dataverse` package at EMR cluster pip installed packages path
-        """
-        working_dir = self.get_working_dir(config)
-        bucket, key = aws_s3_path_parse(working_dir)
-
-        # [ upload to S3 ] ------------------------------------------
-        # config for `dataverse`
-        aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
-
-    def set_default_instance(
-        self,
-        config,
-        min_memory=2048,
-        max_memory=4096,
-    ):
-        """
-        choose default instance type by memory
-
-        args:
-            config (OmegaConf): config for the etl
-            min_memory (int): minimum memory size (MiB)
-            max_memory (int): maximum memory size (MiB)
-        """
-        subnet_id = config.emr.subnet.id
-        az = aws_subnet_az(subnet_id)
-        instances = aws_ec2_instance_at_az(az=az)
-
-        # find memory size is bigger specified min/max memory
-        candidate = None
-        _min_candidate_memory = float('inf')
-        for instance in instances:
-            instance_info = aws_ec2_instance_info(instance)
-            memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
-            if min_memory < memory < max_memory:
-                if memory < _min_candidate_memory:
-                    candidate = instance
-                    _min_candidate_memory = memory
-
-        if candidate is None:
-            raise Exception(f"Unable to find instance type with memory between {min_memory} and {max_memory}")
-
-
-        instance_info = aws_ec2_instance_info(candidate)
-        vcpu = instance_info['InstanceTypes'][0]['VCpuInfo']['DefaultVCpus']
-        memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
-        print(
-            f"{'=' * 80}\n"
-            f"Default instance type is [ {candidate} ]\n"
-            f"{'=' * 80}\n"
-            f" vCPU: {vcpu}\n"
-            f" Memory: {memory}\n"
-            f" Price: {aws_ec2_get_price(candidate)}\n"
-            f"{'=' * 80}\n"
-        )
-
-        if config.emr.master_instance.type is None:
-            config.emr.master_instance.type = candidate
-        if config.emr.core_instance.type is None:
-            config.emr.core_instance.type = candidate
-        if config.emr.task_instance.type is None:
-            config.emr.task_instance.type = candidate
-
-    def get_working_dir(self, config):
-        """
-        get working directory path for the emr cluster
-        if not provided, it will be automatically generated
-        """
-        # to avoid circular import
-        from dataverse.utils.setting import SystemSetting
-
-        if config.emr.working_dir is not None:
-            working_dir = config.emr.working_dir
-            if working_dir.startswith(('s3://', 's3a://', 's3n://')):
-                aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', working_dir)
-                if not aws_s3_matched:
-                    raise ValueError(f"EMR working directory {working_dir} is not a valid s3 path")
-        else:
-            # [ emr versioning ] - emr_YYYY-MM-DD_HH:MM:SS_<emr_id>
-            # datetime first for ascending order
-            bucket = SystemSetting()['AWS_BUCKET']
-            user_id = AWSClient().user_id
-            working_dir_name = datetime.datetime.now().strftime(f"emr_%Y-%m-%d_%H:%M:%S_{config.emr.id}")
-
-            working_dir = f"s3://{bucket}/{user_id}/emr/{working_dir_name}"
-
-        return working_dir
-
-    def clean_stopped_emr(self):
-        """
-        check stopped EMR and update the state
-        """
-        state = aws_get_state()
-
-        # get all emr ids
-        emr_ids = []
-        if 'emr' in state:
-            for emr_id in state['emr']:
-                emr_ids.append(emr_id)
-
-        # remove stopped emr from state
-        REMOVE_STATES = [
-            'TERMINATED',
-            'TERMINATED_WITH_ERRORS'
-        ]
-        for emr_id in emr_ids:
-            emr_info = AWSClient().emr.describe_cluster(ClusterId=emr_id)
-            if emr_info['Cluster']['Status']['State'] in REMOVE_STATES:
-                del state['emr'][emr_id]
-        aws_set_state(state)
-
-    def clean_unused_vpc(self):
-        """
-        check the AWS state and clean vpc that is not used by any emr cluster
-        """
-        state = aws_get_state()
-
-        # get all vpc ids that are used by emr
-        used_vpc_ids = []
-        if 'emr' in state:
-            for emr_id in state['emr']:
-                used_vpc_ids.append(state['emr'][emr_id]['vpc_id'])
-
-        # get all vpc ids that are created
-        all_vpc_ids = []
-        if 'vpc' in state:
-            for vpc_id in state['vpc']:
-                all_vpc_ids.append(vpc_id)
-
-        # clean unused vpc
-        unused_vpc_ids = list(set(all_vpc_ids) - set(used_vpc_ids))
-
-        for vpc_id in unused_vpc_ids:
-            aws_vpc_delete(vpc_id)
-
-    def clean_unused_iam_role(self):
-        """
-        check the AWS state and clean iam role that is not used by any emr cluster
-        """
-        state = aws_get_state()
-
-        # get all iam role names that are used by emr
-        used_iam_role_names = []
-        if 'emr' in state:
-            for emr_id in state['emr']:
-                if 'ec2' in state['emr'][emr_id]['role']:
-                    used_iam_role_names.append(state['emr'][emr_id]['role']['ec2'])
-                if 'emr' in state['emr'][emr_id]['role']:
-                    used_iam_role_names.append(state['emr'][emr_id]['role']['emr'])
-
-        # get all iam role names that are created
-        all_iam_role_names = []
-        if 'iam' in state and 'role' in state['iam']:
-            for role_name in state['iam']['role']:
-                all_iam_role_names.append(role_name)
-
-        # clean unused iam role
-        unused_iam_role_names = list(set(all_iam_role_names) - set(used_iam_role_names))
-
-        for role_name in unused_iam_role_names:
-            aws_iam_role_delete(role_name)
-
-    def clean_unused_iam_instance_profile(self):
-        """
-        check the AWS state and clean iam instance profile that is not used by any emr cluster
-        """
-        state = aws_get_state()
-
-        # get all iam instance profile names that are used by emr
-        used_iam_instance_profile_names = []
-        if 'emr' in state:
-            for emr_id in state['emr']:
-                used_iam_instance_profile_names.append(state['emr'][emr_id]['instance_profile'])
-
-        # get all iam instance profile names that are created
-        all_iam_instance_profile_names = []
-        if 'iam' in state and 'instance_profile' in state['iam']:
-            for instance_profile_name in state['iam']['instance_profile']:
-                all_iam_instance_profile_names.append(instance_profile_name)
-
-        # clean unused iam instance profile
-        unused_iam_instance_profile_names = list(set(all_iam_instance_profile_names) - set(used_iam_instance_profile_names))
-
-        for instance_profile_name in unused_iam_instance_profile_names:
-            aws_iam_instance_profile_delete(instance_profile_name)
-
-    def clean(self):
-        """
-        clean unused resources
-        """
-        self.clean_stopped_emr()
-        self.clean_unused_vpc()
-        self.clean_unused_iam_instance_profile()
-        self.clean_unused_iam_role()
 
     def _role_setup(self, config):
         """
@@ -553,7 +325,6 @@ class EMRManager:
         config.emr.instance_profile.name = instance_profile_name
         config.emr.instance_profile.ec2_role = ec2_role
 
-
     def _vpc_setup(self, config):
         """
         config will be automatically updated
@@ -634,6 +405,58 @@ class EMRManager:
         state['vpc'][vpc_id]['public_subnet'] = config.emr.subnet.public
         aws_set_state(state)
 
+    def _set_default_instance(
+        self,
+        config,
+        min_memory=2048,
+        max_memory=4096,
+    ):
+        """
+        choose default instance type by memory
+
+        args:
+            config (OmegaConf): config for the etl
+            min_memory (int): minimum memory size (MiB)
+            max_memory (int): maximum memory size (MiB)
+        """
+        subnet_id = config.emr.subnet.id
+        az = aws_subnet_az(subnet_id)
+        instances = aws_ec2_instance_at_az(az=az)
+
+        # find memory size is bigger specified min/max memory
+        candidate = None
+        _min_candidate_memory = float('inf')
+        for instance in instances:
+            instance_info = aws_ec2_instance_info(instance)
+            memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
+            if min_memory < memory < max_memory:
+                if memory < _min_candidate_memory:
+                    candidate = instance
+                    _min_candidate_memory = memory
+
+        if candidate is None:
+            raise Exception(f"Unable to find instance type with memory between {min_memory} and {max_memory}")
+
+
+        instance_info = aws_ec2_instance_info(candidate)
+        vcpu = instance_info['InstanceTypes'][0]['VCpuInfo']['DefaultVCpus']
+        memory = instance_info['InstanceTypes'][0]['MemoryInfo']['SizeInMiB']
+        print(
+            f"{'=' * 80}\n"
+            f"Default instance type is [ {candidate} ]\n"
+            f"{'=' * 80}\n"
+            f" vCPU: {vcpu}\n"
+            f" Memory: {memory}\n"
+            f" Price: {aws_ec2_get_price(candidate)}\n"
+            f"{'=' * 80}\n"
+        )
+
+        if config.emr.master_instance.type is None:
+            config.emr.master_instance.type = candidate
+        if config.emr.core_instance.type is None:
+            config.emr.core_instance.type = candidate
+        if config.emr.task_instance.type is None:
+            config.emr.task_instance.type = candidate
 
     def _emr_cluster_create(self, config):
         """
@@ -722,6 +545,180 @@ class EMRManager:
 
         return emr_id
 
+    def get_working_dir(self, config):
+        """
+        get working directory path for the emr cluster
+        if not provided, it will be automatically generated
+        """
+        # to avoid circular import
+        from dataverse.utils.setting import SystemSetting
+
+        if config.emr.working_dir is not None:
+            working_dir = config.emr.working_dir
+            if working_dir.startswith(('s3://', 's3a://', 's3n://')):
+                aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', working_dir)
+                if not aws_s3_matched:
+                    raise ValueError(f"EMR working directory {working_dir} is not a valid s3 path")
+        else:
+            # [ emr versioning ] - emr_YYYY-MM-DD_HH:MM:SS_<emr_id>
+            # datetime first for ascending order
+            bucket = SystemSetting()['AWS_BUCKET']
+            user_id = AWSClient().user_id
+            working_dir_name = datetime.datetime.now().strftime(f"emr_%Y-%m-%d_%H:%M:%S_{config.emr.id}")
+
+            working_dir = f"s3://{bucket}/{user_id}/emr/{working_dir_name}"
+
+        return working_dir
+
+    def setup(self, config):
+        """
+        [ upload to S3 ]
+        - config for `dataverse`
+        - dataverse site-packages source code
+        - requirements.txt
+
+        [ setup environment on EMR cluster ]
+        - install pip dependencies for `dataverse`
+        - set `dataverse` package at EMR cluster pip installed packages path
+        """
+        working_dir = self.get_working_dir(config)
+        bucket, key = aws_s3_path_parse(working_dir)
+
+        # [ upload to S3 ] ------------------------------------------
+        # config for `dataverse`
+        aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
+
+    def clean(self):
+        """
+        clean unused resources
+        """
+        self._clean_stopped_emr()
+        self._clean_unused_vpc()
+        self._clean_unused_iam_instance_profile()
+        self._clean_unused_iam_role()
+
+    def _clean_stopped_emr(self):
+        """
+        check stopped EMR and update the state
+        """
+        state = aws_get_state()
+
+        # get all emr ids
+        emr_ids = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                emr_ids.append(emr_id)
+
+        # remove stopped emr from state
+        REMOVE_STATES = [
+            'TERMINATED',
+            'TERMINATED_WITH_ERRORS'
+        ]
+        for emr_id in emr_ids:
+            emr_info = AWSClient().emr.describe_cluster(ClusterId=emr_id)
+            if emr_info['Cluster']['Status']['State'] in REMOVE_STATES:
+                del state['emr'][emr_id]
+        aws_set_state(state)
+
+    def _clean_unused_vpc(self):
+        """
+        check the AWS state and clean vpc that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all vpc ids that are used by emr
+        used_vpc_ids = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                used_vpc_ids.append(state['emr'][emr_id]['vpc_id'])
+
+        # get all vpc ids that are created
+        all_vpc_ids = []
+        if 'vpc' in state:
+            for vpc_id in state['vpc']:
+                all_vpc_ids.append(vpc_id)
+
+        # clean unused vpc
+        unused_vpc_ids = list(set(all_vpc_ids) - set(used_vpc_ids))
+
+        for vpc_id in unused_vpc_ids:
+            aws_vpc_delete(vpc_id)
+
+    def _clean_unused_iam_role(self):
+        """
+        check the AWS state and clean iam role that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all iam role names that are used by emr
+        used_iam_role_names = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                if 'ec2' in state['emr'][emr_id]['role']:
+                    used_iam_role_names.append(state['emr'][emr_id]['role']['ec2'])
+                if 'emr' in state['emr'][emr_id]['role']:
+                    used_iam_role_names.append(state['emr'][emr_id]['role']['emr'])
+
+        # get all iam role names that are created
+        all_iam_role_names = []
+        if 'iam' in state and 'role' in state['iam']:
+            for role_name in state['iam']['role']:
+                all_iam_role_names.append(role_name)
+
+        # clean unused iam role
+        unused_iam_role_names = list(set(all_iam_role_names) - set(used_iam_role_names))
+
+        for role_name in unused_iam_role_names:
+            aws_iam_role_delete(role_name)
+
+    def _clean_unused_iam_instance_profile(self):
+        """
+        check the AWS state and clean iam instance profile that is not used by any emr cluster
+        """
+        state = aws_get_state()
+
+        # get all iam instance profile names that are used by emr
+        used_iam_instance_profile_names = []
+        if 'emr' in state:
+            for emr_id in state['emr']:
+                used_iam_instance_profile_names.append(state['emr'][emr_id]['instance_profile'])
+
+        # get all iam instance profile names that are created
+        all_iam_instance_profile_names = []
+        if 'iam' in state and 'instance_profile' in state['iam']:
+            for instance_profile_name in state['iam']['instance_profile']:
+                all_iam_instance_profile_names.append(instance_profile_name)
+
+        # clean unused iam instance profile
+        unused_iam_instance_profile_names = list(set(all_iam_instance_profile_names) - set(used_iam_instance_profile_names))
+
+        for instance_profile_name in unused_iam_instance_profile_names:
+            aws_iam_instance_profile_delete(instance_profile_name)
+
+    def terminate(self, config):
+        """
+        terminate emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        if config.emr.id is None:
+            raise ValueError("EMR cluster is not running.")
+
+        AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
+
+        # wait until emr cluster is terminated
+        waiter = AWSClient().emr.get_waiter('cluster_terminated')
+        waiter.wait(ClusterId=config.emr.id)
+
+        # set state
+        state = aws_get_state()
+        if 'emr' in state and config.emr.id in state['emr']:
+            del state['emr'][config.emr.id]
+            aws_set_state(state)
+
+        # clean unused resources
+        self.clean()
 
 
 # --------------------------------------------------------------------------------
