@@ -360,6 +360,8 @@ class ETLPipeline:
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
 
+        # EMR cluster environment setup
+        emr_manager.setup(config)
 
         # TODO: upload source code to s3
         # TODO: upload config to s3

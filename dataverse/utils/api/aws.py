@@ -17,6 +17,7 @@ import time
 import boto3
 import datetime
 import ipaddress
+from omegaconf import OmegaConf
 
 
 def aws_check_credentials(verbose=True):
@@ -255,6 +256,24 @@ class EMRManager:
 
         # clean unused resources
         self.clean()
+
+    def setup(self, config):
+        """
+        [ upload to S3 ]
+        - config for `dataverse`
+        - dataverse site-packages source code
+        - requirements.txt
+
+        [ setup environment on EMR cluster ]
+        - install pip dependencies for `dataverse`
+        - set `dataverse` package at EMR cluster pip installed packages path
+        """
+        working_dir = self.get_working_dir(config)
+        bucket, key = aws_s3_path_parse(working_dir)
+
+        # [ upload to S3 ] ------------------------------------------
+        # config for `dataverse`
+        aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
 
     def set_default_instance(
         self,
