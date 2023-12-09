@@ -22,6 +22,7 @@ import time
 import boto3
 import datetime
 import ipaddress
+import pkg_resources
 from omegaconf import OmegaConf
 
 
@@ -588,6 +589,7 @@ class EMRManager:
         """
         self._upload_config(config)
         self._upload_source_code(config)
+        self._upload_dependencies(config)
 
     def _upload_config(self, config):
         """
@@ -619,6 +621,28 @@ class EMRManager:
         bucket, key = aws_s3_path_parse(working_dir)
 
         aws_s3_upload(bucket, f'{key}/dataverse.tar.gz', zip_file)
+
+        shutil.rmtree(temp_dir)
+
+    def _upload_dependencies(self, config, package_name="dataverse"):
+        # get all dependencies
+        requirements = []
+        for r in pkg_resources.get_distribution(package_name).requires():
+            requirements.append(str(r))
+
+        # create requirements.txt
+        temp_dir = tempfile.mkdtemp()
+        dependency_file = os.path.join(temp_dir, 'requirements.txt')
+
+        with open(dependency_file, 'w') as f:
+            for requirement in requirements:
+                f.write(f"{requirement}\n")
+
+        # upload requirements.txt to S3
+        working_dir = self.get_working_dir(config)
+        bucket, key = aws_s3_path_parse(working_dir)
+
+        aws_s3_upload(bucket, f'{key}/requirements.txt', dependency_file)
 
         shutil.rmtree(temp_dir)
 
