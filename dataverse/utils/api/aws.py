@@ -11,7 +11,12 @@ aws_s3_list("bucket")
 ```
 """
 
+
+import os
 import re
+import shutil
+import tarfile
+import tempfile
 import json
 import time
 import boto3
@@ -581,12 +586,41 @@ class EMRManager:
         - install pip dependencies for `dataverse`
         - set `dataverse` package at EMR cluster pip installed packages path
         """
+        self._upload_config(config)
+        self._upload_source_code(config)
+
+    def _upload_config(self, config):
+        """
+        upload config for `dataverse` to S3
+        """
         working_dir = self.get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
-        # [ upload to S3 ] ------------------------------------------
-        # config for `dataverse`
         aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
+
+    def _upload_source_code(self, config):
+        """
+        upload pip site-packages source code to S3
+
+        caveat:
+            this doesn't include wheel files or meta data for pip packages
+        """
+        # to avoid circular import
+        from dataverse.utils.setting import SystemSetting
+
+        temp_dir = tempfile.mkdtemp()
+        zip_file = os.path.join(temp_dir, 'dataverse.tar.gz')
+
+        dataverse_home = SystemSetting().DATAVERSE_HOME
+        with tarfile.open(zip_file, "w:gz") as tar:
+            tar.add(dataverse_home, arcname=os.path.basename(dataverse_home))
+
+        working_dir = self.get_working_dir(config)
+        bucket, key = aws_s3_path_parse(working_dir)
+
+        aws_s3_upload(bucket, f'{key}/dataverse.tar.gz', zip_file)
+
+        shutil.rmtree(temp_dir)
 
     def clean(self):
         """
