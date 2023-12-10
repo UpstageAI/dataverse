@@ -29,6 +29,7 @@ from dataverse.utils.analyze import is_python_declaration_only
 
 
 # TODO: get the information from AWS when it's supported someday
+# reference - https://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-emr-supported-instance-types.html
 EMR_SUPPORTED_EC2_INSTANCES = [
     "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m3.xlarge", "m3.2xlarge",
     "c1.medium", "c1.xlarge", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge",
@@ -1053,8 +1054,7 @@ def aws_vpc_delete(vpc_id):
         # EMR managed dependency
         vpc = boto3.resource('ec2').Vpc(vpc_id)
 
-        # NOTE: self-referencing happens for EMR managed security group
-        # remove self-referencing security group
+        # NOTE: remove dependency between security groups
         for security_group in vpc.security_groups.all():
             aws_security_group_remove_dependency(security_group.id)
 
