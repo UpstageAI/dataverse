@@ -129,6 +129,11 @@ class Config:
                     'release': 'emr-6.15.0',
                     'idle_timeout': 3600,
 
+                    # uploaded to s3
+                    'config': None,
+                    'source_code': None,
+                    'dependencies': None,
+
                     # master (driver)
                     'master_instance': {
                         'type': None,

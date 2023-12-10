@@ -618,9 +618,12 @@ class EMRManager:
         - install pip dependencies for `dataverse`
         - set `dataverse` package at EMR cluster pip installed packages path
         """
-        self._upload_config(config)
-        self._upload_source_code(config)
-        self._upload_dependencies(config)
+        if config.emr.config is None:
+            self._upload_config(config)
+        if config.emr.source_code is None:
+            self._upload_source_code(config)
+        if config.emr.dependencies is None:
+            self._upload_dependencies(config)
         self._upload_dynamic_etl_files(config)
 
     def _upload_config(self, config):
@@ -631,6 +634,8 @@ class EMRManager:
         bucket, key = aws_s3_path_parse(working_dir)
 
         aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
+
+        config.emr.config = f"{working_dir}/config.yaml"
 
     def _upload_source_code(self, config):
         """
@@ -656,6 +661,8 @@ class EMRManager:
 
         shutil.rmtree(temp_dir)
 
+        config.emr.source_code = f"{working_dir}/dataverse.tar.gz"
+
     def _upload_dependencies(self, config, package_name="dataverse"):
         # get all dependencies
         requirements = []
@@ -677,6 +684,8 @@ class EMRManager:
         aws_s3_upload(bucket, f'{key}/requirements.txt', dependency_file)
 
         shutil.rmtree(temp_dir)
+
+        config.emr.dependencies = f"{working_dir}/requirements.txt"
 
     def _upload_dynamic_etl_files(self, config):
         # to avoid circular import
