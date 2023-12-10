@@ -90,8 +90,9 @@ class AWSClient:
         self.sts = boto3.client('sts')
         self.iam = boto3.client('iam')
         self.s3 = boto3.client('s3')
-        self.ec2 = boto3.client('ec2', region_name=self.region)
-        self.emr = boto3.client('emr', region_name=self.region)
+        self.ec2 = boto3.client('ec2')
+        self.emr = boto3.client('emr')
+        self.ssm = boto3.client('ssm')
         self.user_id = self.sts.get_caller_identity()['UserId']
         self.account_id = self.sts.get_caller_identity()['Account']
         self._initialized = True
