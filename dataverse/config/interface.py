@@ -142,13 +142,13 @@ class Config:
                     # core (data node)
                     'core_instance': {
                         'type': None,
-                        'count': 1,
+                        'count': 2,
                     },
 
                     # task (executors)
                     'task_instance': {
                         'type': None,
-                        'count': 2,
+                        'count': 0,
                     },
 
                     # EMR cluster created by dataverse or user

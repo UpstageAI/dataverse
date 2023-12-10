@@ -507,6 +507,36 @@ class EMRManager:
         from dataverse.utils.setting import SystemSetting
         log_dir = f"s3://{SystemSetting().AWS_BUCKET}/{AWSClient().user_id}/emr/logs"
 
+        # instance group setting
+        instance_groups = [
+            {
+                'Name': 'master nodes',
+                'Market': 'ON_DEMAND',
+                'InstanceRole': 'MASTER',
+                'InstanceType': config.emr.master_instance.type,
+                'InstanceCount': 1,
+            },
+            {
+                'Name': 'core nodes',
+                'Market': 'ON_DEMAND',
+                'InstanceRole': 'CORE',
+                'InstanceType': config.emr.core_instance.type,
+                'InstanceCount': config.emr.core_instance.count,
+            },
+        ]
+
+        # task is optional
+        if config.emr.task_instance.count > 0:
+            instance_groups.append(
+                {
+                    'Name': 'task nodes',
+                    'Market': 'ON_DEMAND',
+                    'InstanceRole': 'TASK',
+                    'InstanceType': config.emr.task_instance.type,
+                    'InstanceCount': config.emr.task_instance.count,
+                }
+            )
+
         # create emr cluster
         emr_id = AWSClient().emr.run_job_flow(
             Name=config.emr.name,
@@ -515,29 +545,7 @@ class EMRManager:
                 "IdleTimeout": config.emr.idle_timeout,
             },
             Instances={
-                'InstanceGroups': [
-                    {
-                        'Name': 'master nodes',
-                        'Market': 'ON_DEMAND',
-                        'InstanceRole': 'MASTER',
-                        'InstanceType': config.emr.master_instance.type,
-                        'InstanceCount': 1,
-                    },
-                    {
-                        'Name': 'core nodes',
-                        'Market': 'ON_DEMAND',
-                        'InstanceRole': 'CORE',
-                        'InstanceType': config.emr.core_instance.type,
-                        'InstanceCount': config.emr.core_instance.count,
-                    },
-                    {
-                        'Name': 'task nodes',
-                        'Market': 'ON_DEMAND',
-                        'InstanceRole': 'TASK',
-                        'InstanceType': config.emr.task_instance.type,
-                        'InstanceCount': config.emr.task_instance.count,
-                    },
-                ],
+                'InstanceGroups': instance_groups,
                 'KeepJobFlowAliveWhenNoSteps': True,
                 'TerminationProtected': False,
                 'Ec2SubnetId': config.emr.subnet.id,
