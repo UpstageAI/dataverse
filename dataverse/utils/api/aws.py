@@ -689,6 +689,7 @@ class EMRManager:
         - install pip dependencies for `dataverse`
         - set `dataverse` package at EMR cluster pip installed packages path
         """
+        # upload to necessary dataverse files to S3
         if config.emr.config is None:
             self._upload_config(config)
         if config.emr.source_code is None:
@@ -696,6 +697,9 @@ class EMRManager:
         if config.emr.dependencies is None:
             self._upload_dependencies(config)
         self._upload_dynamic_etl_files(config)
+
+        # setup environment on EMR cluster
+        self._setup_install_dependencies(config)
 
     def _upload_config(self, config):
         """
@@ -801,6 +805,21 @@ class EMRManager:
                 key=f'{key}/dynamic_etl/{os.path.basename(file_path)}',
                 local_path=file_path
             )
+
+    def _setup_install_dependencies(self, config):
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        commands = [
+            f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
+            "sudo yum install -y python3-devel",
+            "pip3 install wheel setuptools pip --upgrade",
+            "pip3 install -r /home/hadoop/dataverse/requirements.txt",
+        ]
+
+        aws_ssm_run_commands(instance_ids, commands)
 
     def clean(self):
         """
