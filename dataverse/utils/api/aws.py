@@ -212,6 +212,60 @@ def aws_ec2_get_price(instance_type):
 
 
 # --------------------------------------------------------------------------------
+# AWS SSM (Systems Manager)
+def aws_ssm_run_commands(instance_ids, commands, verbose=True):
+    """
+    Run commands on a list of EC2 instances using AWS SSM.
+    """
+    for command in commands:
+        if verbose:
+            print(f"Sending following command to all instances...")
+            print("==========================================")
+            print(command)
+            print("==========================================")
+
+        command_id = AWSClient().ssm.send_command(
+            InstanceIds=instance_ids,
+            DocumentName="AWS-RunShellScript",
+            Parameters={"commands": [command]},
+            TimeoutSeconds=3600,
+        )["Command"]["CommandId"]
+
+        while True:
+            # verify the previous step succeeded before running the next step.
+            cmd_result = AWSClient().ssm.list_commands(CommandId=command_id)["Commands"][0]
+            if cmd_result["StatusDetails"] == "Success":
+                if verbose:
+                    print("=========== Standard output ============")
+                    print(command_invocation["StandardOutputContent"])
+                    print("==========================================")
+                    print(f"Command succeeded.")
+                break
+            elif cmd_result["StatusDetails"] in ["Pending", "InProgress"]:
+                if verbose:
+                    print(f"Command status is {cmd_result['StatusDetails']}, waiting...")
+                time.sleep(10)
+            else:
+                if verbose:
+                    print(f"Command status is {cmd_result['StatusDetails']}, quitting.")
+
+                # get more detailed information about the command failure
+                command_invocation = AWSClient().ssm.get_command_invocation(
+                    CommandId=command_id,
+                    InstanceId=instance_ids[0], # assume all instances are the same
+                )
+                if verbose:
+                    print("============= Error output ==============")
+                    print(command_invocation["StandardErrorContent"])
+                    print("=========== Standard output ============")
+                    print(command_invocation["StandardOutputContent"])
+                    print("==========================================")
+                raise RuntimeError(
+                    f"Command failed to run. [ {cmd_result['StatusDetails']} ]"
+                )
+
+
+# --------------------------------------------------------------------------------
 # AWS EMR
 
 class EMRManager:
