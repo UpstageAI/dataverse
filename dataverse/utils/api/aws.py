@@ -25,6 +25,7 @@ import ipaddress
 import pkg_resources
 from omegaconf import OmegaConf
 
+from dataverse.utils.analyze import is_python_declaration_only
 
 
 # TODO: get the information from AWS when it's supported someday
@@ -619,6 +620,7 @@ class EMRManager:
         self._upload_config(config)
         self._upload_source_code(config)
         self._upload_dependencies(config)
+        self._upload_dynamic_etl_files(config)
 
     def _upload_config(self, config):
         """
@@ -674,6 +676,50 @@ class EMRManager:
         aws_s3_upload(bucket, f'{key}/requirements.txt', dependency_file)
 
         shutil.rmtree(temp_dir)
+
+    def _upload_dynamic_etl_files(self, config):
+        # to avoid circular import
+        from dataverse.etl import ETLRegistry
+
+        # get all etl files
+        dynamic_etl_file_paths = []
+        for etl in ETLRegistry().get_all():
+            # not part of the dataverse source but dynamically loaded by user
+            if not etl.__etl_dir__:
+                file_path = etl.__file_path__
+
+                # jupyter notebook is not supported
+                # TODO: allow jupyter notebook
+                # NOTE: reason why jupyter notebook is not supported is because
+                #       the filename point at the temporary file path not the `.ipynb` file
+                if 'ipykernel' in file_path:
+                    raise ValueError(
+                        'Dynamic ETL from jupyter notebook not supported. Only from .py files\n'
+                        f"[ {file_path} ] is given which is temporary jupyter cell execution file\n"
+                    )
+
+                # only declaration is allowed
+                # TODO: analyze the code and only parse necessary dynamic etl code
+                # NOTE: this is to prevent execution of the code
+                if not is_python_declaration_only(file_path):
+                    raise ValueError(
+                        'Dynamic ETL file should only contain declaration (imports, functions, classes, etc.)'
+                        f"[ {file_path} ] includes execution.\n"
+                    )
+
+                # check not from of jupyter notebook
+                dynamic_etl_file_paths.append(file_path)
+
+        # upload etl files to S3
+        working_dir = self.get_working_dir(config)
+        bucket, key = aws_s3_path_parse(working_dir)
+
+        for file_path in dynamic_etl_file_paths:
+            aws_s3_upload(
+                bucket=bucket,
+                key=f'{key}/dynamic_etl/{os.path.basename(file_path)}',
+                local_path=file_path
+            )
 
     def clean(self):
         """
