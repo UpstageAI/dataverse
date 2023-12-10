@@ -1043,7 +1043,22 @@ def aws_vpc_delete(vpc_id):
             if 'elastic_ip' in state['vpc'][vpc_id]:
                 aws_elastic_ip_release(vpc_id, state['vpc'][vpc_id]['elastic_ip'])
             if 'subnet' in state['vpc'][vpc_id]:
-                aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
+                # NOTE: set retry because terminated EMR cluster iterrupts subnet deletion
+                #       by dependency problem for few seconds
+                # HACK: this is a hacky solution and should be fixed in the future
+                RETRY_SUBNET_DELETION = 5
+                for _ in range(RETRY_SUBNET_DELETION):
+                    try:
+                        aws_subnet_delete(vpc_id, state['vpc'][vpc_id]['subnet'])
+                        break
+                    except AWSClient().ec2.exceptions.ClientError as e:
+                        if e.response['Error']['Code'] == 'DependencyViolation':
+                            time.sleep(5)
+                            continue
+                        else:
+                            raise e
+                    except Exception as e:
+                        raise e
             if 'security_group' in state['vpc'][vpc_id]:
                 aws_security_group_delete(vpc_id, state['vpc'][vpc_id]['security_group'])
             if 'gateway' in state['vpc'][vpc_id]:
