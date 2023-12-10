@@ -286,11 +286,15 @@ class EMRManager:
         }
         ec2_role = 'Dataverse_EMR_EC2_DefaultRole'
         ec2_policy = 'AmazonElasticMapReduceforEC2Role'
+        ssm_policy = 'AmazonSSMManagedInstanceCore'
 
         # add timestamp to temporary role name
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         ec2_role = f"{ec2_role}_{timestamp}"
-        ec2_policy_arns = [f"arn:aws:iam::aws:policy/service-role/{ec2_policy}"]
+        ec2_policy_arns = [
+            f"arn:aws:iam::aws:policy/service-role/{ec2_policy}",
+            f"arn:aws:iam::aws:policy/{ssm_policy}"
+        ]
 
         aws_iam_role_create(
             role_name=ec2_role,
