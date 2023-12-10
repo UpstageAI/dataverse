@@ -554,6 +554,10 @@ class EMRManager:
             LogUri=log_dir,
         )['JobFlowId']
 
+        # wait until emr cluster is ready
+        waiter = AWSClient().emr.get_waiter('cluster_running')
+        waiter.wait(ClusterId=emr_id)
+
         # set state
         state = aws_get_state()
         if 'emr' not in state:
