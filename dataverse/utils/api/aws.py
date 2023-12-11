@@ -1085,6 +1085,18 @@ def aws_iam_instance_profile_delete(instance_profile_name):
             del state['iam']['instance_profile'][instance_profile_name]
             aws_set_state(state)
 
+def aws_iam_remove_all_instance_profile():
+    """
+    WARNING: this will remove all instance profile that has Dataverse in it
+             which means it might remove other instance profile that not from you
+    """
+    # get all instance profile
+    instance_profiles = AWSClient().iam.list_instance_profiles()["InstanceProfiles"]
+    # remove all the instance_profile that has Dataverse in it
+    for profile in instance_profiles:
+        if "Dataverse" in profile["InstanceProfileName"]:
+            aws_iam_instance_profile_delete(profile["InstanceProfileName"])
+
 
 def aws_vpc_create(cidr_block=None, tag_name='Dataverse-Temporary-VPC'):
 
