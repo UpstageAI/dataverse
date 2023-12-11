@@ -1,11 +1,13 @@
 
 import ast
 
-def is_python_declaration_only(file_path, verbose=False):
+def python_is_script_executable(file_path, verbose=False):
     """
-    check if a python script only contains declarations (imports, functions, classes, etc.)
+    check if a python script is executable
+    in other words, check if the python script does not contains any declaration nodes
+    (imports, functions, classes, etc.)
 
-    currently only should include the following:
+    declaration nodes:
     - imports
     - functions
     - classes
@@ -14,7 +16,7 @@ def is_python_declaration_only(file_path, verbose=False):
     Args:
         file_path (str): path to the python script to check
     Returns:
-        bool: True if the python script only contains declarations, False otherwise
+        bool: True if the python script is executable, False otherwise
     """
     with open(file_path, 'r') as file:
         source_code = file.read()
@@ -30,9 +32,9 @@ def is_python_declaration_only(file_path, verbose=False):
             ast.Assign
         )):
             if verbose:
-                print("found non-declaration(execution) code: {}".format(node))
-            return False
+                print("found executable code: {}".format(node))
+            return True
 
     if verbose:
-        print("found only declaration nodes")
-    return True
+        print("found no executable code")
+    return False

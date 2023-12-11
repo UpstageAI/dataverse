@@ -1,2 +1,2 @@
 
-from .python import is_python_declaration_only
+from .python import python_is_script_executable

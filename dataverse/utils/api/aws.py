@@ -25,7 +25,7 @@ import ipaddress
 import pkg_resources
 from omegaconf import OmegaConf
 
-from dataverse.utils.analyze import is_python_declaration_only
+from dataverse.utils.analyze import python_is_script_executable
 
 
 # TODO: get the information from AWS when it's supported someday
@@ -793,7 +793,7 @@ class EMRManager:
                 # only declaration is allowed
                 # TODO: analyze the code and only parse necessary dynamic etl code
                 # NOTE: this is to prevent execution of the code
-                if not is_python_declaration_only(file_path):
+                if python_is_script_executable(file_path):
                     raise ValueError(
                         'Dynamic ETL file should only contain declaration (imports, functions, classes, etc.)'
                         f"[ {file_path} ] includes execution.\n"
