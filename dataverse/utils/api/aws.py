@@ -213,10 +213,12 @@ def aws_ec2_get_price(instance_type):
 
 # --------------------------------------------------------------------------------
 # AWS SSM (Systems Manager)
-def aws_ssm_run_commands(instance_ids, commands, verbose=True):
+def aws_ssm_run_commands(instance_ids, commands, verbose=True, return_output=False):
     """
     Run commands on a list of EC2 instances using AWS SSM.
     """
+    if return_output:
+        results = {}
     for command in commands:
         if verbose:
             print(f"Sending following command to all instances...")
@@ -244,6 +246,10 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True):
                     print(command_invocation["StandardOutputContent"])
                     print("==========================================")
                     print(f"Command succeeded.")
+                    if return_output:
+                        if verbose:
+                            print(f"Saving output to results['{command}']")
+                        results[command] = command_invocation["StandardOutputContent"]
                 break
             elif cmd_result["StatusDetails"] in ["Pending", "InProgress"]:
                 if verbose:
@@ -265,6 +271,9 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True):
                 raise RuntimeError(
                     f"Command failed to run. [ {cmd_result['StatusDetails']} ]"
                 )
+    if return_output:
+        return results
+
 
 
 # --------------------------------------------------------------------------------
