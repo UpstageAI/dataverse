@@ -680,7 +680,7 @@ class EMRManager:
         self._upload_dynamic_etl_files(config)
 
         # setup environment on EMR cluster
-        self._setup_install_dependencies(config)
+        self._setup_dependencies(config)
 
     def _get_working_dir(self, config):
         """
@@ -813,7 +813,7 @@ class EMRManager:
                 local_path=file_path
             )
 
-    def _setup_install_dependencies(self, config):
+    def _setup_dependencies(self, config):
         nodes = AWSClient().emr.list_instances(
             ClusterId=config.emr.id
         )["Instances"]
@@ -823,9 +823,14 @@ class EMRManager:
             f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
             "sudo yum install -y python3-devel",
             "pip3 install wheel setuptools pip --upgrade",
+        ]
+        aws_ssm_run_commands(instance_ids, commands)
+
+        # NOTE: unknown unlimited loop caused by `pip3 install -r requirements.txt`
+        #       so I split the following command separately
+        commands = [
             "pip3 install -r /home/hadoop/dataverse/requirements.txt",
         ]
-
         aws_ssm_run_commands(instance_ids, commands)
 
     def clean(self):
