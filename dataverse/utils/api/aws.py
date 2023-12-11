@@ -236,6 +236,10 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True):
             cmd_result = AWSClient().ssm.list_commands(CommandId=command_id)["Commands"][0]
             if cmd_result["StatusDetails"] == "Success":
                 if verbose:
+                    command_invocation = AWSClient().ssm.get_command_invocation(
+                        CommandId=command_id,
+                        InstanceId=instance_ids[0], # assume all instances are the same
+                    )
                     print("=========== Standard output ============")
                     print(command_invocation["StandardOutputContent"])
                     print("==========================================")
@@ -248,13 +252,11 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True):
             else:
                 if verbose:
                     print(f"Command status is {cmd_result['StatusDetails']}, quitting.")
-
-                # get more detailed information about the command failure
-                command_invocation = AWSClient().ssm.get_command_invocation(
-                    CommandId=command_id,
-                    InstanceId=instance_ids[0], # assume all instances are the same
-                )
-                if verbose:
+                    # get more detailed information about the command failure
+                    command_invocation = AWSClient().ssm.get_command_invocation(
+                        CommandId=command_id,
+                        InstanceId=instance_ids[0], # assume all instances are the same
+                    )
                     print("============= Error output ==============")
                     print(command_invocation["StandardErrorContent"])
                     print("=========== Standard output ============")
