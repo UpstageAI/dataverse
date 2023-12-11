@@ -1014,16 +1014,21 @@ def aws_iam_role_create(
     waiter.wait(RoleName=role_name)
 
 def aws_iam_role_delete(role_name):
-    # detach policy
-    response = AWSClient().iam.list_attached_role_policies(RoleName=role_name)
-    for policy in response['AttachedPolicies']:
-        AWSClient().iam.detach_role_policy(
-            RoleName=role_name,
-            PolicyArn=policy['PolicyArn'],
-        )
+    try:
+        # detach policy
+        response = AWSClient().iam.list_attached_role_policies(RoleName=role_name)
+        for policy in response['AttachedPolicies']:
+            AWSClient().iam.detach_role_policy(
+                RoleName=role_name,
+                PolicyArn=policy['PolicyArn'],
+            )
 
-    # delete role
-    AWSClient().iam.delete_role(RoleName=role_name)
+        # delete role
+        AWSClient().iam.delete_role(RoleName=role_name)
+    except AWSClient().iam.exceptions.NoSuchEntityException:
+        print(f"{role_name} does not exist.")
+    except Exception as e:
+        raise e
 
     # set state
     state = aws_get_state()
