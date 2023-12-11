@@ -690,6 +690,7 @@ class EMRManager:
 
         # setup environment on EMR cluster
         self._setup_dependencies(config)
+        self._setup_source_code(config)
 
     def _get_working_dir(self, config):
         """
@@ -841,6 +842,35 @@ class EMRManager:
             "pip3 install -r /home/hadoop/dataverse/requirements.txt",
         ]
         aws_ssm_run_commands(instance_ids, commands)
+
+    def _setup_source_code(self, config):
+        """
+        copy dataverse source code to pip installed packages path
+        """
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        # unzip dataverse.tar.gz and copy to pip installed packages path
+        commands = [
+            "tar -xzf /home/hadoop/dataverse/dataverse.tar.gz -C /home/hadoop/dataverse",
+        ]
+        aws_ssm_run_commands(instance_ids, commands)
+
+        # get pip installed packages path
+        commands = ["pip3 show numpy"]
+        result = aws_ssm_run_commands(instance_ids, commands, return_output=True)
+        location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
+
+        # copy dataverse source code to pip installed packages path
+        commands = [
+            f"cp -r /home/hadoop/dataverse/dataverse {location}",
+        ]
+        aws_ssm_run_commands(instance_ids, commands)
+
+
+
 
     def clean(self):
         """
