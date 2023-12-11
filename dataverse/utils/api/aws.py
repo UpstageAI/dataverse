@@ -317,6 +317,7 @@ class EMRManager:
         self._set_default_instance(config)
 
         emr_id = self._emr_cluster_create(config)
+        config.emr.id = emr_id
         config.emr.auto_generated = True
 
         return emr_id
@@ -655,7 +656,33 @@ class EMRManager:
 
         return emr_id
 
-    def get_working_dir(self, config):
+    def setup(self, config):
+        """
+        [ upload to S3 ]
+        - config for `dataverse`
+        - dataverse site-packages source code
+        - requirements.txt
+
+        [ setup environment on EMR cluster ]
+        - install pip dependencies for `dataverse`
+        - set `dataverse` package at EMR cluster pip installed packages path
+        """
+        # generate working directory
+        self._get_working_dir(config)
+
+        # upload to necessary dataverse files to S3
+        if config.emr.config is None:
+            self._upload_config(config)
+        if config.emr.source_code is None:
+            self._upload_source_code(config)
+        if config.emr.dependencies is None:
+            self._upload_dependencies(config)
+        self._upload_dynamic_etl_files(config)
+
+        # setup environment on EMR cluster
+        self._setup_install_dependencies(config)
+
+    def _get_working_dir(self, config):
         """
         get working directory path for the emr cluster
         if not provided, it will be automatically generated
@@ -677,37 +704,15 @@ class EMRManager:
             working_dir_name = datetime.datetime.now().strftime(f"emr_%Y-%m-%d_%H:%M:%S_{config.emr.id}")
 
             working_dir = f"s3://{bucket}/{user_id}/emr/{working_dir_name}"
+            config.emr.working_dir = working_dir
 
         return working_dir
-
-    def setup(self, config):
-        """
-        [ upload to S3 ]
-        - config for `dataverse`
-        - dataverse site-packages source code
-        - requirements.txt
-
-        [ setup environment on EMR cluster ]
-        - install pip dependencies for `dataverse`
-        - set `dataverse` package at EMR cluster pip installed packages path
-        """
-        # upload to necessary dataverse files to S3
-        if config.emr.config is None:
-            self._upload_config(config)
-        if config.emr.source_code is None:
-            self._upload_source_code(config)
-        if config.emr.dependencies is None:
-            self._upload_dependencies(config)
-        self._upload_dynamic_etl_files(config)
-
-        # setup environment on EMR cluster
-        self._setup_install_dependencies(config)
 
     def _upload_config(self, config):
         """
         upload config for `dataverse` to S3
         """
-        working_dir = self.get_working_dir(config)
+        working_dir = self._get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
         aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
@@ -731,7 +736,7 @@ class EMRManager:
         with tarfile.open(zip_file, "w:gz") as tar:
             tar.add(dataverse_home, arcname=os.path.basename(dataverse_home))
 
-        working_dir = self.get_working_dir(config)
+        working_dir = self._get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
         aws_s3_upload(bucket, f'{key}/dataverse.tar.gz', zip_file)
@@ -755,7 +760,7 @@ class EMRManager:
                 f.write(f"{requirement}\n")
 
         # upload requirements.txt to S3
-        working_dir = self.get_working_dir(config)
+        working_dir = self._get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
         aws_s3_upload(bucket, f'{key}/requirements.txt', dependency_file)
@@ -798,7 +803,7 @@ class EMRManager:
                 dynamic_etl_file_paths.append(file_path)
 
         # upload etl files to S3
-        working_dir = self.get_working_dir(config)
+        working_dir = self._get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
         for file_path in dynamic_etl_file_paths:

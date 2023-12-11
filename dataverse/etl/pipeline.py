@@ -341,27 +341,24 @@ class ETLPipeline:
         config = Config.load(config)
         config = Config.set_default(config, emr=True)
 
+        # EMR resource manager - yarn
+        config.spark.master = 'yarn'
+
         # ================ [ EMR ] ===================
         # NOTE: config will be auto-updated by EMR Manager
         emr_manager = EMRManager()
 
         # EMR cluster launch
-        config.emr.id = emr_manager.launch(config)
+        emr_manager.launch(config)
 
-        # EMR working directory - AWS S3
-        config.emr.working_dir = emr_manager.get_working_dir(config)
-
-        # EMR resource manager - yarn
-        config.spark.master = 'yarn'
+        # EMR cluster environment setup
+        emr_manager.setup(config)
 
         if verbose:
             print('=' * 50)
             print('[ Configuration ]')
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
-
-        # EMR cluster environment setup
-        emr_manager.setup(config)
 
         # EMR Cluster terminate
         emr_manager.terminate(config)
