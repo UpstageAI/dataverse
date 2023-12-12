@@ -1759,7 +1759,23 @@ def aws_s3_delete(bucket, key):
     Usage:
         aws_s3_delete('tmp', 'this/is/path.json')
     """
-    AWSClient().s3.delete_object(Bucket=bucket, Key=key)
+    obj_type = aws_s3_get_object_type(bucket, key)
+
+    if obj_type == 'folder':
+        paginator = AWSClient().s3.get_paginator('list_objects')
+        page_iterator = paginator.paginate(Bucket=bucket)
+        for page in page_iterator:
+            for obj in page['Contents']:
+                bucket_key = obj['Key']
+
+                if not bucket_key.startswith(key):
+                    continue
+
+                AWSClient().s3.delete_object(Bucket=bucket, Key=bucket_key)
+    elif obj_type == 'file':
+        AWSClient().s3.delete_object(Bucket=bucket, Key=key)
+    elif obj_type == 'no_obj':
+        raise Exception(f"Object doesn't exist: {key}")
 
 def aws_s3_list_buckets():
     """
