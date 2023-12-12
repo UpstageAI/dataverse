@@ -1691,7 +1691,28 @@ def aws_s3_download(bucket, key, local_path):
     Usage:
         aws_s3_download('tmp', 'this/is/path.json', 'path.json')
     """
-    AWSClient().s3.download_file(bucket, key, local_path)
+    obj_type = aws_s3_get_object_type(bucket, key)
+    if obj_type == 'folder':
+        paginator = AWSClient().s3.get_paginator('list_objects')
+        page_iterator = paginator.paginate(Bucket=bucket)
+        for page in page_iterator:
+            for obj in page['Contents']:
+                bucket_key = obj['Key']
+
+                if not bucket_key.startswith(key):
+                    continue
+
+                rel_bucket_path = bucket_key.replace(key, '')
+                if rel_bucket_path.startswith('/'):
+                    rel_bucket_path = rel_bucket_path[1:]
+
+                local_file_path = os.path.join(local_path, rel_bucket_path)
+                os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                AWSClient().s3.download_file(bucket, bucket_key, local_file_path)
+    elif obj_type == 'file':
+        AWSClient().s3.download_file(bucket, key, local_path)
+    elif obj_type == 'no_obj':
+        raise Exception(f"Object doesn't exist: {key}")
 
 def aws_s3_upload(bucket, key, local_path):
     """
