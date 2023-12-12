@@ -49,3 +49,4 @@ from .aws import aws_s3_write
 from .aws import aws_s3_delete
 from .aws import aws_s3_list_buckets
 from .aws import aws_s3_ls 
+from .aws import aws_s3_get_object_type

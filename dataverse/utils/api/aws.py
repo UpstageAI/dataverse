@@ -1817,3 +1817,45 @@ def aws_s3_ls(query=None):
                 objects.remove(obj)
 
     return objects
+
+def aws_s3_get_object_type(bucket, key):
+    """
+    get object type from s3
+
+    NOTE:
+        S3 don't have a concept of folder
+        so this is a hardcoded solution to check key is file/folder or doesn't exist
+
+    TODO:
+        if there is edge case that this function doesn't cover
+        please add it to the test case
+    """
+    results = AWSClient().s3.list_objects_v2(
+        Bucket=bucket,
+        Prefix=key,
+        Delimiter="/",
+    )
+    if 'CommonPrefixes' in results:
+        prefix_folders = results['CommonPrefixes'][0]['Prefix'].split('/')
+        key_folders = key.split('/')
+
+        # remove ''
+        prefix_folders = [x for x in prefix_folders if x != '']
+        key_folders = [x for x in key_folders if x != '']
+
+        # check key exacly match prefix
+        for key_folder in key_folders:
+            if key_folder not in prefix_folders:
+                return 'no_obj'
+        return 'folder'
+    elif 'Contents' in results:
+        content = results['Contents'][0]['Key']
+        if content == key:
+            if content.endswith('/'):
+                return 'folder'
+            else:
+                return 'file'
+        else:
+            return 'folder'
+    else:
+        return 'no_obj'
