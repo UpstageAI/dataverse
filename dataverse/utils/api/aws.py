@@ -1657,6 +1657,15 @@ def aws_s3_create_bucket(bucket):
         CreateBucketConfiguration={'LocationConstraint': AWSClient().region}
     )
 
+def aws_s3_delete_bucket(bucket):
+    """
+    delete aws s3 bucket
+
+    Args:
+        bucket (str): bucket name
+    """
+    AWSClient().s3.delete_bucket(Bucket=bucket)
+
 def aws_s3_read(bucket, key):
     """
     Args:
@@ -1670,7 +1679,6 @@ def aws_s3_read(bucket, key):
     text = obj['Body'].read().decode('utf-8')
 
     return text
-
 
 def aws_s3_download(bucket, key, local_path):
     """

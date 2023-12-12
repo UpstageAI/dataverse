@@ -41,6 +41,7 @@ from .aws import aws_iam_instance_profile_delete
 # S3
 from .aws import aws_s3_path_parse
 from .aws import aws_s3_create_bucket
+from .aws import aws_s3_delete_bucket
 from .aws import aws_s3_read
 from .aws import aws_s3_download
 from .aws import aws_s3_upload
