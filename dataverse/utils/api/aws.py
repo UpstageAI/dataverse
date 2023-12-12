@@ -13,6 +13,7 @@ aws_s3_list("bucket")
 
 
 import os
+import glob
 import re
 import shutil
 import tarfile
@@ -1702,7 +1703,19 @@ def aws_s3_upload(bucket, key, local_path):
     Usage:
         aws_s3_upload('tmp', 'this/is/path.json', 'path.json')
     """
-    AWSClient().s3.upload_file(local_path, bucket, key)
+    if os.path.isdir(local_path):
+        files = glob.glob(os.path.join(local_path, "*/*"))
+        for file in files:
+            rel_path = os.path.relpath(file, local_path)
+            _key = os.path.join(key, rel_path)
+
+            # NOTE: no need to upload folder
+            if os.path.isdir(file):
+                continue
+
+            AWSClient().s3.upload_file(file, bucket, _key)
+    else:
+        AWSClient().s3.upload_file(local_path, bucket, key)
 
 def aws_s3_write(bucket, key, obj):
     """
