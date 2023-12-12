@@ -1716,6 +1716,17 @@ def aws_s3_write(bucket, key, obj):
     """
     AWSClient().s3.put_object(Bucket=bucket, Key=key, Body=obj)
 
+def aws_s3_delete(bucket, key):
+    """
+    Args:
+        bucket (str): bucket name
+        key (str): key (aws s3 file path)
+
+    Usage:
+        aws_s3_delete('tmp', 'this/is/path.json')
+    """
+    AWSClient().s3.delete_object(Bucket=bucket, Key=key)
+
 def aws_s3_list_buckets():
     """
     get all buckets from aws s3
