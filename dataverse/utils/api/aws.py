@@ -863,6 +863,26 @@ class EMRManager:
         ]
         aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
+    def _get_pip_package_path(self, config, verbose=False):
+        """
+        get pip installed packages path
+        """
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        commands = ["pip3 show numpy"]
+        result = aws_ssm_run_commands(
+            instance_ids,
+            commands,
+            verbose=verbose,
+            return_output=True,
+        )
+        location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
+
+        return location
+
     def _setup_aws(self, config, verbose=False):
         """
         setup aws environment on EMR cluster
@@ -912,14 +932,7 @@ class EMRManager:
         aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
         # get pip installed packages path
-        commands = ["pip3 show numpy"]
-        result = aws_ssm_run_commands(
-            instance_ids,
-            commands,
-            verbose=verbose,
-            return_output=True,
-        )
-        location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
+        location = self._get_pip_package_path(config, verbose=verbose)
 
         # copy dataverse source code to pip installed packages path
         commands = [
@@ -932,9 +945,9 @@ class EMRManager:
         self._setup(config, verbose=verbose)
 
         # run emr
-        from dataverse.utils.setting import SystemSetting
-        dataverse_home = SystemSetting().DATAVERSE_HOME
-        emr_main = os.path.join(dataverse_home, 'api', 'emr.py')
+        # get pip installed packages path
+        location = self._get_pip_package_path(config, verbose=verbose)
+        emr_main = os.path.join(location, 'api', 'emr.py')
 
         response = AWSClient().emr.add_job_flow_steps(
             JobFlowId=config.emr.id,
