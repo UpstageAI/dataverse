@@ -665,7 +665,7 @@ class EMRManager:
 
         return emr_id
 
-    def _setup(self, config):
+    def _setup(self, config, verbose=False):
         """
         [ upload to S3 ]
         - config for `dataverse`
@@ -694,12 +694,12 @@ class EMRManager:
         self._upload_dynamic_etl_files(config)
 
         # move uploaded files in S3 from local to EMR cluster
-        self._move_s3_to_ec2(config)
+        self._move_s3_to_ec2(config, verbose=verbose)
 
         # setup environment on EMR cluster
-        self._setup_aws(config)
-        self._setup_dependencies(config)
-        self._setup_source_code(config)
+        self._setup_aws(config, verbose=verbose)
+        self._setup_dependencies(config, verbose=verbose)
+        self._setup_source_code(config, verbose=verbose)
 
     def _get_working_dir(self, config):
         """
@@ -840,7 +840,7 @@ class EMRManager:
                 local_path=file_path
             )
 
-    def _move_s3_to_ec2(self, config):
+    def _move_s3_to_ec2(self, config, verbose=False):
         """
         move uploaded files in S3 from local to EMR cluster
         """
@@ -854,16 +854,16 @@ class EMRManager:
             "rm -r /home/hadoop/dataverse",
         ]
         try:
-            aws_ssm_run_commands(instance_ids, commands)
+            aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
         except:
             pass
 
         commands = [
             f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def _setup_aws(self, config):
+    def _setup_aws(self, config, verbose=False):
         """
         setup aws environment on EMR cluster
         """
@@ -875,9 +875,9 @@ class EMRManager:
         commands = [
             f"aws configure set region {AWSClient().region}",
         ]
-        aws_ssm_run_commands(instance_ids, commands, return_output=True)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def _setup_dependencies(self, config):
+    def _setup_dependencies(self, config, verbose=False):
         nodes = AWSClient().emr.list_instances(
             ClusterId=config.emr.id
         )["Instances"]
@@ -887,16 +887,16 @@ class EMRManager:
             "sudo yum install -y python3-devel",
             "pip3 install wheel setuptools pip --upgrade",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
         # NOTE: unknown unlimited loop caused by `pip3 install -r requirements.txt`
         #       so I split the following command separately
         commands = [
             "pip3 install -r /home/hadoop/dataverse/requirements.txt",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def _setup_source_code(self, config):
+    def _setup_source_code(self, config, verbose=False):
         """
         copy dataverse source code to pip installed packages path
         """
@@ -909,22 +909,27 @@ class EMRManager:
         commands = [
             "tar -xzf /home/hadoop/dataverse/dataverse.tar.gz -C /home/hadoop/dataverse",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
         # get pip installed packages path
         commands = ["pip3 show numpy"]
-        result = aws_ssm_run_commands(instance_ids, commands, return_output=True)
+        result = aws_ssm_run_commands(
+            instance_ids,
+            commands,
+            verbose=verbose,
+            return_output=True,
+        )
         location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
 
         # copy dataverse source code to pip installed packages path
         commands = [
             f"cp -r /home/hadoop/dataverse/dataverse {location}",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def run(self, config):
+    def run(self, config, verbose=False):
         # setup environment
-        self._setup(config)
+        self._setup(config, verbose=verbose)
 
         # run emr
         from dataverse.utils.setting import SystemSetting
