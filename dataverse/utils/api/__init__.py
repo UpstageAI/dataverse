@@ -13,6 +13,9 @@ from .aws import aws_ec2_instance_info
 from .aws import aws_ec2_all_instance_info
 from .aws import aws_ec2_get_price
 
+# SSM
+from .aws import aws_ssm_run_commands
+
 # VPC
 from .aws import aws_vpc_create
 from .aws import aws_vpc_delete
