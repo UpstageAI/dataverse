@@ -693,6 +693,7 @@ class EMRManager:
         self._move_s3_to_ec2(config)
 
         # setup environment on EMR cluster
+        self._setup_aws(config)
         self._setup_dependencies(config)
         self._setup_source_code(config)
 
@@ -857,6 +858,20 @@ class EMRManager:
             f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
         ]
         aws_ssm_run_commands(instance_ids, commands)
+
+    def _setup_aws(self, config):
+        """
+        setup aws environment on EMR cluster
+        """
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        commands = [
+            f"aws configure set region {AWSClient().region}",
+        ]
+        aws_ssm_run_commands(instance_ids, commands, return_output=True)
 
     def _setup_dependencies(self, config):
         nodes = AWSClient().emr.list_instances(
