@@ -354,18 +354,19 @@ class ETLPipeline:
         # EMR cluster launch
         emr_manager.launch(config)
 
-        # EMR cluster environment setup
-        emr_manager.setup(config)
-
         if verbose:
             print('=' * 50)
             print('[ Configuration ]')
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
 
+        # EMR cluster environment setup & run spark
+        step_id = emr_manager.run(config, verbose=verbose)
+
+        # log EMR cluster status
+        emr_manager.status(config, step_id)
+
         # EMR Cluster terminate
         emr_manager.terminate(config)
-
-        raise NotImplementedError('EMR support is not implemented yet')
 
         return None, None

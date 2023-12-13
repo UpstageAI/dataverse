@@ -967,6 +967,26 @@ class EMRManager:
                 },
             ]
         )
+        step_id = response['StepIds'][0]
+
+        return step_id
+
+    def status(config, step_id, verbose=True):
+        """
+        get status of the step until it is completed
+        """
+        while True:
+            response = AWSClient().emr.describe_step(
+                ClusterId=config.emr.id,
+                StepId=step_id,
+            )
+            if verbose:
+                # print the stdout of the step
+                print(response['Step']['Status']['StateChangeReason']['Message'])
+            state = response['Step']['Status']['State']
+            if state in ['COMPLETED', 'FAILED', 'CANCELLED']:
+                break
+            time.sleep(10)
 
     def clean(self):
         """
