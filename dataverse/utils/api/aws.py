@@ -672,8 +672,13 @@ class EMRManager:
         - config for `dataverse`
         - dataverse site-packages source code
         - requirements.txt
+        - dynamic etl files
+
+        [ move s3 to ec2 ]
+        - move uploaded files in S3 from local to EMR cluster
 
         [ setup environment on EMR cluster ]
+        - set aws region
         - install pip dependencies for `dataverse`
         - set `dataverse` package at EMR cluster pip installed packages path
         """
