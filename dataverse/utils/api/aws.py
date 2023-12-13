@@ -238,19 +238,18 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True, return_output=Fal
             # verify the previous step succeeded before running the next step.
             cmd_result = AWSClient().ssm.list_commands(CommandId=command_id)["Commands"][0]
             if cmd_result["StatusDetails"] == "Success":
-                if verbose:
+                if verbose or return_output:
                     command_invocation = AWSClient().ssm.get_command_invocation(
                         CommandId=command_id,
                         InstanceId=instance_ids[0], # assume all instances are the same
                     )
+                if verbose:
                     print("=========== Standard output ============")
                     print(command_invocation["StandardOutputContent"])
                     print("==========================================")
                     print(f"Command succeeded.")
-                    if return_output:
-                        if verbose:
-                            print(f"Saving output to results['{command}']")
-                        results[command] = command_invocation["StandardOutputContent"]
+                if return_output:
+                    results[command] = command_invocation["StandardOutputContent"]
                 break
             elif cmd_result["StatusDetails"] in ["Pending", "InProgress"]:
                 if verbose:
