@@ -666,7 +666,7 @@ class EMRManager:
 
         return emr_id
 
-    def setup(self, config):
+    def _setup(self, config):
         """
         [ upload to S3 ]
         - config for `dataverse`
@@ -923,8 +923,33 @@ class EMRManager:
         ]
         aws_ssm_run_commands(instance_ids, commands)
 
+    def run(self, config):
+        # setup environment
+        self._setup(config)
 
+        # run emr
+        from dataverse.utils.setting import SystemSetting
+        dataverse_home = SystemSetting().DATAVERSE_HOME
+        emr_main = os.path.join(dataverse_home, 'api', 'emr.py')
 
+        response = AWSClient().emr.add_job_flow_steps(
+            JobFlowId=config.emr.id,
+            Steps=[
+                {
+                    'Name': 'Run python script on Master node',
+                    'ActionOnFailure': 'CONTINUE',
+                    'HadoopJarStep': {
+                        'Jar': 'command-runner.jar',
+                        'Args': [
+                            'python3',
+                            emr_main,
+                            '--config',
+                            '/home/hadoop/dataverse/config.yaml',
+                        ]
+                    }
+                },
+            ]
+        )
 
     def clean(self):
         """
