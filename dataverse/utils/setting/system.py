@@ -127,6 +127,7 @@ class SystemSetting:
         # HARD CODED DEFAULT SETTING
         self.CACHE_DIR = Path.home().as_posix()
         self.IS_CLI = False
+        self.IS_EMR = False
 
         # AWS SETTING
         self.AWS_BUCKET = self._get_aws_bucket()

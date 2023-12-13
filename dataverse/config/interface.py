@@ -103,8 +103,6 @@ class Config:
         """
         fill the missing config with default
         """
-        local_dir = f"{SystemSetting().CACHE_DIR}/.cache/dataverse/tmp"
-
         default = OmegaConf.create({
             'spark': {
                 'master': 'local[10]',
@@ -114,11 +112,15 @@ class Config:
                     'maxResultSize': '2G',
                 },
                 'executor': {'memory': '1G'},
-                'local': {'dir': local_dir},
                 'ui': {'port': 4040},
             },
             'etl': [],
         })
+
+        # if running on EMR, leave the local dir set by EMR
+        if not emr:
+            local_dir = f"{SystemSetting().CACHE_DIR}/.cache/dataverse/tmp"
+            default.spark.local = {'dir': local_dir}
 
         if emr:
             default.update({
