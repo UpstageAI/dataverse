@@ -14,13 +14,13 @@ Dataverse is a freely-accessible open-source project that supports your ETL pipe
 
 ## 🌌 Installation
 ### 🌠 Option 1: Git clone
-1. Clone Dataverse repository
+1. Clone _Dataverse_ repository
 ```bash
 git clone https://github.com/UpstageAI/dataverse.git
 ```
-2. Install requirements
+2. Install _Dataverse_
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 3. Install Java
 ```bash
