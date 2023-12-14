@@ -22,6 +22,7 @@ from dataverse.etl import ETLRegistry
 from dataverse.utils.setting import SystemSetting
 from dataverse.utils.api import aws_check_credentials
 from dataverse.utils.api import EMRManager
+from dataverse.utils.api import AWSClient
 
 
 class ETLPipeline:
@@ -367,6 +368,19 @@ class ETLPipeline:
         emr_manager.status(config, step_id)
 
         # EMR Cluster terminate
-        emr_manager.terminate(config)
+        # XXX: after EMR cluster is terminated, and confirmed by waiter
+        #      there is still a chance that the cluster is not terminated and cause error
+        #       - DependencyViolation (which depends on terminated cluster)
+        # FIXME: this is a temporary solution, need to find a better way to handle this
+        try:
+            emr_manager.terminate(config)
+        except AWSClient().ec2.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                print('DependencyViolation occured when terminating EMR cluster. Retrying one more time')
+                emr_manager.terminate(config)
+            else:
+                raise e
+        except Exception as e:
+            raise e
 
         return None, None
