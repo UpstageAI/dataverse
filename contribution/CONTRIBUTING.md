@@ -37,8 +37,11 @@ We appreciate all the pull requests to fix typo / improve grammar or semantic st
 ## __Report a Bug / Request New Feature / Suggest Enhancements__
 Please opne an issue whenever you find a bug or have an idea to enhance _Dataverse_. Maintainers will label it or leave comment on it as soon as they check the issue. Issues labeled as `open-for-contribution` mean they are open for contribution.
 ### __*Tips:* How to submit a good bug report__
+(TBD)
 ### __*Tips:* How to submit a good new feature request__
+(TBD)
 ### __*Tips:* How to submit a good enhancement suggestion__
+(TBD)
 
 ## __Fix a Bug / Add New Feature / Improve Existing Feature__
 If you have a particular roadmap, goals, or new feature, share it via issue. already fixed a bug or have new feature that enhacnes _Dataverse_, you can jump on to fourth step which is opening pull requests. Please note that when you open pull requests without opening an issue or maintainers' check, it can be declined if it does not aligh with philosophy of _Dataverse_.
@@ -70,10 +73,15 @@ Go ahead and visit your GitHub fork, then initiate a pull request — it's time 
 Don't worry if the maintainers have some feedback or suggest changes—it's all part of the process and happens to even our most experienced contributors. Keep your updates flowing by working in your local branch and pushing any new changes to your fork. Your pull request will update automatically for everyone to see the progress.
 
 # Tests
+(TBD)
 # Structure of Dataverse
+(TBD)
 # Design Philosophy
+(TBD)
 # Git Branches
+(TBD)
 # Commit Messages
+(TBD)
 # Style Guides
-
+(TBD)
 
