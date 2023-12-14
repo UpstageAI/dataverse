@@ -1,61 +1,64 @@
+<div align="center">
+
 # Dataverse
-> The Universe of Data. All about Data, Data Science, and Data Engineering.
+The Universe of Data. 
+All about Data, Data Science, and Data Engineering.
 
-Dataverse, a freely-accessible open-source project on GitHub, offers a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers.
+[Tutorials]() • [Contribution Guide]()  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
+<br><br>
+<div align="left">
 
+## Welcome to Dataverse!
+Dataverse is a freely-accessible open-source project that supports your ETL pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
-
-## 🌌 Where to start?
-
-### 🌠 ETL Guideline
-> recommend starting with ETL guideline. check out below links! It will give you a glimpse of what you can do with `dataverse`.
-
-- [ETL Guideline](https://github.com/UpstageAI/dataverse/tree/main/guideline/etl)
-    - ETL_01_how_to_run.ipynb
-    - etc.
 
 ## 🌌 Installation
-
-### 🌠 Install `dataverse`
-`caveat` - we are installing pyspark with `pip` and this does not guarantee standalone pyspark installation. 
-
-```python
-pip install dataverse
+### 🌠 Option 1: Git clone
+1. Clone Datavers repository
+```bash
+git clone https://github.com/UpstageAI/dataverse.git
 ```
-
-### 🌠 Install Java
-> user for pyspark
-
-#### using `Makefile`
-```python
+2. Install requirements
+```bash
+pip install -r requirements.txt
+```
+3. Install Java
+```bash
 make java
 ```
+4. Pyspark envrionment setup - `SPARK_HOME` and `PYSPARK_PYTHON`
 
-#### manual installation
-if you want to install java manually, you can do so by following the instructions below:
+This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
+```bash
+make pyspark
+```
 
-```python
+
+### 🌠 Option 2: Install via Pypi \*WIP*
+> **Currently, pip install is not supported. Please install Datavers with option 1.**
+
+
+1. Install Datavers with Python's pip package manager:
+```bash
+pip install dataverse
+```
+2. Install Java
+```bash
 sudo apt-get update
 sudo apt-get install openjdk-11-jdk
 echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
 source ~/.bashrc
 ```
+3. Pyspark envrionment setup - `SPARK_HOME` and `PYSPARK_PYTHON`
 
-### 🌠 Pyspark Environment Setup - `SPARK_HOME` and `PYSPARK_PYTHON`
-> This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
-
-#### using `Makefile`
-```python
-make pyspark
-```
-
-#### manual setup
-```python
+This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
+```bash
 pyspark_location=$(pip show pyspark | grep Location | cut -d' ' -f2)
 echo "export SPARK_HOME=$pyspark_location/pyspark" >> ~/.bashrc
 echo "export PYSPARK_PYTHON=python3" >> ~/.bashrc
 source ~/.bashrc
 ```
+
 
 ## 🌌 AWS S3 Support
 > This is not mandatory, but if you want to use AWS, this is required
@@ -113,7 +116,7 @@ aws configure set aws_session_token <your_session_token>
 ```
 
 ### 🌠 Dataverse is ready to use AWS S3!
-> now you are ready to use `dataverse` with AWS! Every other details will be handled by `dataverse`!
+> now you are ready to use `Datavers` with AWS! Every other details will be handled by `Datavers`!
 
 ```python
 s3a_src_url = "s3a://your-awesome-bucket/your-awesome-data-old.parquet"
@@ -127,7 +130,10 @@ spark.write.parquet(data, s3a_dst_url)
 
 ## 🌌 Acknowledgements
 
-Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+Datavers is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+
+## 🌌 License
+PyCaret is completely freely-accessible open-source and licensed under the MIT license.
 
 
 ## 🌌 Citation
@@ -136,7 +142,7 @@ Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team*
 ```bibtex
 @misc{dataverse,
   title = {Dataverse},
-  author = {Hyunbyung, Park},
+  author = {Hyunbyung Park, Sukyung Lee, Chanjun Park, Yungi Kim, Gyoungjin Gim, Changbae Ahn},
   year = {2023},
   publisher = {GitHub, Upstage AI},
   howpublished = {\url{https://github.com/UpstageAI/dataverse}},
