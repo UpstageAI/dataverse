@@ -14,7 +14,7 @@ Dataverse is a freely-accessible open-source project that supports your ETL pipe
 
 ## 🌌 Installation
 ### 🌠 Option 1: Git clone
-1. Clone Datavers repository
+1. Clone Dataverse repository
 ```bash
 git clone https://github.com/UpstageAI/dataverse.git
 ```
@@ -35,10 +35,10 @@ make pyspark
 
 
 ### 🌠 Option 2: Install via Pypi \*WIP*
-> **Currently, pip install is not supported. Please install Datavers with option 1.**
+> **Currently, pip install is not supported. Please install Dataverse with option 1.**
 
 
-1. Install Datavers with Python's pip package manager:
+1. Install Dataverse with Python's pip package manager:
 ```bash
 pip install dataverse
 ```
@@ -116,7 +116,7 @@ aws configure set aws_session_token <your_session_token>
 ```
 
 ### 🌠 Dataverse is ready to use AWS S3!
-> now you are ready to use `Datavers` with AWS! Every other details will be handled by `Datavers`!
+> now you are ready to use `Dataverse` with AWS! Every other details will be handled by `Dataverse`!
 
 ```python
 s3a_src_url = "s3a://your-awesome-bucket/your-awesome-data-old.parquet"
@@ -127,13 +127,15 @@ data = data.filter(data['awesome'] == True)
 spark.write.parquet(data, s3a_dst_url)
 ```
 
+## 🌌 Contributors
+(TBD)
 
 ## 🌌 Acknowledgements
 
-Datavers is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
 
 ## 🌌 License
-PyCaret is completely freely-accessible open-source and licensed under the MIT license.
+Dataverse is completely freely-accessible open-source and licensed under the MIT license.
 
 
 ## 🌌 Citation
@@ -142,7 +144,7 @@ PyCaret is completely freely-accessible open-source and licensed under the MIT l
 ```bibtex
 @misc{dataverse,
   title = {Dataverse},
-  author = {Hyunbyung Park, Sukyung Lee, Chanjun Park, Yungi Kim, Gyoungjin Gim, Changbae Ahn},
+  author = {Hyunbyung Park, Sukyung Lee, Chanjun Park, Yungi Kim, Gyoungjin Gim, Changbae Ahn, Jijoo Kim, Seonghoon Yang},
   year = {2023},
   publisher = {GitHub, Upstage AI},
   howpublished = {\url{https://github.com/UpstageAI/dataverse}},
