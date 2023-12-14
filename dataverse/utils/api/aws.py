@@ -971,9 +971,9 @@ class EMRManager:
         ]
         aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def status(self, config, step_id, verbose=True):
+    def wait(self, config, step_id, verbose=True):
         """
-        get status of the step until it is completed
+        waiter for emr step
         """
         while True:
             response = AWSClient().emr.describe_step(

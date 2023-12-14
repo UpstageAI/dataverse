@@ -364,8 +364,8 @@ class ETLPipeline:
         # EMR cluster environment setup & run spark
         step_id = emr_manager.run(config, verbose=verbose)
 
-        # log EMR cluster status
-        emr_manager.status(config, step_id)
+        # wait until EMR cluster step is done
+        emr_manager.wait(config, step_id)
 
         # EMR Cluster terminate
         # XXX: after EMR cluster is terminated, and confirmed by waiter
