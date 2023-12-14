@@ -665,6 +665,37 @@ class EMRManager:
 
         return emr_id
 
+    def run(self, config, verbose=False):
+        # setup environment
+        self._setup(config, verbose=verbose)
+
+        # run emr
+        # get pip installed packages path
+        location = self._get_pip_package_path(config, verbose=verbose)
+        emr_main = os.path.join(location, 'dataverse', 'api', 'emr.py')
+
+        response = AWSClient().emr.add_job_flow_steps(
+            JobFlowId=config.emr.id,
+            Steps=[
+                {
+                    'Name': 'Run Dataverse python script on Master node',
+                    'ActionOnFailure': 'CONTINUE',
+                    'HadoopJarStep': {
+                        'Jar': 'command-runner.jar',
+                        'Args': [
+                            'python3',
+                            emr_main,
+                            '--config',
+                            '/home/hadoop/dataverse/config.yaml',
+                        ]
+                    }
+                },
+            ]
+        )
+        step_id = response['StepIds'][0]
+
+        return step_id
+
     def _setup(self, config, verbose=False):
         """
         [ upload to S3 ]
@@ -940,37 +971,6 @@ class EMRManager:
         ]
         aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def run(self, config, verbose=False):
-        # setup environment
-        self._setup(config, verbose=verbose)
-
-        # run emr
-        # get pip installed packages path
-        location = self._get_pip_package_path(config, verbose=verbose)
-        emr_main = os.path.join(location, 'dataverse', 'api', 'emr.py')
-
-        response = AWSClient().emr.add_job_flow_steps(
-            JobFlowId=config.emr.id,
-            Steps=[
-                {
-                    'Name': 'Run Dataverse python script on Master node',
-                    'ActionOnFailure': 'CONTINUE',
-                    'HadoopJarStep': {
-                        'Jar': 'command-runner.jar',
-                        'Args': [
-                            'python3',
-                            emr_main,
-                            '--config',
-                            '/home/hadoop/dataverse/config.yaml',
-                        ]
-                    }
-                },
-            ]
-        )
-        step_id = response['StepIds'][0]
-
-        return step_id
-
     def status(self, config, step_id, verbose=True):
         """
         get status of the step until it is completed
@@ -1126,6 +1126,22 @@ class EMRManager:
 
         # clean unused resources
         self.clean()
+
+    def terminate_by_id(self, emr_id):
+        """
+        when you want to terminate emr cluster without config
+
+        ```python
+        from dataverse.utils.api import EMRManager
+        EMRManager().terminate_by_id('j-3C05XDxxxxxxx')
+        ```
+        """
+        # to avoid circular import
+        from dataverse.config import Config
+
+        config = Config.default(emr=True)
+        config.emr.id = emr_id
+        self.terminate(config)
 
 
 # --------------------------------------------------------------------------------
