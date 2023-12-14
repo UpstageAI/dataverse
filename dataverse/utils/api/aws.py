@@ -294,14 +294,6 @@ class EMRManager:
         self.clean()
 
         if config.emr.id is not None:
-            raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
-
-            # TODO: check if the existing emr cluster is valid and running
-            ...
-
-            # TODO: set vpc, subnet, etc id info from existing emr cluster
-            ...
-
             config.emr.auto_generated = False
 
             return config.emr.id
@@ -1109,6 +1101,11 @@ class EMRManager:
         Args:
             config (OmegaConf): config for the etl
         """
+        # only terminate auto generated emr cluster
+        if config.emr.auto_generated is False:
+            print('EMR cluster is not auto generated. Not terminating.')
+            return
+
         if config.emr.id is None:
             raise ValueError("EMR cluster is not running.")
 
