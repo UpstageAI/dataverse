@@ -5,6 +5,7 @@ ETL Interface
 user will be interacting with this interface
 """
 
+import time
 import boto3
 
 from typing import Union
@@ -379,15 +380,18 @@ class ETLPipeline:
         #      there is still a chance that the cluster is not terminated and cause error
         #       - DependencyViolation (which depends on terminated cluster)
         # FIXME: this is a temporary solution, need to find a better way to handle this
-        try:
-            emr_manager.terminate(config)
-        except AWSClient().ec2.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == 'DependencyViolation':
-                print('DependencyViolation occured when terminating EMR cluster. Retrying one more time')
+        RETRY_TERMINATE = 5
+        for _ in range(RETRY_TERMINATE):
+            try:
                 emr_manager.terminate(config)
-            else:
+                break
+            except AWSClient().ec2.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == 'DependencyViolation':
+                    print('DependencyViolation - retrying to terminate EMR cluster')
+                    time.sleep(5)
+                else:
+                    raise e
+            except Exception as e:
                 raise e
-        except Exception as e:
-            raise e
 
         return None, config
