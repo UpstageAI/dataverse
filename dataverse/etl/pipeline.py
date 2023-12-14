@@ -360,38 +360,49 @@ class ETLPipeline:
         # NOTE: config will be auto-updated by EMR Manager
         emr_manager = EMRManager()
 
-        # EMR cluster launch
-        emr_manager.launch(config)
+        try:
+            # EMR cluster launch
+            emr_manager.launch(config)
 
-        if verbose:
-            print('=' * 50)
-            print('[ Configuration ]')
-            print(OmegaConf.to_yaml(config))
-            print('=' * 50)
+            if verbose:
+                print('=' * 50)
+                print('[ Configuration ]')
+                print(OmegaConf.to_yaml(config))
+                print('=' * 50)
 
-        # EMR cluster environment setup & run spark
-        step_id = emr_manager.run(config, verbose=verbose)
+            # EMR cluster environment setup & run spark
+            step_id = emr_manager.run(config, verbose=verbose)
 
-        # wait until EMR cluster step is done
-        emr_manager.wait(config, step_id)
+            # wait until EMR cluster step is done
+            emr_manager.wait(config, step_id)
 
-        # EMR Cluster terminate
-        # XXX: after EMR cluster is terminated, and confirmed by waiter
-        #      there is still a chance that the cluster is not terminated and cause error
-        #       - DependencyViolation (which depends on terminated cluster)
-        # FIXME: this is a temporary solution, need to find a better way to handle this
-        RETRY_TERMINATE = 5
-        for _ in range(RETRY_TERMINATE):
-            try:
-                emr_manager.terminate(config)
-                break
-            except AWSClient().ec2.exceptions.ClientError as e:
-                if e.response['Error']['Code'] == 'DependencyViolation':
-                    print('DependencyViolation - retrying to terminate EMR cluster')
-                    time.sleep(5)
-                else:
+            # EMR Cluster terminate
+            # XXX: after EMR cluster is terminated, and confirmed by waiter
+            #      there is still a chance that the cluster is not terminated and cause error
+            #       - DependencyViolation (which depends on terminated cluster)
+            # FIXME: this is a temporary solution, need to find a better way to handle this
+            RETRY_TERMINATE = 5
+            for _ in range(RETRY_TERMINATE):
+                try:
+                    emr_manager.terminate(config)
+                    break
+                except AWSClient().ec2.exceptions.ClientError as e:
+                    if e.response['Error']['Code'] == 'DependencyViolation':
+                        print('DependencyViolation - retrying to terminate EMR cluster')
+                        time.sleep(5)
+                    else:
+                        raise e
+                except Exception as e:
                     raise e
-            except Exception as e:
-                raise e
+
+        # ctrl + c
+        except KeyboardInterrupt:
+            print('KeyboardInterrupt - terminating EMR cluster')
+            emr_manager.terminate(config)
+            raise KeyboardInterrupt
+        except Exception as e:
+            print('Exception - terminating EMR cluster')
+            emr_manager.terminate(config)
+            raise e
 
         return None, config
