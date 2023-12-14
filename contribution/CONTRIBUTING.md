@@ -19,7 +19,7 @@ This page is not the Constituion of the _Dataverse_. We are providing guidelines
 </br>
 
 # Questions or Feedback
-Join the conversation on our GitHub discussion board! It's the go-to spot for questions, chats, and a helping hand from the Executable Books Project community. Drop by and say hello here: [link](https://github.com/UpstageAI/dataverse/discussions)
+Join the conversation on our GitHub discussion board! It's the go-to spot for questions, chats, and a helping hand from the _Dataverse_ community. Drop by and say hello here: [link](https://github.com/UpstageAI/dataverse/discussions)
 
 And if there's a shiny new feature you're dreaming of, don't be shy—head over to our [issue page](https://github.com/UpstageAI/dataverse/issues) to let us know! Your input could help shape the future. ✨
 
