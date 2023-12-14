@@ -7,6 +7,6 @@ spark:
 etl:
   - name: data_ingestion___parquet___pq2ufl
     args:
-      input_paths:
+      path:
         - ./sample/preprocess_ufl.parquet
   - name: data_load___huggingface___ufl2hf_obj
