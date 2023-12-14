@@ -1098,19 +1098,19 @@ class EMRManager:
             return
 
         if config.emr.id is None:
-            raise ValueError("EMR cluster is not running.")
+            print('EMR cluster is not launched. Proceeding to clean resources.')
+        else:
+            AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
 
-        AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
+            # wait until emr cluster is terminated
+            waiter = AWSClient().emr.get_waiter('cluster_terminated')
+            waiter.wait(ClusterId=config.emr.id)
 
-        # wait until emr cluster is terminated
-        waiter = AWSClient().emr.get_waiter('cluster_terminated')
-        waiter.wait(ClusterId=config.emr.id)
-
-        # set state
-        state = aws_get_state()
-        if 'emr' in state and config.emr.id in state['emr']:
-            del state['emr'][config.emr.id]
-            aws_set_state(state)
+            # set state
+            state = aws_get_state()
+            if 'emr' in state and config.emr.id in state['emr']:
+                del state['emr'][config.emr.id]
+                aws_set_state(state)
 
         # clean unused resources
         self.clean()
