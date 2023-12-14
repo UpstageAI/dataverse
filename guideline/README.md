@@ -9,6 +9,7 @@
 - 03. `ETL_create_new_etl_process.ipynb`
 - 04. `ETL_add_new_etl_process.ipynb`
 - 05. `ETL_test_etl_process.ipynb`
+- 06. `ETL_scaleout_with_EMR.ipynb`
 
 ## 🗺️ ETL with live examples
 > Showing specific usage examples of ETL
