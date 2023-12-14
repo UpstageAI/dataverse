@@ -334,6 +334,13 @@ class ETLPipeline:
                 - the verbose will be applied to the ETL process as well
                 - ETL process `verbose` takes precedence over this
             cache (bool): cache every stage of the ETL process
+
+        Returns:
+            None, Config:
+                - None for spark session
+                - Config for the config
+                    - originally data is returned, but it is not necessary for EMR
+                    - so rather data, config is returned
         """
         if not aws_check_credentials(verbose=verbose):
             raise ValueError('AWS EMR requires AWS credentials')
@@ -383,4 +390,4 @@ class ETLPipeline:
         except Exception as e:
             raise e
 
-        return None, None
+        return None, config
