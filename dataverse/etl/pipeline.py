@@ -22,6 +22,7 @@ from dataverse.etl import ETLRegistry
 from dataverse.utils.setting import SystemSetting
 from dataverse.utils.api import aws_check_credentials
 from dataverse.utils.api import EMRManager
+from dataverse.utils.api import AWSClient
 
 
 class ETLPipeline:
@@ -333,6 +334,13 @@ class ETLPipeline:
                 - the verbose will be applied to the ETL process as well
                 - ETL process `verbose` takes precedence over this
             cache (bool): cache every stage of the ETL process
+
+        Returns:
+            None, Config:
+                - None for spark session
+                - Config for the config
+                    - originally data is returned, but it is not necessary for EMR
+                    - so rather data, config is returned
         """
         if not aws_check_credentials(verbose=verbose):
             raise ValueError('AWS EMR requires AWS credentials')
@@ -344,6 +352,9 @@ class ETLPipeline:
         # EMR resource manager - yarn
         config.spark.master = 'yarn'
 
+        # reset local_dir for EMR cluster
+        config.spark.local.dir = '/tmp'
+
         # ================ [ EMR ] ===================
         # NOTE: config will be auto-updated by EMR Manager
         emr_manager = EMRManager()
@@ -351,18 +362,32 @@ class ETLPipeline:
         # EMR cluster launch
         emr_manager.launch(config)
 
-        # EMR cluster environment setup
-        emr_manager.setup(config)
-
         if verbose:
             print('=' * 50)
             print('[ Configuration ]')
             print(OmegaConf.to_yaml(config))
             print('=' * 50)
 
+        # EMR cluster environment setup & run spark
+        step_id = emr_manager.run(config, verbose=verbose)
+
+        # wait until EMR cluster step is done
+        emr_manager.wait(config, step_id)
+
         # EMR Cluster terminate
-        emr_manager.terminate(config)
+        # XXX: after EMR cluster is terminated, and confirmed by waiter
+        #      there is still a chance that the cluster is not terminated and cause error
+        #       - DependencyViolation (which depends on terminated cluster)
+        # FIXME: this is a temporary solution, need to find a better way to handle this
+        try:
+            emr_manager.terminate(config)
+        except AWSClient().ec2.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                print('DependencyViolation occured when terminating EMR cluster. Retrying one more time')
+                emr_manager.terminate(config)
+            else:
+                raise e
+        except Exception as e:
+            raise e
 
-        raise NotImplementedError('EMR support is not implemented yet')
-
-        return None, None
+        return None, config
