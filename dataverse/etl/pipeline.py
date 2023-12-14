@@ -345,7 +345,7 @@ class ETLPipeline:
         config.spark.master = 'yarn'
 
         # reset local_dir for EMR cluster
-        config.spark.local = None
+        config.spark.local.dir = '/tmp'
 
         # ================ [ EMR ] ===================
         # NOTE: config will be auto-updated by EMR Manager

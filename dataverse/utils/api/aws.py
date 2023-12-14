@@ -947,13 +947,13 @@ class EMRManager:
         # run emr
         # get pip installed packages path
         location = self._get_pip_package_path(config, verbose=verbose)
-        emr_main = os.path.join(location, 'api', 'emr.py')
+        emr_main = os.path.join(location, 'dataverse', 'api', 'emr.py')
 
         response = AWSClient().emr.add_job_flow_steps(
             JobFlowId=config.emr.id,
             Steps=[
                 {
-                    'Name': 'Run python script on Master node',
+                    'Name': 'Run Dataverse python script on Master node',
                     'ActionOnFailure': 'CONTINUE',
                     'HadoopJarStep': {
                         'Jar': 'command-runner.jar',
@@ -971,7 +971,7 @@ class EMRManager:
 
         return step_id
 
-    def status(config, step_id, verbose=True):
+    def status(self, config, step_id, verbose=True):
         """
         get status of the step until it is completed
         """
@@ -980,13 +980,20 @@ class EMRManager:
                 ClusterId=config.emr.id,
                 StepId=step_id,
             )
-            if verbose:
-                # print the stdout of the step
-                print(response['Step']['Status']['StateChangeReason']['Message'])
             state = response['Step']['Status']['State']
+            if state == 'Pending':
+                time.sleep(10)
+                if verbose:
+                    print("[ Dataverse ] step pending...")
+                continue
             if state in ['COMPLETED', 'FAILED', 'CANCELLED']:
+                if verbose:
+                    print(f"[ Dataverse ] step status: {state}. Done.")
                 break
-            time.sleep(10)
+            if verbose:
+                if 'Message' in response['Step']['Status']['StateChangeReason']:
+                    print(response['Step']['Status']['StateChangeReason']['Message'])
+                time.sleep(10)
 
     def clean(self):
         """
