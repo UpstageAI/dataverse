@@ -291,7 +291,7 @@ class EMRManager:
             config (OmegaConf): config for the etl
         """
         # clean unused resources
-        self.clean()
+        self._clean()
 
         if config.emr.id is not None:
             config.emr.auto_generated = False
@@ -978,9 +978,39 @@ class EMRManager:
                     print(response['Step']['Status']['StateChangeReason']['Message'])
                 time.sleep(10)
 
-    def clean(self):
+    def terminate(self, config):
         """
-        clean unused resources
+        terminate emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        # only terminate auto generated emr cluster
+        if config.emr.auto_generated is False:
+            print('EMR cluster is not auto generated. Not terminating.')
+            return
+
+        if config.emr.id is None:
+            print('EMR cluster is not launched. Proceeding to clean resources.')
+        else:
+            AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
+
+            # wait until emr cluster is terminated
+            waiter = AWSClient().emr.get_waiter('cluster_terminated')
+            waiter.wait(ClusterId=config.emr.id)
+
+            # set state
+            state = aws_get_state()
+            if 'emr' in state and config.emr.id in state['emr']:
+                del state['emr'][config.emr.id]
+                aws_set_state(state)
+
+        # clean unused resources
+        self._clean()
+
+    def _clean(self):
+        """
+        clean unused resources related to EMR
         """
         self._clean_stopped_emr()
         self._clean_unused_vpc()
@@ -1084,36 +1114,6 @@ class EMRManager:
 
         for instance_profile_name in unused_iam_instance_profile_names:
             aws_iam_instance_profile_delete(instance_profile_name)
-
-    def terminate(self, config):
-        """
-        terminate emr cluster
-
-        Args:
-            config (OmegaConf): config for the etl
-        """
-        # only terminate auto generated emr cluster
-        if config.emr.auto_generated is False:
-            print('EMR cluster is not auto generated. Not terminating.')
-            return
-
-        if config.emr.id is None:
-            print('EMR cluster is not launched. Proceeding to clean resources.')
-        else:
-            AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
-
-            # wait until emr cluster is terminated
-            waiter = AWSClient().emr.get_waiter('cluster_terminated')
-            waiter.wait(ClusterId=config.emr.id)
-
-            # set state
-            state = aws_get_state()
-            if 'emr' in state and config.emr.id in state['emr']:
-                del state['emr'][config.emr.id]
-                aws_set_state(state)
-
-        # clean unused resources
-        self.clean()
 
     def terminate_by_id(self, emr_id):
         """
