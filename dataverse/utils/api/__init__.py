@@ -13,6 +13,9 @@ from .aws import aws_ec2_instance_info
 from .aws import aws_ec2_all_instance_info
 from .aws import aws_ec2_get_price
 
+# SSM
+from .aws import aws_ssm_run_commands
+
 # VPC
 from .aws import aws_vpc_create
 from .aws import aws_vpc_delete
@@ -41,9 +44,12 @@ from .aws import aws_iam_instance_profile_delete
 # S3
 from .aws import aws_s3_path_parse
 from .aws import aws_s3_create_bucket
+from .aws import aws_s3_delete_bucket
 from .aws import aws_s3_read
 from .aws import aws_s3_download
 from .aws import aws_s3_upload
 from .aws import aws_s3_write
+from .aws import aws_s3_delete
 from .aws import aws_s3_list_buckets
 from .aws import aws_s3_ls 
+from .aws import aws_s3_get_object_type

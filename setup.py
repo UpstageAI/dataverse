@@ -16,14 +16,11 @@ setup(
     name="dataverse",
     version="0.1.0",
     packages=find_packages(),
-    author="hyunbyung park",
-    author_email="hyunbyung87@gmail.com",
+    author="Dataverse Team",
+    author_email="dataverse@upstage.ai",
     description="universe of data",
+    license="MIT",
     include_package_data=True,
     install_requires=get_requirements(),
-    entry_points={
-        "console_scripts": [
-            "dataverse = dataverse.api.cli:main"
-        ]
-    },
+    entry_points={"console_scripts": ["dataverse = dataverse.api.cli:main"]},
 )

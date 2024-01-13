@@ -13,6 +13,7 @@ aws_s3_list("bucket")
 
 
 import os
+import glob
 import re
 import shutil
 import tarfile
@@ -237,19 +238,18 @@ def aws_ssm_run_commands(instance_ids, commands, verbose=True, return_output=Fal
             # verify the previous step succeeded before running the next step.
             cmd_result = AWSClient().ssm.list_commands(CommandId=command_id)["Commands"][0]
             if cmd_result["StatusDetails"] == "Success":
-                if verbose:
+                if verbose or return_output:
                     command_invocation = AWSClient().ssm.get_command_invocation(
                         CommandId=command_id,
                         InstanceId=instance_ids[0], # assume all instances are the same
                     )
+                if verbose:
                     print("=========== Standard output ============")
                     print(command_invocation["StandardOutputContent"])
                     print("==========================================")
                     print(f"Command succeeded.")
-                    if return_output:
-                        if verbose:
-                            print(f"Saving output to results['{command}']")
-                        results[command] = command_invocation["StandardOutputContent"]
+                if return_output:
+                    results[command] = command_invocation["StandardOutputContent"]
                 break
             elif cmd_result["StatusDetails"] in ["Pending", "InProgress"]:
                 if verbose:
@@ -291,17 +291,9 @@ class EMRManager:
             config (OmegaConf): config for the etl
         """
         # clean unused resources
-        self.clean()
+        self._clean()
 
         if config.emr.id is not None:
-            raise NotImplementedError("Using existing EMR cluster is not implemented yet.")
-
-            # TODO: check if the existing emr cluster is valid and running
-            ...
-
-            # TODO: set vpc, subnet, etc id info from existing emr cluster
-            ...
-
             config.emr.auto_generated = False
 
             return config.emr.id
@@ -665,14 +657,50 @@ class EMRManager:
 
         return emr_id
 
-    def setup(self, config):
+    def run(self, config, verbose=False):
+        # setup environment
+        self._setup(config, verbose=verbose)
+
+        # run emr
+        # get pip installed packages path
+        location = self._get_pip_package_path(config, verbose=verbose)
+        emr_main = os.path.join(location, 'dataverse', 'api', 'emr.py')
+
+        response = AWSClient().emr.add_job_flow_steps(
+            JobFlowId=config.emr.id,
+            Steps=[
+                {
+                    'Name': 'Run Dataverse python script on Master node',
+                    'ActionOnFailure': 'CONTINUE',
+                    'HadoopJarStep': {
+                        'Jar': 'command-runner.jar',
+                        'Args': [
+                            'python3',
+                            emr_main,
+                            '--config',
+                            '/home/hadoop/dataverse/config.yaml',
+                        ]
+                    }
+                },
+            ]
+        )
+        step_id = response['StepIds'][0]
+
+        return step_id
+
+    def _setup(self, config, verbose=False):
         """
         [ upload to S3 ]
         - config for `dataverse`
         - dataverse site-packages source code
         - requirements.txt
+        - dynamic etl files
+
+        [ move s3 to ec2 ]
+        - move uploaded files in S3 from local to EMR cluster
 
         [ setup environment on EMR cluster ]
+        - set aws region
         - install pip dependencies for `dataverse`
         - set `dataverse` package at EMR cluster pip installed packages path
         """
@@ -680,17 +708,18 @@ class EMRManager:
         self._get_working_dir(config)
 
         # upload to necessary dataverse files to S3
-        if config.emr.config is None:
-            self._upload_config(config)
-        if config.emr.source_code is None:
-            self._upload_source_code(config)
-        if config.emr.dependencies is None:
-            self._upload_dependencies(config)
+        self._upload_config(config)
+        self._upload_source_code(config)
+        self._upload_dependencies(config)
         self._upload_dynamic_etl_files(config)
 
+        # move uploaded files in S3 from local to EMR cluster
+        self._move_s3_to_ec2(config, verbose=verbose)
+
         # setup environment on EMR cluster
-        self._setup_dependencies(config)
-        self._setup_source_code(config)
+        self._setup_aws(config, verbose=verbose)
+        self._setup_dependencies(config, verbose=verbose)
+        self._setup_source_code(config, verbose=verbose)
 
     def _get_working_dir(self, config):
         """
@@ -727,8 +756,6 @@ class EMRManager:
 
         aws_s3_write(bucket, f"{key}/config.yaml", OmegaConf.to_yaml(config))
 
-        config.emr.config = f"{working_dir}/config.yaml"
-
     def _upload_source_code(self, config):
         """
         upload pip site-packages source code to S3
@@ -753,8 +780,6 @@ class EMRManager:
 
         shutil.rmtree(temp_dir)
 
-        config.emr.source_code = f"{working_dir}/dataverse.tar.gz"
-
     def _upload_dependencies(self, config, package_name="dataverse"):
         # get all dependencies
         requirements = []
@@ -776,8 +801,6 @@ class EMRManager:
         aws_s3_upload(bucket, f'{key}/requirements.txt', dependency_file)
 
         shutil.rmtree(temp_dir)
-
-        config.emr.dependencies = f"{working_dir}/requirements.txt"
 
     def _upload_dynamic_etl_files(self, config):
         # to avoid circular import
@@ -816,6 +839,14 @@ class EMRManager:
         working_dir = self._get_working_dir(config)
         bucket, key = aws_s3_path_parse(working_dir)
 
+        # if dynamic_etl dir exists, remove it
+        # NOTE: this is to prevent old files from being uploaded
+        #       in case that user is using setup multiple times with same working_dir
+        try:
+            aws_s3_delete(bucket, f'{key}/dynamic_etl')
+        except:
+            pass
+
         for file_path in dynamic_etl_file_paths:
             aws_s3_upload(
                 bucket=bucket,
@@ -823,27 +854,83 @@ class EMRManager:
                 local_path=file_path
             )
 
-    def _setup_dependencies(self, config):
+    def _move_s3_to_ec2(self, config, verbose=False):
+        """
+        move uploaded files in S3 from local to EMR cluster
+        """
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        # remove existing dataverse directory
+        commands = [
+            "rm -r /home/hadoop/dataverse",
+        ]
+        try:
+            aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
+        except:
+            pass
+
+        commands = [
+            f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
+        ]
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
+
+    def _get_pip_package_path(self, config, verbose=False):
+        """
+        get pip installed packages path
+        """
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        commands = ["pip3 show numpy"]
+        result = aws_ssm_run_commands(
+            instance_ids,
+            commands,
+            verbose=verbose,
+            return_output=True,
+        )
+        location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
+
+        return location
+
+    def _setup_aws(self, config, verbose=False):
+        """
+        setup aws environment on EMR cluster
+        """
         nodes = AWSClient().emr.list_instances(
             ClusterId=config.emr.id
         )["Instances"]
         instance_ids = [node["Ec2InstanceId"] for node in nodes]
 
         commands = [
-            f"aws s3 cp {config.emr.working_dir} /home/hadoop/dataverse --recursive",
+            f"aws configure set region {AWSClient().region}",
+        ]
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
+
+    def _setup_dependencies(self, config, verbose=False):
+        nodes = AWSClient().emr.list_instances(
+            ClusterId=config.emr.id
+        )["Instances"]
+        instance_ids = [node["Ec2InstanceId"] for node in nodes]
+
+        commands = [
             "sudo yum install -y python3-devel",
             "pip3 install wheel setuptools pip --upgrade",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
         # NOTE: unknown unlimited loop caused by `pip3 install -r requirements.txt`
         #       so I split the following command separately
         commands = [
             "pip3 install -r /home/hadoop/dataverse/requirements.txt",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-    def _setup_source_code(self, config):
+    def _setup_source_code(self, config, verbose=False):
         """
         copy dataverse source code to pip installed packages path
         """
@@ -856,25 +943,74 @@ class EMRManager:
         commands = [
             "tar -xzf /home/hadoop/dataverse/dataverse.tar.gz -C /home/hadoop/dataverse",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
         # get pip installed packages path
-        commands = ["pip3 show numpy"]
-        result = aws_ssm_run_commands(instance_ids, commands, return_output=True)
-        location = re.findall(r'Location: (.*)\n', result['pip3 show numpy'])[0]
+        location = self._get_pip_package_path(config, verbose=verbose)
 
         # copy dataverse source code to pip installed packages path
         commands = [
             f"cp -r /home/hadoop/dataverse/dataverse {location}",
         ]
-        aws_ssm_run_commands(instance_ids, commands)
+        aws_ssm_run_commands(instance_ids, commands, verbose=verbose)
 
-
-
-
-    def clean(self):
+    def wait(self, config, step_id, verbose=True):
         """
-        clean unused resources
+        waiter for emr step
+        """
+        while True:
+            response = AWSClient().emr.describe_step(
+                ClusterId=config.emr.id,
+                StepId=step_id,
+            )
+            state = response['Step']['Status']['State']
+            if state == 'Pending':
+                time.sleep(10)
+                if verbose:
+                    print("[ Dataverse ] step pending...")
+                continue
+            if state in ['COMPLETED', 'FAILED', 'CANCELLED']:
+                if verbose:
+                    print(f"[ Dataverse ] step status: {state}. Done.")
+                break
+            if verbose:
+                if 'Message' in response['Step']['Status']['StateChangeReason']:
+                    print(response['Step']['Status']['StateChangeReason']['Message'])
+                time.sleep(10)
+
+    def terminate(self, config):
+        """
+        terminate emr cluster
+
+        Args:
+            config (OmegaConf): config for the etl
+        """
+        # only terminate auto generated emr cluster
+        if config.emr.auto_generated is False:
+            print('EMR cluster is not auto generated. Not terminating.')
+            return
+
+        if config.emr.id is None:
+            print('EMR cluster is not launched. Proceeding to clean resources.')
+        else:
+            AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
+
+            # wait until emr cluster is terminated
+            waiter = AWSClient().emr.get_waiter('cluster_terminated')
+            waiter.wait(ClusterId=config.emr.id)
+
+            # set state
+            state = aws_get_state()
+            if 'emr' in state and config.emr.id in state['emr']:
+                del state['emr'][config.emr.id]
+                aws_set_state(state)
+
+        # clean unused resources
+        self._clean()
+
+    def _clean(self):
+        """
+        clean unused resources related to EMR
         """
         self._clean_stopped_emr()
         self._clean_unused_vpc()
@@ -979,30 +1115,21 @@ class EMRManager:
         for instance_profile_name in unused_iam_instance_profile_names:
             aws_iam_instance_profile_delete(instance_profile_name)
 
-    def terminate(self, config):
+    def terminate_by_id(self, emr_id):
         """
-        terminate emr cluster
+        when you want to terminate emr cluster without config
 
-        Args:
-            config (OmegaConf): config for the etl
+        ```python
+        from dataverse.utils.api import EMRManager
+        EMRManager().terminate_by_id('j-3C05XDxxxxxxx')
+        ```
         """
-        if config.emr.id is None:
-            raise ValueError("EMR cluster is not running.")
+        # to avoid circular import
+        from dataverse.config import Config
 
-        AWSClient().emr.terminate_job_flows(JobFlowIds=[config.emr.id])
-
-        # wait until emr cluster is terminated
-        waiter = AWSClient().emr.get_waiter('cluster_terminated')
-        waiter.wait(ClusterId=config.emr.id)
-
-        # set state
-        state = aws_get_state()
-        if 'emr' in state and config.emr.id in state['emr']:
-            del state['emr'][config.emr.id]
-            aws_set_state(state)
-
-        # clean unused resources
-        self.clean()
+        config = Config.default(emr=True)
+        config.emr.id = emr_id
+        self.terminate(config)
 
 
 # --------------------------------------------------------------------------------
@@ -1657,6 +1784,15 @@ def aws_s3_create_bucket(bucket):
         CreateBucketConfiguration={'LocationConstraint': AWSClient().region}
     )
 
+def aws_s3_delete_bucket(bucket):
+    """
+    delete aws s3 bucket
+
+    Args:
+        bucket (str): bucket name
+    """
+    AWSClient().s3.delete_bucket(Bucket=bucket)
+
 def aws_s3_read(bucket, key):
     """
     Args:
@@ -1671,7 +1807,6 @@ def aws_s3_read(bucket, key):
 
     return text
 
-
 def aws_s3_download(bucket, key, local_path):
     """
     Args:
@@ -1682,7 +1817,28 @@ def aws_s3_download(bucket, key, local_path):
     Usage:
         aws_s3_download('tmp', 'this/is/path.json', 'path.json')
     """
-    AWSClient().s3.download_file(bucket, key, local_path)
+    obj_type = aws_s3_get_object_type(bucket, key)
+    if obj_type == 'folder':
+        paginator = AWSClient().s3.get_paginator('list_objects')
+        page_iterator = paginator.paginate(Bucket=bucket)
+        for page in page_iterator:
+            for obj in page['Contents']:
+                bucket_key = obj['Key']
+
+                if not bucket_key.startswith(key):
+                    continue
+
+                rel_bucket_path = bucket_key.replace(key, '')
+                if rel_bucket_path.startswith('/'):
+                    rel_bucket_path = rel_bucket_path[1:]
+
+                local_file_path = os.path.join(local_path, rel_bucket_path)
+                os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                AWSClient().s3.download_file(bucket, bucket_key, local_file_path)
+    elif obj_type == 'file':
+        AWSClient().s3.download_file(bucket, key, local_path)
+    elif obj_type == 'no_obj':
+        raise Exception(f"Object doesn't exist: {key}")
 
 def aws_s3_upload(bucket, key, local_path):
     """
@@ -1694,7 +1850,19 @@ def aws_s3_upload(bucket, key, local_path):
     Usage:
         aws_s3_upload('tmp', 'this/is/path.json', 'path.json')
     """
-    AWSClient().s3.upload_file(local_path, bucket, key)
+    if os.path.isdir(local_path):
+        files = glob.glob(os.path.join(local_path, "*/*"))
+        for file in files:
+            rel_path = os.path.relpath(file, local_path)
+            _key = os.path.join(key, rel_path)
+
+            # NOTE: no need to upload folder
+            if os.path.isdir(file):
+                continue
+
+            AWSClient().s3.upload_file(file, bucket, _key)
+    else:
+        AWSClient().s3.upload_file(local_path, bucket, key)
 
 def aws_s3_write(bucket, key, obj):
     """
@@ -1707,6 +1875,33 @@ def aws_s3_write(bucket, key, obj):
         aws_s3_write('tmp', 'this/is/path.json', '{"hello": "world"}')
     """
     AWSClient().s3.put_object(Bucket=bucket, Key=key, Body=obj)
+
+def aws_s3_delete(bucket, key):
+    """
+    Args:
+        bucket (str): bucket name
+        key (str): key (aws s3 file path)
+
+    Usage:
+        aws_s3_delete('tmp', 'this/is/path.json')
+    """
+    obj_type = aws_s3_get_object_type(bucket, key)
+
+    if obj_type == 'folder':
+        paginator = AWSClient().s3.get_paginator('list_objects')
+        page_iterator = paginator.paginate(Bucket=bucket)
+        for page in page_iterator:
+            for obj in page['Contents']:
+                bucket_key = obj['Key']
+
+                if not bucket_key.startswith(key):
+                    continue
+
+                AWSClient().s3.delete_object(Bucket=bucket, Key=bucket_key)
+    elif obj_type == 'file':
+        AWSClient().s3.delete_object(Bucket=bucket, Key=key)
+    elif obj_type == 'no_obj':
+        raise Exception(f"Object doesn't exist: {key}")
 
 def aws_s3_list_buckets():
     """
@@ -1798,3 +1993,45 @@ def aws_s3_ls(query=None):
                 objects.remove(obj)
 
     return objects
+
+def aws_s3_get_object_type(bucket, key):
+    """
+    get object type from s3
+
+    NOTE:
+        S3 don't have a concept of folder
+        so this is a hardcoded solution to check key is file/folder or doesn't exist
+
+    TODO:
+        if there is edge case that this function doesn't cover
+        please add it to the test case
+    """
+    results = AWSClient().s3.list_objects_v2(
+        Bucket=bucket,
+        Prefix=key,
+        Delimiter="/",
+    )
+    if 'CommonPrefixes' in results:
+        prefix_folders = results['CommonPrefixes'][0]['Prefix'].split('/')
+        key_folders = key.split('/')
+
+        # remove ''
+        prefix_folders = [x for x in prefix_folders if x != '']
+        key_folders = [x for x in key_folders if x != '']
+
+        # check key exacly match prefix
+        for key_folder in key_folders:
+            if key_folder not in prefix_folders:
+                return 'no_obj'
+        return 'folder'
+    elif 'Contents' in results:
+        content = results['Contents'][0]['Key']
+        if content == key:
+            if content.endswith('/'):
+                return 'folder'
+            else:
+                return 'file'
+        else:
+            return 'folder'
+    else:
+        return 'no_obj'
