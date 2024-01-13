@@ -1,0 +1,28 @@
+name: "🚀 Feature Request"
+description: Suggesting new desired feature and enhancement of existing feature
+title: "🚀 [REQUEST] - <title>"
+labels: [
+  "enhancement", "feature"
+]
+
+body:
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: Feature request
+      description: |
+        Please describe the feature you want to add or needs to be enhanced.
+        If you have any related paper or code, please provide us.
+      validations:
+        required: true
+
+
+  - type: textarea
+    id: context
+    validations:
+      required: false
+    attributes:
+      label: Context
+      description: |
+        Please let us know your motivation or additional context for this suggestion.
+        Knowing the reason why it needs to be add/enhanced makes us easy to understand the need.
