@@ -1,0 +1,44 @@
+name: "📝 Documentation Improvement"
+description: Report wrong or missing documentation. You can suggest new document or document that needs any improvement.
+title: "📝 [Docs] - <title>"
+labels: [
+  "docs"
+]
+
+body:
+  - type: checkboxes
+    attributes:
+      label: dataverse version checks
+      options:
+        - label: >
+            I have checked that the issue still exists on the latest versions of the _dataverse_.
+          required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location of the documentation
+      description: >
+        Please provide the location of the documentation.
+        If you are suggesting new document, please provide appropriate place it has to be.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Documentation problem
+      description: >
+        Please provide a description of what documentation you believe needs to be fixed/improved/added.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggestion
+      description: >
+        Please explain the suggested fix and **why** it's better than the existing documentation.
+        Or it could be content of new document you are suggesting.
+    validations:
+      required: true
