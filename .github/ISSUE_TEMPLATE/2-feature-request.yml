@@ -13,8 +13,8 @@ body:
       description: |
         Please describe the feature you want to add or needs to be enhanced.
         If you have any related paper or code, please provide us.
-      validations:
-        required: true
+    validations:
+      required: true
 
 
   - type: textarea
