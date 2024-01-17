@@ -1,4 +1,3 @@
-
 """
 base class to support the registration of the ETL classes
 """
@@ -20,21 +19,22 @@ from dataverse.utils.setting import SystemSetting
 
 # This is where you choose what categories to register
 ETL_CATEGORIES = [
-    'data_ingestion',
-    'decontamination',
-    'deduplication',
-    'bias',
-    'toxicity',
-    'cleaning',
-    'pii',
-    'quality',
-    'data_load',
-    'utils',
+    "data_ingestion",
+    "decontamination",
+    "deduplication",
+    "bias",
+    "toxicity",
+    "cleaning",
+    "pii",
+    "quality",
+    "data_load",
+    "utils",
 ]
 
 IGNORE_FILES = [
-    '__init__.py',
+    "__init__.py",
 ]
+
 
 def auto_register(etl_categories=ETL_CATEGORIES):
     """
@@ -42,13 +42,13 @@ def auto_register(etl_categories=ETL_CATEGORIES):
     """
     etl_path = os.path.dirname(os.path.abspath(__file__))
     for etl_category in etl_categories:
-        
+
         # Get the files(sub-categories) in the category
         category_path = os.path.join(etl_path, etl_category)
         files = os.listdir(category_path)
 
         # Filter out non-Python files
-        files = [f for f in files if f.endswith('.py')]
+        files = [f for f in files if f.endswith(".py")]
 
         # Dynamically import all Python files in the directory
         for file in files:
@@ -71,10 +71,11 @@ class ETLStructure: ...
 
 class ETLRegistry:
     """Singleton class to register the ETL classes"""
+
     _initialized = False
 
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(ETLRegistry, cls).__new__(cls)
         return cls.instance
 
@@ -89,7 +90,6 @@ class ETLRegistry:
         self._registry = {}
         self._status = {}
         auto_register()
-
 
     def __len__(self):
         return len(self._registry.keys())
@@ -141,7 +141,7 @@ class ETLRegistry:
             self._update_status(key=key)
 
     def _update_status(self, key: str):
-        category, sub_category, _ = key.split('___')
+        category, sub_category, _ = key.split("___")
         if category not in self._status:
             self._status[category] = {}
 
@@ -162,17 +162,21 @@ class ETLRegistry:
 
         filtered_status = {}
         if category is not None:
-            assert type(category) != list, 'we do not support list search for category'
-            assert type(category) == str, 'category must be a string'
+            assert type(category) != list, "we do not support list search for category"
+            assert type(category) == str, "category must be a string"
             if sub_category is None:
                 filtered_status[category] = status[category]
             else:
-                assert type(sub_category) != list, 'we do not support list search for sub-category'
-                assert type(sub_category) == str, 'sub_category must be a string'
-                filtered_status[category] = {sub_category: status[category][sub_category]}
+                assert (
+                    type(sub_category) != list
+                ), "we do not support list search for sub-category"
+                assert type(sub_category) == str, "sub_category must be a string"
+                filtered_status[category] = {
+                    sub_category: status[category][sub_category]
+                }
         else:
             if sub_category is not None:
-                raise ValueError('sub-category cannot be specified without category')
+                raise ValueError("sub-category cannot be specified without category")
             filtered_status = status
 
         return self._convert_to_report_format(
@@ -203,35 +207,37 @@ class ETLRegistry:
         for category in categories:
             if category not in stats:
                 stats[category] = {}
-                stats[category]['__total__'] = 0
+                stats[category]["__total__"] = 0
 
             sub_categories = list(status[category].keys())
             for sub_category in sub_categories:
                 sub_n = len(status[category][sub_category])
                 stats[category][sub_category] = sub_n
-                stats[category]['__total__'] += sub_n
+                stats[category]["__total__"] += sub_n
                 total += sub_n
 
         # convert to the report format
         infos = []
 
-        infos.append('=' * 50)
+        infos.append("=" * 50)
         infos.append(f"Total [ {total} ]")
-        infos.append('=' * 50)
+        infos.append("=" * 50)
 
         for category in categories:
             infos.append(f"{category} [ {stats[category]['__total__']} ]")
             sub_categories = list(status[category].keys())
 
             if print_sub_category:
-                for sub_category in sub_categories:   
-                    infos.append(f"{' ' * 4}- {sub_category} [ {stats[category][sub_category]} ]")
+                for sub_category in sub_categories:
+                    infos.append(
+                        f"{' ' * 4}- {sub_category} [ {stats[category][sub_category]} ]"
+                    )
 
                     if print_etl_name:
                         for etl in status[category][sub_category]:
                             infos.append(f"{' ' * 8}- {etl}")
 
-        return '\n'.join(infos)
+        return "\n".join(infos)
 
     def get(self, key: str) -> ETLStructure:
         """
@@ -263,6 +269,7 @@ class ETLRegistry:
         """
         return list(self._registry.values())
 
+
 class ETLAutoRegistry(abc.ABCMeta, type):
     def __new__(cls, name, bases, attrs):
         """
@@ -272,12 +279,14 @@ class ETLAutoRegistry(abc.ABCMeta, type):
         new_class = super().__new__(cls, name, bases, attrs)
 
         # BaseETL is base class and should not be registered
-        # Another reason is BaseETL is not initialized yet before `__new__` is done but 
+        # Another reason is BaseETL is not initialized yet before `__new__` is done but
         # the registry will verify the class is subclass of BaseETL and raise error
         # because BaseETL is not initialized yet :)
-        if name != 'BaseETL':
+        if name != "BaseETL":
             if "__file_path__" not in attrs:
-                raise TypeError("Direct inheritance from BaseETL not allowed. Use @register_etl decorator.")
+                raise TypeError(
+                    "Direct inheritance from BaseETL not allowed. Use @register_etl decorator."
+                )
 
             registry = ETLRegistry()
             registry.register(key=name, etl=new_class)
@@ -289,6 +298,7 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     """
     spark ETL
     """
+
     @abc.abstractmethod
     def run(self, data: Union[RDD, DataFrame], *args, **kwargs):
         """
@@ -308,9 +318,12 @@ def add_self(func):
     Decorator to add self to the function
     intent is to make the function as a method
     """
+
     def wrapper(self, *args, **kwargs):
         return func(*args, **kwargs)
+
     return wrapper
+
 
 def register_etl(func):
     """
@@ -324,7 +337,7 @@ def register_etl(func):
     - __etl_dir__ (bool): if the file is in the etl directory
         - if not, it means it's dynamically registered user-defined ETL
     """
-    ETL_DIR = os.path.join(SystemSetting().DATAVERSE_HOME, 'etl')
+    ETL_DIR = os.path.join(SystemSetting().DATAVERSE_HOME, "etl")
     etl_file_path = inspect.getfile(func)
 
     # I know using class name without snake case is awkward
@@ -336,7 +349,7 @@ def register_etl(func):
             "run": add_self(func),
             "__file_path__": etl_file_path,
             "__etl_dir__": etl_file_path.startswith(ETL_DIR),
-        }
+        },
     )
 
     return etl_cls
