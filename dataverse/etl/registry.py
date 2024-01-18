@@ -129,12 +129,16 @@ class ETLRegistry:
         if not issubclass(etl, ETLStructure):
             raise TypeError(f"ETL class should be subclass of ETLStructure not {etl}")
 
-        # register already exists
-        if key in self._registry:
-            raise KeyError(f"The key [ {key} ] is already registered")
-
-        self._registry[key] = etl
-        self._update_status(key=key)
+        # register
+        if key in self._registry:  # while key is already registered
+            # However, if pytests is running, it does not raise error
+            if os.getenv("DATAVERSE_TEST_MODE") == "True":
+                pass
+            else:
+                raise KeyError(f"The key [ {key} ] is already registered")
+        else:  # key is not registered
+            self._registry[key] = etl
+            self._update_status(key=key)
 
     def _update_status(self, key: str):
         category, sub_category, _ = key.split('___')
