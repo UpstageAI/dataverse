@@ -11,3 +11,4 @@ html2text
 faker
 awscli
 boto3
+pre-commit==3.6.0
