@@ -6,10 +6,21 @@ repos:
     -   id: check-added-large-files
     -   id: detect-private-key
     -   id: detect-aws-credentials
+- repo: https://github.com/pycqa/isort
+  rev: 5.13.2
+  hooks:
+    -   id: isort
+        args: [
+            --profile=black,
+        ]
 -   repo: https://github.com/psf/black
     rev:  23.12.1
     hooks:
     -   id: black
+        args: [
+            --line-length=100,
+        ]
+
 -   repo: https://github.com/myint/autoflake
     rev: v2.2.0
     hooks:
@@ -24,7 +35,8 @@ repos:
     rev: 6.0.0
     hooks:
     -   id: flake8
-- repo: https://github.com/pycqa/isort
-  rev: 5.13.2
-  hooks:
-    -   id: isort
+        args: [
+            --max-line-length=100, # since black changes max length as 100, flake 8 follows it
+            ]
+
+        
