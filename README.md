@@ -1,6 +1,14 @@
 <div align="center">
 
-# Dataverse
+<br>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/dataverse_logo-white.png" width=300>
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/dataverse_logo-color.png" width=300>
+  <img alt="DATAVERSE" src="docs/images/dataverse_logo-color.png" width=300>
+</picture>
+
+<br>
+
 The Universe of Data. 
 All about Data, Data Science, and Data Engineering.
 
