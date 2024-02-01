@@ -33,7 +33,7 @@ To use this library, the following conditions are recommended:
   - You can automatically install Java 11 during the installation process.
   - Alternatively, if you wish to manually control your Java setup, you can download it from [Oracle Java](https://www.oracle.com/java/technologies/downloads/#java11) or from your preferred vendor.
 
-<br>
+
 
 ### 🌠 Installation process
 ```bash
@@ -56,6 +56,77 @@ This is not mandatory, but setting up these environment variables is highly reco
 ```bash
 make pyspark
 ```
+<br>
+
+## 🌌 Quickstart
+Various and more detailed tutorials are [here](https://github.com/UpstageAI/dataverse/tree/main/guideline).
+
+<details>
+    <summary><u>Detail to the example etl configure.</u></summary>
+    <ul></ul>
+    <ul>
+        <li style="line-height:250%;"> <b>data_ingestion___huggingface___hf2raw </b></li>
+        Load dataset from <a href="https://huggingface.co/datasets/allenai/ai2_arc">Hugging Face</a>, which contains a total of 2.59k rows.
+    </ul>
+    <ul>
+        <li style="line-height:250%;"> <b>utils___sampling___random </b></li>
+        To decrease the dataset size, randomly subsample 50% of data to reduce the size of dataset, with a default seed value of 42. <br/>
+        This will reduce the dataset to 1.29k rows. 
+    </ul>
+    <ul>
+        <li style="line-height:250%;"> <b>deduplication___minhash___lsh_jaccard </b></li>
+        Deduplicate by <code>question</code> column, 5-gram minhash jaccard similarity threshold of 0.1.
+    </ul>
+    <ul>
+        <li style="line-height:250%;"> <b>data_load___parquet___ufl2parquet </b></li>
+        Save the processed dataset as a Parquet file to <code>./guideline/etl/sample/quickstart.parquet</code>.<br/>
+        The final dataset comprises around 1.14k rows.
+    </ul>
+</details>
+
+```python
+# 1. Set your ETL process as config.
+
+from omegaconf import OmegaConf
+
+ETL_config = OmegaConf.create({
+    'spark': {
+        'appname': 'ETL',
+        'driver': {'memory': '4g'},
+    },
+    'etl': [
+        { 
+            'name': 'data_ingestion___huggingface___hf2raw', # Extract
+            'args': {'name_or_path': ['ai2_arc', 'ARC-Challenge']}
+        },
+        {
+            'name': 'utils___sampling___random',
+            'args': {'sample_n_or_frac': 0.5}
+        },
+        {
+            'name': 'deduplication___minhash___lsh_jaccard', # Transform
+            'args': {'threshold': 0.1,
+                    'ngram_size': 5,
+                    'subset': 'question'}
+        },
+        {
+          'name': 'data_load___parquet___ufl2parquet', # Load
+          'args': {'save_path': './guideline/etl/sample/quickstart.parquet'}
+        }
+      ]
+  })
+```
+
+
+```python
+# 2. Run ETLpipeline.
+
+from dataverse.etl import ETLPipeline
+
+etl_pipeline = ETLPipeline()
+spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
+```
+<br>
 
 
 ## 🌌 AWS S3 Support
