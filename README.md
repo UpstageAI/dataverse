@@ -19,52 +19,42 @@ All about Data, Data Science, and Data Engineering.
 ## Welcome to Dataverse!
 Dataverse is a freely-accessible open-source project that supports your ETL pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
+<br>
 
 ## 🌌 Installation
-### 🌠 Option 1: Git clone
-1. Clone _Dataverse_ repository
+Currently, pip install is not supported. We will update it soon! <br>
+Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](link)
+
+### 🌠 Prerequisites
+To use this library, the following conditions are recommended:
+- **Python** (version 3.10.11 or higher)
+  - _Dataverse_ has not been tested with earlier versions of Python.
+- **Java** (version 11)
+  - You can automatically install Java 11 during the installation process.
+  - Alternatively, if you wish to manually control your Java setup, you can download it from [Oracle Java](https://www.oracle.com/java/technologies/downloads/#java11) or from your preferred vendor.
+
+<br>
+
+### 🌠 Installation process
 ```bash
 git clone https://github.com/UpstageAI/dataverse.git
-```
-2. Install _Dataverse_
-```bash
+cd dataverse
 pip install .
 ```
-3. Install Java
+<br>
+
+**[Optional]** If you've already installed OpenJDK 11, you can skip this step. <br>
+Please verify your environment's PATH variables are set properly to run Java.
 ```bash
 make java
 ```
-4. Pyspark envrionment setup - `SPARK_HOME` and `PYSPARK_PYTHON`
+<br>
 
-This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
+**[Optional]** By running the following command, you'll set SPARK_HOME and PYSPARK_PYTHON as environment variables. <br>
+This is not mandatory, but setting up these environment variables is highly recommended for PySpark.
+
 ```bash
 make pyspark
-```
-
-
-### 🌠 Option 2: Install via Pypi \*WIP*
-> **Currently, pip install is not supported. Please install Dataverse with option 1.**
-
-
-1. Install Dataverse with Python's pip package manager:
-```bash
-pip install dataverse
-```
-2. Install Java
-```bash
-sudo apt-get update
-sudo apt-get install openjdk-11-jdk
-echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
-source ~/.bashrc
-```
-3. Pyspark envrionment setup - `SPARK_HOME` and `PYSPARK_PYTHON`
-
-This is not mandatory, but it is recommended to set up `SPARK_HOME` and `PYSPARK_PYTHON` for pyspark.
-```bash
-pyspark_location=$(pip show pyspark | grep Location | cut -d' ' -f2)
-echo "export SPARK_HOME=$pyspark_location/pyspark" >> ~/.bashrc
-echo "export PYSPARK_PYTHON=python3" >> ~/.bashrc
-source ~/.bashrc
 ```
 
 
