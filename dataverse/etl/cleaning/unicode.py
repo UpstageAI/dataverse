@@ -1,17 +1,16 @@
-
-
-from pyspark.rdd import RDD
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import split, posexplode
-from pyspark.sql.functions import collect_list
-
-from dataverse.etl.registry import register_etl
+"""
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
+"""
 
 import re
 import unicodedata
 from typing import Union
 
+from pyspark.rdd import RDD
+from pyspark.sql import DataFrame
 
+from dataverse.etl.registry import register_etl
 
 UNICODE_PUNCT = {
     "，": ",",
@@ -53,20 +52,21 @@ UNICODE_PUNCT = {
 
 @register_etl
 def cleaning___unicode___remove_punct(
-    spark,
-    data: Union[RDD, DataFrame],
-    subset='text',
-    *args,
-    **kwargs
-):
+    spark, data: Union[RDD, DataFrame], subset: str = "text", *args, **kwargs
+) -> RDD:
     """
-    remove all the unicode punctuations
+    Removes all the Unicode punctuations.
 
     Code is from facebookresearch/cc_net
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
-    args:
-        subset (str): subset or columns to consider
+    Args:
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be processed. It can be either an RDD or a DataFrame.
+        subset (str, optional): A subset or column to consider. Defaults to 'text'.
+
+    Returns:
+        The cleaned data.
     """
     if isinstance(data, DataFrame):
         data = data.rdd
@@ -83,20 +83,21 @@ def cleaning___unicode___remove_punct(
 
 @register_etl
 def cleaning___unicode___replace_punct(
-    spark,
-    data: Union[RDD, DataFrame],
-    subset='text',
-    *args,
-    **kwargs
-):
+    spark, data: Union[RDD, DataFrame], subset: str = "text", *args, **kwargs
+) -> RDD:
     """
-    replace all the unicode punctuations
+    Replace all the unicode punctuations
 
     Code is from facebookresearch/cc_net
     https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
 
-    args:
-        subset (str): subset or columns to consider if duplicated
+    Args:
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be processed. It can be either an RDD or a DataFrame.
+        subset (str, optional): A subset or column to consider. Defaults to 'text'.
+
+    Returns:
+        The cleaned data.
     """
     if isinstance(data, DataFrame):
         data = data.rdd
@@ -110,19 +111,21 @@ def cleaning___unicode___replace_punct(
 
     return data
 
+
 @register_etl
 def cleaning___unicode___normalize(
-    spark,
-    data: Union[RDD, DataFrame],
-    subset='text',
-    *args,
-    **kwargs
+    spark, data: Union[RDD, DataFrame], subset="text", *args, **kwargs
 ):
     """
-    normalize the unicode
+    Normalize the unicode
 
     Args:
-        subset (str): subset or columns to consider for normalization
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be processed. It can be either an RDD or a DataFrame.
+        subset (str, optional): A subset or column to consider. Defaults to 'text'.
+
+    Returns:
+        The cleaned data.
     """
     if isinstance(data, DataFrame):
         data = data.rdd
