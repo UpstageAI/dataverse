@@ -17,8 +17,8 @@ Dataverse
    etl/etl.pii.rst
    etl/etl.quality.rst
    etl/etl.utils.rst
-   .. etl/etl.toxicity.rst
-   .. etl/etl.decontamination.rst
+.. etl/etl.toxicity.rst
+.. etl/etl.decontamination.rst
 
 
 Indices and tables
