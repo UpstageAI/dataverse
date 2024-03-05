@@ -119,7 +119,7 @@ spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
 
 ## 🌌 Acknowledgements
 
-Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in December 2023, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
 
 ## 🌌 License
 Dataverse is completely freely-accessible open-source and licensed under the MIT license.
@@ -131,7 +131,7 @@ Dataverse is completely freely-accessible open-source and licensed under the MIT
 ```bibtex
 @misc{dataverse,
   title = {Dataverse},
-  author = {Hyunbyung Park, Sukyung Lee, Chanjun Park, Yungi Kim, Gyoungjin Gim, Changbae Ahn, Jihoo Kim, Seonghoon Yang},
+  author = {Hyunbyung Park, Sukyung Lee, Gyoungjin Gim, Yungi Kim, Seonghoon Yang, Jihoo Kim, Changbae Ahn, Chanjun Park},
   year = {2023},
   publisher = {GitHub, Upstage AI},
   howpublished = {\url{https://github.com/UpstageAI/dataverse}},
