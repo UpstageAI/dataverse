@@ -1,20 +1,31 @@
+"""
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
+"""
 
+
+from typing import List, Union
 
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
 from dataverse.etl.registry import register_etl
 
-from typing import Union
-
 
 @register_etl
-def deduplication___exact___column(spark, data: Union[RDD, DataFrame], subset=['text'], *args, **kwargs):
+def deduplication___exact___column(
+    spark, data: Union[RDD, DataFrame], subset: List[str] = ["text"], *args, **kwargs
+):
     """
-    exact column deduplication
+    Exact column deduplication
 
-    args:
-        subset: subset or columns to consider if duplicated
+    Args:
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be deduplicated..
+        subset(List[str]): Subset of columns to consider for duplication check. Default to ['text'].
+
+    Returns:
+        Deduplicated DataFrame object
     """
     if isinstance(data, RDD):
         data = data.toDF()
