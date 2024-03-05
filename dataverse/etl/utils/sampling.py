@@ -7,7 +7,8 @@ Apache-2.0 license
 
 from typing import Union
 
-from pyspark.rdd import RDD, DataFrame
+from pyspark.rdd import RDD
+from pyspark.sql import DataFrame
 
 from dataverse.etl import register_etl
 
