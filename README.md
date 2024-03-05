@@ -17,13 +17,13 @@ All about Data, Data Science, and Data Engineering.
 <div align="left">
 
 ## Welcome to Dataverse!
-Dataverse is a freely-accessible open-source project that supports your ETL pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers. Even though you don't know much about Spark, you can use it easily via _dataverse_.
+Dataverse is a freely-accessible open-source project that supports your ETL pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
 <br>
 
 ## 🌌 Installation
 Currently, pip install is not supported. We will update it soon! <br>
-Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](link)
+Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
 
 ### 🌠 Prerequisites
 To use this library, the following conditions are needed:
