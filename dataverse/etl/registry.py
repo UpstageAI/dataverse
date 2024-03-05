@@ -1,18 +1,20 @@
 """
-base class to support the registration of the ETL classes
+Base class to support the registration of the ETL classes
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
 
-import os
 import abc
-import inspect
 import importlib.util
+import inspect
+import os
+from typing import Union
 
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
-from typing import Union
 from dataverse.utils.setting import SystemSetting
-
 
 # TODO: If you add category directories, add them here too
 # _sample is a special directory that is not imported
@@ -42,7 +44,6 @@ def auto_register(etl_categories=ETL_CATEGORIES):
     """
     etl_path = os.path.dirname(os.path.abspath(__file__))
     for etl_category in etl_categories:
-
         # Get the files(sub-categories) in the category
         category_path = os.path.join(etl_path, etl_category)
         files = os.listdir(category_path)
@@ -66,11 +67,36 @@ def auto_register(etl_categories=ETL_CATEGORIES):
 
 
 # To avoid circular dependency
-class ETLStructure: ...
+class ETLStructure:
+    ...
 
 
 class ETLRegistry:
-    """Singleton class to register the ETL classes"""
+    """Singleton class to register the ETL classes.
+
+    This class provides a registry for ETL classes.
+    It ensures that only one instance of the registry is created and provides
+    methods to register, search, and retrieve ETL classes.
+
+    Attributes:
+        _initialized (bool): Flag to check if the class has been initialized.
+        _registry (dict): Dictionary to store the registered ETL classes.
+        _status (dict): Dictionary to store the status of the registered ETL classes.
+
+    Methods:
+        __new__(): Creates a new instance of the class if it doesn't exist.
+        __init__(): Initializes the class and registers the ETL classes.
+        __len__(): Returns the number of registered ETL classes.
+        __repr__(): Returns a string representation of the registry.
+        __str__(): Returns a string representation of the registry.
+        reset(): Resets the registry.
+        register(key, etl): Registers an ETL class with a given key.
+        _update_status(key): Updates the status of the registry.
+        search(category, sub_category): Searches for ETL classes based on category and sub-category.
+        _convert_to_report_format(status, print_sub_category, print_etl_name): Converts the status to a report format.
+        get(key): Retrieves an ETL class based on the key.
+        get_all(): Retrieves all the registered ETL classes.
+    """
 
     _initialized = False
 
@@ -108,16 +134,24 @@ class ETLRegistry:
 
     def register(self, key: str, etl: ETLStructure):
         """
-        register the etl
+        Registers the ETL (Extract, Transform, Load) process.
+
+        Args:
+            key (str): The key used to identify the ETL process. Should be in the format below:
+            etl (ETLStructure): The ETL process to be registered. It should be a subclass of ETLStructure.
+
+        Raises:
+            ValueError: If the key is not all lowercase, not separated by '___', or does not have 2 layers of category.
+            TypeError: If the ETL class is not a subclass of ETLStructure.
+            KeyError: If the key is already registered.
+
+        Note:
+            The key should be in the format of:
+            - all lowercase
+            - separated by ___
+            - it should have 2 layers of category
+            - Example: <etl_type>___<file_key>___<etl_key> or <category>___<sub_category>___<etl_key>.
         """
-        # the key should be the format of the following
-        # ==================================================
-        # <etl_type>___<file_key>___<etl_key>
-        # <category>___<sub_category>___<etl_key>
-        # ==================================================
-        # 1. is it all lowercase
-        # 2. is it separated by ___
-        # 3. it should have 2 layers of category
         if not key.islower():
             raise ValueError(f"The key [ {key} ] should be all lowercase")
         if "___" not in key:
@@ -150,13 +184,26 @@ class ETLRegistry:
         else:
             self._status[category][sub_category].append(key)
 
-    def search(self, category=None, sub_category=None):
+    def search(self, category: str = None, sub_category: str = None):
         """
-        search the etl
+        Search the ETL.
 
-        printing all the information is fixed as default
-        - print_sub_category: print the sub-category
-        - print_etl_name: print the etl name
+        Args:
+            category (str, optional): The category to search for. Defaults to None.
+            sub_category (str, optional): The sub-category to search for. Defaults to None.
+
+        Returns:
+            dict: A dictionary containing the filtered status information.
+
+        Raises:
+            AssertionError: If category is a list or not a string.
+            AssertionError: If sub_category is a list or not a string.
+            ValueError: If sub_category is specified without category.
+
+        Note:
+            - Printing all the information is fixed as default.
+            - Set print_sub_category to True to print the sub-category.
+            - Set print_etl_name to True to print the ETL name.
         """
         status = self._status
 
@@ -167,13 +214,9 @@ class ETLRegistry:
             if sub_category is None:
                 filtered_status[category] = status[category]
             else:
-                assert (
-                    type(sub_category) != list
-                ), "we do not support list search for sub-category"
+                assert type(sub_category) != list, "we do not support list search for sub-category"
                 assert type(sub_category) == str, "sub_category must be a string"
-                filtered_status[category] = {
-                    sub_category: status[category][sub_category]
-                }
+                filtered_status[category] = {sub_category: status[category][sub_category]}
         else:
             if sub_category is not None:
                 raise ValueError("sub-category cannot be specified without category")
@@ -229,9 +272,7 @@ class ETLRegistry:
 
             if print_sub_category:
                 for sub_category in sub_categories:
-                    infos.append(
-                        f"{' ' * 4}- {sub_category} [ {stats[category][sub_category]} ]"
-                    )
+                    infos.append(f"{' ' * 4}- {sub_category} [ {stats[category][sub_category]} ]")
 
                     if print_etl_name:
                         for etl in status[category][sub_category]:
@@ -241,16 +282,25 @@ class ETLRegistry:
 
     def get(self, key: str) -> ETLStructure:
         """
-        get the etl
+        Retrieves the ETLStructure associated with the given key.
+
+        Args:
+            key (str): The key used to retrieve the ETLStructure. Should be in the format below.
+
+        Returns:
+            ETLStructure: The ETLStructure associated with the given key.
+
+        Raises:
+            ValueError: If the key is not all lowercase, not separated by '___', or does not have 2 layers of category.
+            KeyError: If the key is not registered in the registry.
+
+        Note:
+             The key should be in the format of:
+            - all lowercase
+            - separated by ___
+            - it should have 2 layers of category
+            - Example: <etl_type>___<file_key>___<etl_key> or <category>___<sub_category>___<etl_key>.
         """
-        # the key should be the format of the following
-        # ==================================================
-        # <etl_type>___<file_key>___<etl_key>
-        # <category>___<sub_category>___<etl_key>
-        # ==================================================
-        # 1. is it all lowercase
-        # 2. is it separated by ___
-        # 3. it should have 2 layers of category
         if not key.islower():
             raise ValueError(f"The key [ {key} ] should be all lowercase")
         if "___" not in key:
@@ -296,7 +346,21 @@ class ETLAutoRegistry(abc.ABCMeta, type):
 
 class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     """
-    spark ETL
+    Base class for spark ETL.
+
+    This class provides a base structure for implementing spark ETL processes.
+    If you need to use `self` directly, inherit this class.
+
+    Attributes:
+        None
+
+    Methods:
+        run(data: Union[RDD, DataFrame], *args, **kwargs):
+            Run the preprocessing logic.
+            This method should be implemented by subclasses.
+
+        __call__(*args, **kwargs):
+            Call the `run` method to perform the preprocessing.
     """
 
     @abc.abstractmethod
@@ -327,15 +391,30 @@ def add_self(func):
 
 def register_etl(func):
     """
-    Decorator to register a function as an ETL
+    Decorator to register a function as an ETL.
 
-    one downside is that the function cannot leverage the `self`
-    if you need to use `self` directly inherit the BaseETL
+    Args:
+        func (callable): The function to be registered as an ETL.
+
+    Returns:
+        type: A dynamically created class that inherits from BaseETL and wraps the original function.
+
+    Raises:
+        None.
 
     About Attributes:
-    - __file_path__ (str): the file path of the function where it is defined
-    - __etl_dir__ (bool): if the file is in the etl directory
-        - if not, it means it's dynamically registered user-defined ETL
+        - __file_path__ (str): The file path of the function where it is defined.
+        - __etl_dir__ (bool): If the file is in the etl directory. If not, it means it's a dynamically registered user-defined ETL.
+
+    Example:
+        >>> @register_etl
+        >>> def my_etl_function():
+        >>>    pass
+
+    Note:
+        The registered ETL function should not rely on the `self` parameter.
+
+        If you need to use `self`, directly inherit the BaseETL class.
     """
     ETL_DIR = os.path.join(SystemSetting().DATAVERSE_HOME, "etl")
     etl_file_path = inspect.getfile(func)
