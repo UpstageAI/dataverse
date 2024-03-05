@@ -7,6 +7,7 @@ Apache-2.0 license
 """
 
 import re
+import unicodedata
 from typing import Union
 
 from pyspark.rdd import RDD
@@ -80,5 +81,52 @@ def cleaning___char___remove_unprintable(
         return row
 
     data = data.map(_remove_non_printable_char)
+
+    return data
+
+
+def strip_accents(text: str) -> str:
+    """Strips accents from a piece of text."""
+    nfd = unicodedata.normalize("NFD", text)
+    output = [c for c in nfd if unicodedata.category(c) != "Mn"]
+    if len(output) == text:
+        return text
+    return "".join(output)
+
+
+@register_etl
+def cleaning___char___remove_accent(
+    spark, data: Union[RDD, DataFrame], subset: str = "text", *args, **kwargs
+) -> RDD:
+    """Strips accents from a piece of text.
+
+        +--------+--------+
+        | input  | output |
+        +========+========+
+        | café   | cafe   |
+        | résumé | resume |
+        +--------+--------+
+
+    Code is from facebookresearch/cc_net
+    https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py
+
+    Args:
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be processed.
+        subset (str): A subset or column to consider. Defaults to 'text'.
+
+    Returns:
+        The processed data with accents removed.
+
+    """
+    if isinstance(data, DataFrame):
+        data = data.rdd
+        data = data.map(lambda row: row.asDict())
+
+    def _strip_accents(row):
+        row[subset] = strip_accents(row[subset])
+        return row
+
+    data = data.map(_strip_accents)
 
     return data
