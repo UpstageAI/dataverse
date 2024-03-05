@@ -22,16 +22,12 @@ Dataverse is a freely-accessible open-source project that supports your ETL(Extr
 <br>
 
 ## 🌌 Installation
-Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
-
 ### 🌠 Prerequisites
 To use this library, the following conditions are needed:
 - Python (version between 3.10 and 3.11)
 - JDK (version 11)
 - PySpark
-
-Detail guide for prerequisites can be found on [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
-
+Detail installation guide for prerequisites can be found on [here](https://data-verse.gitbook.io/docs/installation).
 
 ### 🌠 Install via PyPi
 ```bash
