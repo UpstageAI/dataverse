@@ -37,5 +37,8 @@ repos:
       hooks:
         -   id: flake8
             args: [
-                --max-line-length=100, # since black changes max length as 100, flake 8 follows it
+                "--ignore=E203, E501, W503", 
                 ]
+            # E203: Whitespace before ':'
+            # E501: line length - because black checks and this makes error even on commented code
+            # W503: PEP8 now recommends to break before binary operator (https://peps.python.org/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
