@@ -1,21 +1,14 @@
-
-from pyspark.rdd import RDD
-from pyspark.sql import DataFrame
-
-from dataverse.etl import register_etl
-from dataverse.utils.format import huggingface2parquet
-from dataverse.utils.format import load_huggingface_dataset
-
-from typing import Union, List
-from omegaconf import ListConfig
-
-import datasets
-
-
 """
 Supported datasets:
 https://huggingface.co/datasets/cerebras/SlimPajama-627B
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
+from typing import List, Union
+
+from dataverse.etl import register_etl
+from dataverse.utils.format import huggingface2parquet, load_huggingface_dataset
 
 
 @register_etl
@@ -28,10 +21,11 @@ def data_ingestion___slim_pajama___parquet2ufl(spark, input_paths, repartition=2
     rdd = rdd.map(lambda row: row.asDict())
     return rdd
 
+
 @register_etl
 def data_ingestion___slim_pajama___hf2ufl(
     spark,
-    name_or_path : Union[str, List[str]] = 'cerebras/SlimPajama-627B',
+    name_or_path: Union[str, List[str]] = "cerebras/SlimPajama-627B",
     split=None,
     from_disk=False,
     repartition=20,
