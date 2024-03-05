@@ -42,6 +42,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
+    "sphinx.ext.githubpages",
 ]
 todo_include_todos = True
 napoleon_google_docstring = True
@@ -64,7 +65,7 @@ exclude_patterns = []
 html_permalinks_icon = "<span>#</span>"
 html_theme = "sphinx_pdj_theme"
 html_theme_path = [sphinx_pdj_theme.get_html_theme_path()]
-
+html_baseurl = "https://UpstageAI.github.io/dataverse/"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
