@@ -9,6 +9,7 @@ import abc
 import importlib.util
 import inspect
 import os
+from functools import wraps
 from typing import Union
 
 from pyspark.rdd import RDD
@@ -165,9 +166,8 @@ class ETLRegistry:
 
         # register
         if key in self._registry:
-            if (
-                os.getenv("DATAVERSE_TEST_MODE") == "True"
-                or os.getenv("DATAVERSE_BUILD_DOC") == "true"
+            if (os.getenv("DATAVERSE_TEST_MODE") == "True") or (
+                os.getenv("DATAVERSE_BUILD_DOC") == "true"
             ):
                 pass
             else:
@@ -385,9 +385,11 @@ def add_self(func):
     intent is to make the function as a method
     """
 
+    @wraps(func)
     def wrapper(self, *args, **kwargs):
         return func(*args, **kwargs)
 
+    wrapper.__doc__ = func.__doc__
     return wrapper
 
 
