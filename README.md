@@ -113,7 +113,7 @@ spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
 
 ## 🌌 Contributors
 <a href="https://github.com/UpstageAI/dataverse/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=UpstageAI/dataverse"/>
+  <img src="https://contrib.rocks/image?repo=UpstageAI/dataverse" />
 </a>
 
 ## 🌌 Acknowledgements
