@@ -1,4 +1,3 @@
-
 """
 Load Common Crawl data from dump-id & segment files
 
@@ -6,27 +5,33 @@ Code is from facebookresearch/cc_net with some modifications
 https://github.com/facebookresearch/cc_net
 
 This is a migration of the code to Dataverse.
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
 
-import io
-import os
-import json
-import gzip
-import glob
-import time
-import tempfile
-import requests
 import functools
+import glob
+import gzip
+import io
+import json
+import os
+import sys
+import tempfile
+import time
+import typing as tp
 import warnings
-import numpy as np
-
 from pathlib import Path
+from typing import Iterable, List, Optional, TextIO, Union
 from urllib.parse import urlparse
-from typing import Any, List, Text, Tuple, Optional, Union, Dict, Iterable, TextIO
+
+import numpy as np
+import requests
+from pyspark.rdd import RDD
 
 from dataverse.etl import register_etl
-from dataverse.utils.setting import SystemSetting
 from dataverse.utils.format import get_uuidv1
+from dataverse.utils.setting import SystemSetting
 
 
 def parse_doc(headers: List[str], doc: List[str]) -> Optional[dict]:
@@ -55,7 +60,7 @@ def parse_doc(headers: List[str], doc: List[str]) -> Optional[dict]:
             elif header.startswith("Content-Length:"):
                 length = int(header.split()[1])
 
-    except Exception as e:
+    except Exception:
         # logger.warning("Can't parse header:", e, headers, doc)
         return None
 
@@ -75,6 +80,7 @@ def parse_doc(headers: List[str], doc: List[str]) -> Optional[dict]:
         "title": title,
         "raw_content": "\n".join(doc),
     }
+
 
 def group_by_docs(warc_lines: Iterable[str]) -> Iterable[dict]:
     doc: List[str] = []
@@ -102,9 +108,11 @@ def group_by_docs(warc_lines: Iterable[str]) -> Iterable[dict]:
         if parsed is not None:
             yield parsed
 
+
 def _close_when_exhausted(file) -> Iterable[str]:
     with file:
         yield from file
+
 
 def open_segment_file(segment: str, verbose: bool = True) -> Iterable[str]:
     """
@@ -120,21 +128,24 @@ def open_segment_file(segment: str, verbose: bool = True) -> Iterable[str]:
         file = open(filename, "rt")
     return _close_when_exhausted(file)
 
+
 def process_segment_file(segment: str, verbose: bool = True) -> Iterable[dict]:
     for doc in group_by_docs(open_segment_file(segment, verbose=verbose)):
         doc["cc_segment"] = segment
         yield doc
 
+
 def find_wet_files(directory):
     """find *.wet, *wet.gz files recursively"""
-    return glob.glob(os.path.join(directory, '**/*.wet'), recursive=True) + \
-           glob.glob(os.path.join(directory, '**/*.wet.gz'), recursive=True)
-
+    return glob.glob(os.path.join(directory, "**/*.wet"), recursive=True) + glob.glob(
+        os.path.join(directory, "**/*.wet.gz"), recursive=True
+    )
 
 
 WET_URL_ROOT = "https://data.commoncrawl.org"
 FileDescriptor = Union[Path, List[Path], str]
 ReadableFileLike = Union[Iterable[str], FileDescriptor, None]
+
 
 def _tmp(prefix: str = None, suffix: str = None, dir: Path = None) -> Path:
     if isinstance(prefix, Path):
@@ -144,9 +155,11 @@ def _tmp(prefix: str = None, suffix: str = None, dir: Path = None) -> Path:
     _, tmp_path = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=dir)
     return Path(tmp_path)
 
+
 def _yield_from(files: list) -> Iterable[str]:
     for file in files:
         yield from open_read(file)
+
 
 def open_read(filename: ReadableFileLike) -> Iterable[str]:
     """Open the given file, list of files or files matching the given glob and read lines.
@@ -218,11 +231,8 @@ def request_get_content(url: str, n_retry: int = 3, verbose: bool = True) -> byt
             message = e.args[0] if isinstance(e.args[0], str) else ""
             if i == n_retry or "Client Error" in message:
                 raise e
-            warnings.warn(
-                f"Swallowed error {e} while downloading {url} ({i} out of {n_retry})"
-            )
-            time.sleep(10 * 2 ** i)
-
+            warnings.warn(f"Swallowed error {e} while downloading {url} ({i} out of {n_retry})")
+            time.sleep(10 * 2**i)
 
     if verbose:
         dl_time = time.time() - t0
@@ -272,14 +282,17 @@ def open_remote_file(url: str, cache: Path, verbose: bool = True) -> Iterable[st
 def cc_wet_paths_url(dump_id: str) -> str:
     return "/".join([WET_URL_ROOT, "crawl-data", "CC-MAIN-" + dump_id, "wet.paths.gz"])
 
+
 def segment_url(segment: str):
     return "/".join((WET_URL_ROOT, segment))
+
 
 def cc_segment_urls(dump_id: str, cache_dir: Path, verbose: bool = True) -> List[str]:
     wet_paths = cc_wet_paths_url(dump_id)
     wet_paths_cache = cache_dir / f"wet_{dump_id}.paths.gz"
     f = open_remote_file(wet_paths, cache=wet_paths_cache, verbose=verbose)
     return [segment.strip() for segment in f]
+
 
 def open_segment_url(segment: str, cache_dir: Path, verbose: bool = True) -> Iterable[str]:
     url = segment_url(segment)
@@ -289,12 +302,11 @@ def open_segment_url(segment: str, cache_dir: Path, verbose: bool = True) -> Ite
 
     return open_remote_file(url, cache=file, verbose=verbose)
 
+
 def process_segment_url(segment: str, cache_dir: Path, verbose: bool = True) -> Iterable[str]:
     for doc in group_by_docs(open_segment_url(segment, cache_dir, verbose=verbose)):
         doc["cc_segment"] = segment
         yield doc
-
-
 
 
 @register_etl
@@ -306,25 +318,28 @@ def data_ingestion___common_crawl___wet2raw(
     seed: int = 42,
     verbose=True,
     *args,
-    **kwargs
-):
+    **kwargs,
+) -> RDD:
     """
-    load WET to raw format as dict
+    Load WET files and convert them to raw format as a dictionary.
 
     [ what is WET? ]
-    - WET files which store extracted plain text from the data stored in the WARC‍
+    - WET files which store extracted plain text from the data stored in the WARC.
 
     Args:
-        spark (SparkSession): spark session
-        wet_path (str): path to the WET folder includes WET format files
-            - this search recursively, so you don't need to specify the path to each WET file
-            - this search for all the *.wet, *.gz files in the folder
-        segment_n (int): the number of segments to load, this is sampling
-            - one segment is about 1GB
-            - (default) set as -1 if you wanna load all the segments
-        repartition (int): the number of partitions
-        seed (int): random seed
-        verbose (bool): whether to print the information of the dataset
+        spark: The Spark session.
+        wet_path: The path to the WET folder that includes WET format files.
+            This search recursively, so you don't need to specify the path to each WET file.
+            This search for all the *.wet, *.gz files in the folder.
+        segment_n: The number of segments to load. This is a sampling parameter.
+            One segment is about 1GB.
+            Set as -1 (default) to load all the segments.
+        repartition: The number of partitions.
+        seed: The random seed.
+        verbose: Whether to print the information of the dataset.
+
+    Returns:
+        rdd: The RDD containing the converted raw data.
     """
     wet_paths = find_wet_files(wet_path)
     if segment_n > 0 and segment_n < len(wet_paths):
@@ -343,29 +358,32 @@ def data_ingestion___common_crawl___dump2raw(
     spark,
     dump: str,
     segment_n: int = -1,
-    repartition=20,
+    repartition: int = 20,
     use_cache: bool = True,
     cache_dir: str = None,
     seed: int = 42,
-    verbose=True,
+    verbose: bool = True,
     *args,
-    **kwargs
-):
+    **kwargs,
+) -> RDD:
     """
+    Ingests data from Common Crawl dump and converts it to raw format.
+
     Args:
-        spark (SparkSession): spark session
-        dump (str): dump id of the Common Crawl
-            - ex) 2023-23
-        segment_n (int): the number of segments to load, this is sampling
-            - one segment is about 1GB
-            - (default) set as -1 if you wanna load all the segments
-        repartition (int): the number of partitions
-        use_cache (bool): whether to use the cache
-            - set as False if you wanna save disk space, because the cache is huge
-            - one WET dump is about 10TB
-        cache_dir (str): cache path to save the dataset
-        seed (int): random seed
-        verbose (bool): whether to print the information of the dataset
+        spark (SparkSession): The Spark session.
+        dump (str): The dump ID of the Common Crawl. For example, '2023-23'.
+        segment_n (int, optional): The number of segments to load. Default is -1, which loads all segments.
+            Note that one segment is about 1GB.
+        repartition (int, optional): The number of partitions. Default is 20.
+        use_cache (bool, optional): Whether to use the cache. Default is True.
+            If you want to save disk space, set as False because the size of cache can be large.
+            FYI, on WET dump is about 10TB.
+        cache_dir (str, optional): The cache path to save the dataset.
+        seed (int, optional): The random seed. Default is 42.
+        verbose (bool, optional): Whether to print the information of the dataset. Default is True.
+
+    Returns:
+        RDD: The RDD containing the processed data.
     """
     if use_cache:
         if cache_dir is None:
@@ -391,11 +409,13 @@ def data_ingestion___common_crawl___dump2raw(
         wet_urls = np.random.choice(wet_urls, size=segment_n, replace=False)
 
     rdd = spark.sparkContext.parallelize(wet_urls)
-    rdd = rdd.flatMap(functools.partial(
-        process_segment_url,
-        cache_dir=cache_dir,
-        verbose=verbose,
-    ))
+    rdd = rdd.flatMap(
+        functools.partial(
+            process_segment_url,
+            cache_dir=cache_dir,
+            verbose=verbose,
+        )
+    )
     rdd = rdd.repartition(repartition)
 
     return rdd
@@ -410,29 +430,38 @@ def convert_bytes(data):
         return [convert_bytes(element) for element in data]
     return data
 
+
 @register_etl
-def data_ingestion___common_crawl___raw2ufl(spark, data, *args, **kwargs):
+def data_ingestion___common_crawl___raw2ufl(spark, data: RDD, *args, **kwargs):
     """
-    convert raw format to ufl with custom template
+    Converts raw format to UFL with custom template.
+
+    Args:
+        spark (SparkSession): The Spark session.
+        data (RDD): The input data.
+
+    Returns:
+        The converted data in UFL format.
     """
+
     def templatev1(data):
         new_data = {}
-        new_data['id'] = get_uuidv1()
-        new_data['name'] = 'common_crawl'
-        new_data['text'] = (
-            f"{data.get('raw_content', None)}"
-        )
-        new_data['meta'] = json.dumps(
-            convert_bytes({
-                'title': data.get('title', None),
-                'url': data.get('url', None),
-                'date_download': data.get('date_download', None),
-                'digest': data.get('digest', None),
-                'length': data.get('length', None),
-                'nlines': data.get('nlines', None),
-                'source_domain': data.get('source_domain', None),
-                'cc_segment': data.get('cc_segment', None),
-            })
+        new_data["id"] = get_uuidv1()
+        new_data["name"] = "common_crawl"
+        new_data["text"] = f"{data.get('raw_content', None)}"
+        new_data["meta"] = json.dumps(
+            convert_bytes(
+                {
+                    "title": data.get("title", None),
+                    "url": data.get("url", None),
+                    "date_download": data.get("date_download", None),
+                    "digest": data.get("digest", None),
+                    "length": data.get("length", None),
+                    "nlines": data.get("nlines", None),
+                    "source_domain": data.get("source_domain", None),
+                    "cc_segment": data.get("cc_segment", None),
+                }
+            )
         )
         return new_data
 

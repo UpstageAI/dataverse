@@ -1,35 +1,32 @@
-
-from pyspark.rdd import RDD
-from pyspark.sql import DataFrame
-
-from dataverse.etl import register_etl
-from dataverse.utils.format import huggingface2parquet
-from dataverse.utils.format import load_huggingface_dataset
-from dataverse.utils.format import get_uuidv1
-
-from typing import Union, List
-from omegaconf import ListConfig
-
-import datasets
-
-
 """
 Supported datasets:
 https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T
 https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T-Sample
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
+from typing import List, Union
 
-
+from dataverse.etl import register_etl
+from dataverse.utils.format import (
+    get_uuidv1,
+    huggingface2parquet,
+    load_huggingface_dataset,
+)
 
 """
 1 stage data ingestion - default
 ====================================
 direct loading ufl with one ETL process
 """
+
+
 def convert2ufl(row):
-    row['id'] = get_uuidv1()
-    row['name'] = 'red_pajama'
+    row["id"] = get_uuidv1()
+    row["name"] = "red_pajama"
     return row
+
 
 @register_etl
 def data_ingestion___red_pajama___parquet2ufl(spark, input_paths, repartition=20, *args, **kwargs):
@@ -43,10 +40,11 @@ def data_ingestion___red_pajama___parquet2ufl(spark, input_paths, repartition=20
 
     return rdd
 
+
 @register_etl
 def data_ingestion___red_pajama___hf2ufl(
     spark,
-    name_or_path : Union[str, List[str]] = 'togethercomputer/RedPajama-Data-1T-Sample',
+    name_or_path: Union[str, List[str]] = "togethercomputer/RedPajama-Data-1T-Sample",
     split=None,
     from_disk=False,
     repartition=20,
@@ -82,10 +80,12 @@ def data_ingestion___red_pajama___hf2ufl(
 ====================================
 loading ufl with custom template with two ETL process
 """
+
+
 @register_etl
 def data_ingestion___red_pajama___hf2raw(
     spark,
-    name_or_path : Union[str, List[str]] = 'togethercomputer/RedPajama-Data-1T-Sample',
+    name_or_path: Union[str, List[str]] = "togethercomputer/RedPajama-Data-1T-Sample",
     split=None,
     repartition=20,
     verbose=True,
@@ -116,14 +116,16 @@ def data_ingestion___red_pajama___raw2ufl_templatev1(spark, ufl, *args, **kwargs
     """
     convert raw format to ufl with custom template
     """
+
     def templatev1(row):
-        row['id'] = get_uuidv1()
-        row['name'] = 'red_pajama'
+        row["id"] = get_uuidv1()
+        row["name"] = "red_pajama"
         return row
 
     ufl = ufl.map(lambda x: templatev1(x))
 
     return ufl
+
 
 @register_etl
 def data_ingestion___red_pajama___raw2ufl_templatev2(spark, ufl, *args, **kwargs):
