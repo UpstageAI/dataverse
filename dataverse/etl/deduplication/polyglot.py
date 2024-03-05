@@ -1,23 +1,23 @@
-
 """
 Code is from EleutherAI/dps
 https://github.com/EleutherAI/dps/blob/master/dps/spark/jobs/dedup_job.py
 
 This is a migration of the deduplication job from the DPS project to the Dataverse.
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
 
-import random
 import binascii
-import numpy as np
+import random
 from itertools import combinations
+from typing import List, Union
 
+import numpy as np
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 
 from dataverse.etl import register_etl
-
-from typing import Union, List
-
 
 MERSENNE_PRIME = (1 << 61) - 1
 MAX_HASH = (1 << 32) - 1
@@ -96,9 +96,7 @@ def explore_dedup_instance(hash_groups, threshold: float = 0.8):
     if len(hash_groups) <= 1:
         return
 
-    group_represent_text = hash_groups[0][
-        "text"
-    ]  # not to remove all text instances in group.
+    group_represent_text = hash_groups[0]["text"]  # not to remove all text instances in group.
     pairs = combinations(hash_groups, 2)
 
     for d_1, d_2 in pairs:
@@ -106,9 +104,7 @@ def explore_dedup_instance(hash_groups, threshold: float = 0.8):
         if sim_score >= threshold:
             dedup_text = [d_1["text"], d_2["text"]]
             if group_represent_text in dedup_text:
-                yield dedup_text[0] if dedup_text[
-                    0
-                ] != group_represent_text else dedup_text[1]
+                yield dedup_text[0] if dedup_text[0] != group_represent_text else dedup_text[1]
             else:
                 yield random.choice(dedup_text)
 
@@ -126,9 +122,27 @@ def deduplication___polyglot___minhash(
     **kwargs,
 ):
     """
-    fuzzy deduplication
+    Fuzzy deduplication using MinHash algorithm.
 
-    for UFL
+    Args:
+        spark (SparkSession): The SparkSession object.
+        data (Union[RDD, DataFrame]): The input data to be deduplicated.
+        expand_size (int, optional): The size of expansion for each instance. Defaults to 64.
+        n_gram (int, optional): The size of n-gram for tokenization. Defaults to 15.
+        seed (int, optional): The seed value for random number generation. Defaults to 1.
+        char_level (bool, optional): Whether to use character-level tokenization. Defaults to False.
+        sim_threshold (float, optional): The similarity threshold for deduplication. Defaults to 0.8.
+        *args: Additional positional arguments.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        RDD or DataFrame: The deduplicated data.
+
+    Raises:
+        None
+
+    Examples:
+        >>> deduplication___polyglot___minhash()(spark, data, expand_size=128, sim_threshold=0.9)
     """
     if isinstance(data, DataFrame):
         data = data.rdd
@@ -145,15 +159,11 @@ def deduplication___polyglot___minhash(
             )
         )
         .reduceByKey(lambda x, y: x + y)
-        .flatMap(
-            lambda x: explore_dedup_instance(x[1], threshold=sim_threshold)
-        )
+        .flatMap(lambda x: explore_dedup_instance(x[1], threshold=sim_threshold))
         .distinct()
         .map(lambda x: (x, dict(text=x)))
         .cache()
     )
 
-    data = data.map(lambda x: (x["text"], x)).subtractByKey(overlap_kv_rdd).map(
-        lambda x: x[1]
-    )
+    data = data.map(lambda x: (x["text"], x)).subtractByKey(overlap_kv_rdd).map(lambda x: x[1])
     return data

@@ -1,28 +1,29 @@
-
 """
 Code is from ChenghaoMou/text-dedup
 https://github.com/ChenghaoMou/text-dedup/blob/main/text_dedup/minhash_spark.py
 
 This is a migration of the code to Dataverse.
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
 
+import hashlib
+import re
+import struct
+import sys
+from itertools import tee
+from operator import add
+from typing import Any, List, Text, Tuple, Union
+
+import numpy as np
 import pyspark
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
-from dataverse.etl.registry import register_etl
-from typing import Union, List, Tuple, Any, Text
-
-import re
-import sys
-import hashlib
-import struct
-import numpy as np
-
-from operator import add
-from itertools import tee
 from scipy.integrate import quad as integrate
 
+from dataverse.etl.registry import register_etl
 
 NON_ALPHA = re.compile(r"\W", re.UNICODE)
 DTYPE = np.uint32
@@ -70,7 +71,11 @@ def small_star(edges):
         node, neighbors = x
         nodes = neighbors + [node]
         min_node = min(nodes)
-        new_edges = set((neighbor, min_node) for neighbor in nodes if (neighbor <= node and neighbor != min_node))
+        new_edges = set(
+            (neighbor, min_node)
+            for neighbor in nodes
+            if (neighbor <= node and neighbor != min_node)
+        )
         change = len(new_edges.difference(set([(node, neighbor) for neighbor in neighbors])))
         return (list(new_edges), change)
 
@@ -99,7 +104,9 @@ def large_star(edges):
         node, neighbors = x
         nodes = neighbors + [node]
         min_node = min(nodes)
-        new_edges = set((neighbor, min_node) for neighbor in (neighbors + [node]) if (neighbor > node))
+        new_edges = set(
+            (neighbor, min_node) for neighbor in (neighbors + [node]) if (neighbor > node)
+        )
         change = len(new_edges.difference(set([(node, neighbor) for neighbor in neighbors])))
         return list(new_edges), change
 
@@ -137,6 +144,7 @@ def alternating_algo(edges, max_iteration: int) -> Tuple[Any, bool, int]:
         max_iteration -= 1
 
     return edges, False, curr_iteration
+
 
 # endregion
 
@@ -258,7 +266,10 @@ def generate_hash_values(
     >>> sum(len(h) for _, h, _ in res) == len(res) * 25 * np.dtype(DTYPE).itemsize
     True
     """
-    tokens = {" ".join(t).encode("utf-8") for t in ngrams(NON_ALPHA.split(content.lower()), ngram_size, min_length)}
+    tokens = {
+        " ".join(t).encode("utf-8")
+        for t in ngrams(NON_ALPHA.split(content.lower()), ngram_size, min_length)
+    }
     a, b = permutations
     hv = np.array([sha1_hash32(token) for token in tokens], dtype=DTYPE)
     phv = np.bitwise_and(((hv * np.tile(a, (len(tokens), 1)).T).T + b) % MOD_PRIME, MAX_HASH)  # type: ignore
@@ -268,6 +279,7 @@ def generate_hash_values(
 
 
 # endregion
+
 
 # region: MinHashLSH
 def optimal_param(
@@ -337,40 +349,47 @@ def optimal_param(
 
 # endregion
 
+
 # region: Quality Control
 def process_cluster(cluster: List[Any]) -> List[Any]:
     return cluster[:1]
-# endregion
 
+
+# endregion
 
 
 @register_etl
 def deduplication___minhash___lsh_jaccard(
     spark,
     data: Union[RDD, DataFrame],
-    threshold=0.7,
-    ngram_size=5,
-    min_length=5,
-    num_perm=250,
-    band_n=None,
-    row_per_band=None,
-    subset="text",
-    seed=42,
+    threshold: float = 0.7,
+    ngram_size: int = 5,
+    min_length: int = 5,
+    num_perm: int = 250,
+    band_n: int = None,
+    row_per_band: int = None,
+    subset: str = "text",
+    seed: int = 42,
     *args,
     **kwargs,
-):
+) -> RDD:
     """
-    fuzzy deduplication using minhash and lsh
-    reference - ChenghaoMou/text-dedup
+    Fuzzy deduplication using MinHash and Locality Sensitive Hashing (LSH).
 
-    args:
-        threshold: similarity threshold
-        ngram_size: n-gram size
-        min_length: minimum token length of document to be considered
-        num_perm: number of permutations
-        band_n: number of bands
-        row_per_band: number of rows per band
-        subset: column to deduplicate on
+    Args:
+        spark (SparkSession): The SparkSession object.
+        data (Union[RDD, DataFrame]): Input data to be deduplicated.
+        threshold (float, optional): Similarity threshold. Default is 0.7.
+        ngram_size (int, optional): Size of n-grams. Default is 5.
+        min_length (int, optional): Minimum token length of document to be considered. Default is 5.
+        num_perm (int, optional): Number of permutations. Default is 250.
+        band_n (int, optional): Number of bands. If not provided, it will be calculated based on the threshold and num_perm.
+        row_per_band (int, optional): Number of rows per band. If not provided, it will be calculated based on the threshold and num_perm.
+        subset (str, optional): Column to deduplicate on. Default is "text".
+        seed (int, optional): Random seed. Default is 42.
+
+    Returns:
+        RDD: Deduplicated data as a DataFrame.
     """
     if isinstance(data, RDD):
         data = data.toDF()
