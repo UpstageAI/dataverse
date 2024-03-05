@@ -6,12 +6,16 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import inspect
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
 import sys
+
+from sphinx.application import Sphinx
 
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("../../dataverse"))
@@ -63,3 +67,33 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+
+# -- Handle register_etl decorator -------------------------------------------------
+
+
+def process_signature(
+    app: Sphinx, what: str, name: str, obj, options, signature, return_annotation
+):
+    if what == "function" and hasattr(obj, "run"):
+        original_func = obj.run.__wrapped__
+        new_signature = inspect.signature(original_func)
+        parameters = list(new_signature.parameters.values())
+        new_signature = new_signature.replace(
+            parameters=[inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+            + parameters
+        )
+        return str(new_signature), return_annotation
+
+    return signature, return_annotation
+
+
+def skip_undoc_members(app, what, name, obj, skip, options):
+    if inspect.isclass(obj) and not hasattr(obj, "__is_etl__"):
+        return None
+    return True
+
+
+def setup(app):
+    app.connect("autodoc-process-signature", process_signature)
+    app.connect("autodoc-skip-member", skip_undoc_members)
