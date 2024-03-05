@@ -132,7 +132,7 @@ Dataverse is completely freely-accessible open-source and licensed under the MIT
 @misc{dataverse,
   title = {Dataverse},
   author = {Hyunbyung Park, Sukyung Lee, Gyoungjin Gim, Yungi Kim, Seonghoon Yang, Jihoo Kim, Changbae Ahn, Chanjun Park},
-  year = {2023},
+  year = {2024},
   publisher = {GitHub, Upstage AI},
   howpublished = {\url{https://github.com/UpstageAI/dataverse}},
 }
