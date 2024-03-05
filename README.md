@@ -12,7 +12,7 @@
 The Universe of Data. 
 All about Data, Data Science, and Data Engineering.
 
-[Docs](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/guideline) • [API Reference](https://UpstageAI.github.io/dataverse/) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
+[Docs](https://data-verse.gitbook.io/docs/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/guideline) • [API Reference](https://UpstageAI.github.io/dataverse/) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
 <br><br>
 <div align="left">
 
