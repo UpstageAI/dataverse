@@ -12,7 +12,7 @@
 The Universe of Data. 
 All about Data, Data Science, and Data Engineering.
 
-[Docs](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/) • [Guidelines](https://github.com/UpstageAI/dataverse/tree/main/guideline) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
+[Docs](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/guideline) • [API Reference](https://UpstageAI.github.io/dataverse/) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
 <br><br>
 <div align="left">
 
@@ -118,7 +118,7 @@ spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
 
 ## 🌌 Acknowledgements
 
-Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an data ecosystem for LLM(Large Language Model). Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of LLM.
 
 ## 🌌 License
 Dataverse is completely freely-accessible open-source and licensed under the Apache-2.0 license.
