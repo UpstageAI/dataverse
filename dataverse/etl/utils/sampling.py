@@ -1,34 +1,48 @@
-
 """
 Sampling module for data ingestion
+
+Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license
 """
 
-from pyspark.rdd import RDD
+from typing import Union
+
+from pyspark.rdd import RDD, DataFrame
+
 from dataverse.etl import register_etl
+
 
 @register_etl
 def utils___sampling___random(
     spark,
-    ufl: RDD,
-    replace=False,
-    sample_n_or_frac=0.1,
-    seed=42,
+    data: Union[RDD, DataFrame],
+    replace: bool = False,
+    sample_n_or_frac: float = 0.1,
+    seed: int = 42,
     *args,
     **kwargs
-):
+) -> RDD:
     """
-    random sampling
+    Randomly sample the input RDD.
 
     Args:
-        ufl: ufl rdd
-        replace: with replacement
-        sample_n_or_frac: sample_n or fraction
-        seed: seed
+        spark (SparkSession): The Spark session object.
+        data (Union[RDD, DataFrame]): The input data to be sampled.
+        replace (bool, optional): Whether to sample with replacement. Defaults to False.
+        sample_n_or_frac (float, optional): Number of samples to take or fraction of the RDD to sample. Defaults to 0.1
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+
+    Returns:
+        RDD: Sampled RDD
     """
+    if isinstance(data, DataFrame):
+        data = data.rdd
+        data = data.map(lambda row: row.asDict())
+
     if isinstance(sample_n_or_frac, float):
-        ufl = ufl.sample(replace, sample_n_or_frac, seed)
+        data = data.sample(replace, sample_n_or_frac, seed)
 
     # XXX: Take too long, 1M sample takes over 10 mins and didn't finish
     elif isinstance(sample_n_or_frac, int):
-        ufl = ufl.takeSample(replace, sample_n_or_frac, seed)
-    return ufl
+        data = data.takeSample(replace, sample_n_or_frac, seed)
+    return data
