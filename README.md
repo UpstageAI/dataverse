@@ -22,7 +22,6 @@ Dataverse is a freely-accessible open-source project that supports your ETL(Extr
 <br>
 
 ## 🌌 Installation
-Currently, pip install is not supported. We will update it soon! <br>
 Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
 
 ### 🌠 Prerequisites
