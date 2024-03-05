@@ -15,6 +15,7 @@ import inspect
 import os
 import sys
 
+import sphinx_pdj_theme
 from sphinx.application import Sphinx
 
 sys.path.insert(0, os.path.abspath("../.."))
@@ -61,7 +62,8 @@ exclude_patterns = []
 # a list of builtin themes.
 
 html_permalinks_icon = "<span>#</span>"
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_pdj_theme"
+html_theme_path = [sphinx_pdj_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
