@@ -12,8 +12,14 @@ BUILDDIR      = build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+.PHONY: help Makefile html
 
+html:
+	@echo "Setting environment variable for the build process..."
+	@export DATAVERSE_BUILD_DOC=true && \
+	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O) && \
+	echo "Build is finished. Cleaning up environment variable." && \
+	unset DATAVERSE_BUILD_DOC
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
