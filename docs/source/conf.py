@@ -29,7 +29,7 @@ copyright = "2024, Upstage AI"
 author = "Upstage AI"
 
 # The full version, including alpha/beta/rc tags
-release = "1.0.0"
+release = "1.0.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -63,9 +63,8 @@ exclude_patterns = []
 # a list of builtin themes.
 
 html_permalinks_icon = "<span>#</span>"
-html_theme = "sphinx_pdj_theme"
-html_theme_path = [sphinx_pdj_theme.get_html_theme_path()]
-html_baseurl = "https://UpstageAI.github.io/dataverse/"
+html_theme = "sphinx_rtd_theme"
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -83,7 +82,9 @@ def process_signature(
         new_signature = inspect.signature(original_func)
         parameters = list(new_signature.parameters.values())
         new_signature = new_signature.replace(
-            parameters=[inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+            parameters=[
+                inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)
+            ]
             + parameters
         )
         return str(new_signature), return_annotation
