@@ -1,0 +1,606 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="" lang="" version="-//W3C//DTD XHTML 1.1//EN" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="">
+    <link rel="icon" type="image/x-icon" href="">
+
+  
+  <title>etl.data_ingestion package &mdash; dataverse 1.0.0 documentation</title>
+  
+
+  
+
+  
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'/>
+
+
+  <link rel="stylesheet" href="../_static/css/img.css" type="text/css"/>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/css/pdj.css" type="text/css" />
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/darker.css" type="text/css" media="(prefers-color-scheme: dark)"/>
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="dataverse 1.0.0 documentation" href="../index.html"/>
+        <link rel="up" title="etl package" href="etl.html"/>
+        <link rel="next" title="etl.data_load package" href="etl.data_load.html"/>
+        <link rel="prev" title="etl.cleaning package" href="etl.cleaning.html"/>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="cache-control" content="public" />
+    <meta name="robots" content="follow, all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+    <script type="module" src="https://googlechromelabs.github.io/dark-mode-toggle/src/dark-mode-toggle.mjs"></script>
+
+  </head>
+
+  <body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+	
+        <a href="../index.html" class="fa fa-home"> dataverse </a>
+	
+	
+        <div role="search">
+	  
+	  <form id ="rtd-search-form" class="wy-form"
+		action="../search.html" method="get">
+	    <input type="text" name="q" placeholder="Search docs" />
+	    <input type="hidden" name="check_keywords" value="yes" />
+	    <input type="hidden" name="area" value="default" />
+	  </form>
+	  
+	</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	
+          
+          
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="etl.html">etl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="etl.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#module-etl.pipeline">etl.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#module-etl.registry">etl.registry module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.cleaning.html">etl.cleaning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.char">etl.cleaning.char module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.document">etl.cleaning.document module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.html">etl.cleaning.html module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.korean">etl.cleaning.korean module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.length">etl.cleaning.length module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.number">etl.cleaning.number module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.table">etl.cleaning.table module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.cleaning.html#module-etl.cleaning.unicode">etl.cleaning.unicode module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">etl.data_ingestion package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.arrow">etl.data_ingestion.arrow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.common_crawl">etl.data_ingestion.common_crawl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.csv">etl.data_ingestion.csv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.cultura_x">etl.data_ingestion.cultura_x module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.huggingface">etl.data_ingestion.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.parquet">etl.data_ingestion.parquet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.red_pajama">etl.data_ingestion.red_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.slim_pajama">etl.data_ingestion.slim_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.data_ingestion.test">etl.data_ingestion.test module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.data_load.html">etl.data_load package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.aws">etl.data_load.aws module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.huggingface">etl.data_load.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.parquet">etl.data_load.parquet module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.pii.html">etl.pii package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#module-etl.pii.card">etl.pii.card module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#module-etl.pii.nin">etl.pii.nin module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.quality.html">etl.quality package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.quality.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.quality.html#module-etl.quality.language">etl.quality.language module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.utils.html">etl.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.log">etl.utils.log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.sampling">etl.utils.sampling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.statistics">etl.utils.statistics module</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+
+      </div>
+      &nbsp;
+    </nav>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      <nav class="wy-nav-top" id="barra-mobile" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">dataverse </a>
+      </nav>
+
+      <div class="wy-nav-content">
+	<div class="fundo-claro">
+	</div>
+	<div class="fundo-escuro">
+	</div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+	    
+	    <!-- <ul class="wy-breadcrumbs"> -->
+	    <!--   <li><a href="#">Docs</a> &raquo;</li> -->
+
+	    <!--   <li>Features</li> -->
+	    <!--   <li class="wy-breadcrumbs-aside"> -->
+
+	    <!-- 	<a href="_sources/index.txt" rel="nofollow"> View page source</a> -->
+
+	    <!--   </li> -->
+	    <!-- </ul> -->
+	    <!-- <hr/> -->
+	  </div>
+          <div role="main" class="">
+
+	    <div id="content" class="hfeed entry-container hentry">
+      	<div id="dark-mode-toggle-container">
+	  <dark-mode-toggle appearance="toggle" dark="switch to light mode" light="switch to dark mode">
+	  </dark-mode-toggle>
+	</div>
+  <section id="etl-data-ingestion-package">
+<h1>etl.data_ingestion package<a class="headerlink" href="#etl-data-ingestion-package" title="Link to this heading"><span>#</span></a></h1>
+<section id="module-etl.data_ingestion.arrow">
+<span id="etl-data-ingestion-arrow-module"></span><h2>etl.data_ingestion.arrow module<a class="headerlink" href="#module-etl.data_ingestion.arrow" title="Link to this heading"><span>#</span></a></h2>
+<p>Load Arrow.
+Support direct loading of arrow saved huggingface dataset to spark dataframe.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.arrow.data_ingestion___arrow___hf2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.arrow.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___arrow___hf2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_partition_mb_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_partition_mb_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.arrow.data_ingestion___arrow___hf2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Directly loads the arrow saved HuggingFace dataset to raw format as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The path of the arrow folders.</p></li>
+<li><p><strong>sample_n</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of arrow files to be sampled. Defaults to -1.
+If sample_n is -1, all arrow files will be loaded.</p></li>
+<li><p><strong>arrow_partition_mb_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The size of each arrow partition in MB. Defaults to -1.
+If arrow_partition_size is -1, it will repartition arrow files by the number of arrow files.
+This assumes that arrow file size is evenly distributed. When there is data skew in arrow file size, it is recommended to use the default (-1).</p></li>
+<li><p><strong>raw_partition_mb_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The size of each raw partition in MB. Defaults to 256.
+This is activated only when repartition is -1.</p></li>
+<li><p><strong>repartition</strong> (<em>int</em><em>, </em><em>optional</em>) – Manually choose the number of partitions. Defaults to -1.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – The seed for sampling. Defaults to 42.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print the information of the dataset. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The RDD containing the raw data in dictionary format.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;ducky&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">save_to_disk</span><span class="p">(</span><span class="s1">&#39;your/path/to/ducky&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_ingestion___arrow___hf2raw</span><span class="p">()(</span><span class="n">spark</span><span class="p">,</span> <span class="s1">&#39;your/path/to/ducky&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Caveats:</dt><dd><p>Arrow paths are repartitioned by the number of arrow files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.common_crawl">
+<span id="etl-data-ingestion-common-crawl-module"></span><h2>etl.data_ingestion.common_crawl module<a class="headerlink" href="#module-etl.data_ingestion.common_crawl" title="Link to this heading"><span>#</span></a></h2>
+<p>Load Common Crawl data from dump-id &amp; segment files</p>
+<p>Code is from facebookresearch/cc_net with some modifications
+<a class="reference external" href="https://github.com/facebookresearch/cc_net">https://github.com/facebookresearch/cc_net</a></p>
+<p>This is a migration of the code to Dataverse.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.common_crawl.data_ingestion___common_crawl___wet2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.common_crawl.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___common_crawl___wet2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___wet2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Load WET files and convert them to raw format as a dictionary.</p>
+<p>[ what is WET? ]
+- WET files which store extracted plain text from the data stored in the WARC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> – The Spark session.</p></li>
+<li><p><strong>wet_path</strong> – The path to the WET folder that includes WET format files.
+This search recursively, so you don’t need to specify the path to each WET file.
+This search for all the <a href="#id1"><span class="problematic" id="id2">*</span></a>.wet, <a href="#id3"><span class="problematic" id="id4">*</span></a>.gz files in the folder.</p></li>
+<li><p><strong>segment_n</strong> – The number of segments to load. This is a sampling parameter.
+One segment is about 1GB.
+Set as -1 (default) to load all the segments.</p></li>
+<li><p><strong>repartition</strong> – The number of partitions.</p></li>
+<li><p><strong>seed</strong> – The random seed.</p></li>
+<li><p><strong>verbose</strong> – Whether to print the information of the dataset.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The RDD containing the converted raw data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdd</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.common_crawl.data_ingestion___common_crawl___dump2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.common_crawl.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___common_crawl___dump2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dump</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___dump2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Ingests data from Common Crawl dump and converts it to raw format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session.</p></li>
+<li><p><strong>dump</strong> (<em>str</em>) – The dump ID of the Common Crawl. For example, ‘2023-23’.</p></li>
+<li><p><strong>segment_n</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of segments to load. Default is -1, which loads all segments.
+Note that one segment is about 1GB.</p></li>
+<li><p><strong>repartition</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of partitions. Default is 20.</p></li>
+<li><p><strong>use_cache</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use the cache. Default is True.
+If you want to save disk space, set as False because the size of cache can be large.
+FYI, on WET dump is about 10TB.</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The cache path to save the dataset.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – The random seed. Default is 42.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print the information of the dataset. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The RDD containing the processed data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.common_crawl.data_ingestion___common_crawl___raw2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.common_crawl.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___common_crawl___raw2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___raw2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Converts raw format to UFL with custom template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session.</p></li>
+<li><p><strong>data</strong> (<em>RDD</em>) – The input data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The converted data in UFL format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.csv">
+<span id="etl-data-ingestion-csv-module"></span><h2>etl.data_ingestion.csv module<a class="headerlink" href="#module-etl.data_ingestion.csv" title="Link to this heading"><span>#</span></a></h2>
+<p>Load CSV data</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.csv.data_ingestion___csv___csv2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.csv.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___csv___csv2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.csv.data_ingestion___csv___csv2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Converts CSV data to raw RDD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session.</p></li>
+<li><p><strong>path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The path(s) to the CSV file(s).</p></li>
+<li><p><strong>repartition</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of partitions for the RDD. Defaults to 20.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print the information of the dataset.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The raw RDD containing the CSV data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.cultura_x">
+<span id="etl-data-ingestion-cultura-x-module"></span><h2>etl.data_ingestion.cultura_x module<a class="headerlink" href="#module-etl.data_ingestion.cultura_x" title="Link to this heading"><span>#</span></a></h2>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.cultura_x.data_ingestion___cultura_x___raw2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.cultura_x.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___cultura_x___raw2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ufl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.cultura_x.data_ingestion___cultura_x___raw2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Converts raw format to UFL with custom template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>ufl</strong> (<em>RDD</em>) – The input DataFrame in raw format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed DataFrame in UFL format.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.huggingface">
+<span id="etl-data-ingestion-huggingface-module"></span><h2>etl.data_ingestion.huggingface module<a class="headerlink" href="#module-etl.data_ingestion.huggingface" title="Link to this heading"><span>#</span></a></h2>
+<p>Load Huggingface data</p>
+<p>This is used just to load huggingface dataset without any refomatting</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.huggingface.data_ingestion___huggingface___hf2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.huggingface.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___huggingface___hf2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_or_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.huggingface.data_ingestion___huggingface___hf2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Convert a HuggingFace dataset to raw format as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session.</p></li>
+<li><p><strong>name_or_path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The name or path of the HuggingFace dataset.</p></li>
+<li><p><strong>split</strong> (<em>int</em><em>, </em><em>optional</em>) – The split of the dataset. Defaults to None.</p></li>
+<li><p><strong>from_disk</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to load from disk. Defaults to False.
+No split is allowed when from_disk is True.</p></li>
+<li><p><strong>repartition</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of partitions. Defaults to 20.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print the information of the dataset. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The converted dataset as an RDD of dictionaries.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdd</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.parquet">
+<span id="etl-data-ingestion-parquet-module"></span><h2>etl.data_ingestion.parquet module<a class="headerlink" href="#module-etl.data_ingestion.parquet" title="Link to this heading"><span>#</span></a></h2>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.parquet.data_ingestion___parquet___pq2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.parquet.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___parquet___pq2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.parquet.data_ingestion___parquet___pq2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Reads parquet files into an RDD and repartitions it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session.</p></li>
+<li><p><strong>path</strong> (<em>str</em><em> or </em><em>list</em>) – The path of the parquet files.</p></li>
+<li><p><strong>repartition</strong> (<em>int</em>) – The number of partitions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The repartitioned RDD containing the data from the parquet files.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdd</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.red_pajama">
+<span id="etl-data-ingestion-red-pajama-module"></span><h2>etl.data_ingestion.red_pajama module<a class="headerlink" href="#module-etl.data_ingestion.red_pajama" title="Link to this heading"><span>#</span></a></h2>
+<p>Supported datasets:
+<a class="reference external" href="https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T">https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T</a>
+<a class="reference external" href="https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T-Sample">https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T-Sample</a></p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.red_pajama.data_ingestion___red_pajama___parquet2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.red_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___red_pajama___parquet2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___parquet2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert parquet file to ufl</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.red_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___red_pajama___hf2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_or_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'togethercomputer/RedPajama-Data-1T-Sample'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_disk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert huggingface dataset to ufl</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – spark session</p></li>
+<li><p><strong>name_or_path</strong> (<em>str</em><em> or </em><em>list</em>) – the name or path of the huggingface dataset</p></li>
+<li><p><strong>split</strong> (<em>str</em>) – the split of the dataset</p></li>
+<li><p><strong>from_disk</strong> (<em>bool</em>) – whether to load from disk
+- no split is allowed when from_disk is True</p></li>
+<li><p><strong>repartition</strong> (<em>int</em>) – the number of partitions</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print the information of the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2raw">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.red_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___red_pajama___hf2raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_or_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'togethercomputer/RedPajama-Data-1T-Sample'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2raw" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert huggingface dataset to raw format as dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – spark session</p></li>
+<li><p><strong>name_or_path</strong> (<em>str</em><em> or </em><em>list</em>) – the name or path of the huggingface dataset</p></li>
+<li><p><strong>split</strong> (<em>str</em>) – the split of the dataset</p></li>
+<li><p><strong>repartition</strong> (<em>int</em>) – the number of partitions</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print the information of the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.red_pajama.data_ingestion___red_pajama___raw2ufl_templatev1">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.red_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___red_pajama___raw2ufl_templatev1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ufl</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___raw2ufl_templatev1" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert raw format to ufl with custom template</p>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.slim_pajama">
+<span id="etl-data-ingestion-slim-pajama-module"></span><h2>etl.data_ingestion.slim_pajama module<a class="headerlink" href="#module-etl.data_ingestion.slim_pajama" title="Link to this heading"><span>#</span></a></h2>
+<p>Supported datasets:
+<a class="reference external" href="https://huggingface.co/datasets/cerebras/SlimPajama-627B">https://huggingface.co/datasets/cerebras/SlimPajama-627B</a></p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___parquet2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.slim_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___slim_pajama___parquet2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___parquet2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert parquet file to ufl</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___hf2ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.slim_pajama.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___slim_pajama___hf2ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_or_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cerebras/SlimPajama-627B'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_disk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___hf2ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>convert huggingface dataset to ufl</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – spark session</p></li>
+<li><p><strong>name_or_path</strong> (<em>str</em><em> or </em><em>list</em>) – the name or path of the huggingface dataset</p></li>
+<li><p><strong>split</strong> (<em>str</em>) – the split of the dataset</p></li>
+<li><p><strong>from_disk</strong> (<em>bool</em>) – whether to load from disk
+- no split is allowed when from_disk is True</p></li>
+<li><p><strong>repartition</strong> (<em>int</em>) – the number of partitions</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print the information of the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.data_ingestion.test">
+<span id="etl-data-ingestion-test-module"></span><h2>etl.data_ingestion.test module<a class="headerlink" href="#module-etl.data_ingestion.test" title="Link to this heading"><span>#</span></a></h2>
+<p>special purpose to create fake data for testing or debugging</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.data_ingestion.test.data_ingestion___test___generate_fake_ufl">
+<span class="sig-prename descclassname"><span class="pre">etl.data_ingestion.test.</span></span><span class="sig-name descname"><span class="pre">data_ingestion___test___generate_fake_ufl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repartition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.data_ingestion.test.data_ingestion___test___generate_fake_ufl" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Generate fake data for testing or debugging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of data to generate. Default is 100.</p></li>
+<li><p><strong>repartition</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of partitions. Default is 20.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print the information of the dataset. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated fake data RDD.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+	    </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="etl.data_load.html" class="btn btn-neutral float-right" title="etl.data_load package">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="etl.cleaning.html" class="btn btn-neutral" title="etl.cleaning package"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Upstage AI.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/jucacrispim/sphinx_pdj_theme">theme</a> provided by <a href="https://poraodojuca.dev">Porão do Juca</a>.
+
+</footer>
+	</div>
+	</div>
+	  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/doctools.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/sphinx_highlight.js">
+
+    </script>
+
+  
+
+   <script type="text/javascript"
+           src="../_static/js/theme.js"></script>
+
+   <script type="text/javascript"
+           src="../_static/js/pdj.js"></script>
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+  </body>
+</html>

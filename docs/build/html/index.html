@@ -1,0 +1,435 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="" lang="" version="-//W3C//DTD XHTML 1.1//EN" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="">
+    <link rel="icon" type="image/x-icon" href="">
+
+  
+  <title>Dataverse &mdash; dataverse 1.0.0 documentation</title>
+  
+
+  
+
+  
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'/>
+
+
+  <link rel="stylesheet" href="_static/css/img.css" type="text/css"/>
+  
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/pdj.css" type="text/css" />
+  
+
+  
+
+  <link rel="stylesheet" href="_static/css/darker.css" type="text/css" media="(prefers-color-scheme: dark)"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="dataverse 1.0.0 documentation" href="#"/>
+        <link rel="next" title="etl package" href="etl/etl.html"/>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="cache-control" content="public" />
+    <meta name="robots" content="follow, all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+    <script type="module" src="https://googlechromelabs.github.io/dark-mode-toggle/src/dark-mode-toggle.mjs"></script>
+
+  </head>
+
+  <body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+	
+        <a href="#" class="fa fa-home"> dataverse </a>
+	
+	
+        <div role="search">
+	  
+	  <form id ="rtd-search-form" class="wy-form"
+		action="search.html" method="get">
+	    <input type="text" name="q" placeholder="Search docs" />
+	    <input type="hidden" name="check_keywords" value="yes" />
+	    <input type="hidden" name="area" value="default" />
+	  </form>
+	  
+	</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	
+          
+          
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.html">etl package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#module-etl.pipeline">etl.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#module-etl.registry">etl.registry module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.cleaning.html">etl.cleaning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.char">etl.cleaning.char module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.document">etl.cleaning.document module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.html">etl.cleaning.html module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.korean">etl.cleaning.korean module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.length">etl.cleaning.length module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.number">etl.cleaning.number module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.table">etl.cleaning.table module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.unicode">etl.cleaning.unicode module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.data_ingestion.html">etl.data_ingestion package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.arrow">etl.data_ingestion.arrow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.common_crawl">etl.data_ingestion.common_crawl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.csv">etl.data_ingestion.csv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.cultura_x">etl.data_ingestion.cultura_x module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.huggingface">etl.data_ingestion.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.parquet">etl.data_ingestion.parquet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.red_pajama">etl.data_ingestion.red_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.slim_pajama">etl.data_ingestion.slim_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.test">etl.data_ingestion.test module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.data_load.html">etl.data_load package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.aws">etl.data_load.aws module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.huggingface">etl.data_load.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.parquet">etl.data_load.parquet module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.pii.html">etl.pii package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#module-etl.pii.card">etl.pii.card module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#module-etl.pii.nin">etl.pii.nin module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.quality.html">etl.quality package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.quality.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.quality.html#module-etl.quality.language">etl.quality.language module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.utils.html">etl.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.log">etl.utils.log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.sampling">etl.utils.sampling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.statistics">etl.utils.statistics module</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+
+      </div>
+      &nbsp;
+    </nav>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      <nav class="wy-nav-top" id="barra-mobile" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">dataverse </a>
+      </nav>
+
+      <div class="wy-nav-content">
+	<div class="fundo-claro">
+	</div>
+	<div class="fundo-escuro">
+	</div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+	    
+	    <!-- <ul class="wy-breadcrumbs"> -->
+	    <!--   <li><a href="#">Docs</a> &raquo;</li> -->
+
+	    <!--   <li>Features</li> -->
+	    <!--   <li class="wy-breadcrumbs-aside"> -->
+
+	    <!-- 	<a href="_sources/index.txt" rel="nofollow"> View page source</a> -->
+
+	    <!--   </li> -->
+	    <!-- </ul> -->
+	    <!-- <hr/> -->
+	  </div>
+          <div role="main" class="">
+
+	    <div id="content" class="hfeed entry-container hentry">
+      	<div id="dark-mode-toggle-container">
+	  <dark-mode-toggle appearance="toggle" dark="switch to light mode" light="switch to dark mode">
+	  </dark-mode-toggle>
+	</div>
+  <section id="dataverse">
+<h1>Dataverse<a class="headerlink" href="#dataverse" title="Link to this heading"><span>#</span></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.html">etl package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.bias.html">etl.bias package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html">etl.cleaning package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html">etl.data_ingestion package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_load.html">etl.data_load package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.decontamination.html">etl.decontamination package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.deduplication.html">etl.deduplication package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.pii.html">etl.pii package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.quality.html">etl.quality package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.toxicity.html">etl.toxicity package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.utils.html">etl.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#module-etl.pipeline">etl.pipeline module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl-interface">ETL Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.pipeline.ETLPipeline"><code class="docutils literal notranslate"><span class="pre">ETLPipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id0"><code class="docutils literal notranslate"><span class="pre">status()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id1"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id2"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id3"><code class="docutils literal notranslate"><span class="pre">setup_spark_conf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id4"><code class="docutils literal notranslate"><span class="pre">sample()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id5"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.pipeline.ETLPipeline.run_emr"><code class="docutils literal notranslate"><span class="pre">run_emr()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.html#module-etl.registry">etl.registry module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.BaseETL"><code class="docutils literal notranslate"><span class="pre">BaseETL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.ETLAutoRegistry"><code class="docutils literal notranslate"><span class="pre">ETLAutoRegistry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.ETLRegistry"><code class="docutils literal notranslate"><span class="pre">ETLRegistry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.ETLStructure"><code class="docutils literal notranslate"><span class="pre">ETLStructure</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.auto_register"><code class="docutils literal notranslate"><span class="pre">auto_register()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#etl.registry.register_etl"><code class="docutils literal notranslate"><span class="pre">register_etl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id10"><code class="docutils literal notranslate"><span class="pre">register()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id11"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id12"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.html#id13"><code class="docutils literal notranslate"><span class="pre">get_all()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.cleaning.html">etl.cleaning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.char">etl.cleaning.char module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.char.cleaning___char___remove_accent"><code class="docutils literal notranslate"><span class="pre">cleaning___char___remove_accent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.char.cleaning___char___normalize_whitespace"><code class="docutils literal notranslate"><span class="pre">cleaning___char___normalize_whitespace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.char.cleaning___char___remove_unprintable"><code class="docutils literal notranslate"><span class="pre">cleaning___char___remove_unprintable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.document">etl.cleaning.document module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.document.cleaning___document___split_by_word"><code class="docutils literal notranslate"><span class="pre">cleaning___document___split_by_word()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.html">etl.cleaning.html module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.html.cleaning___html___extract_plain_text"><code class="docutils literal notranslate"><span class="pre">cleaning___html___extract_plain_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.korean">etl.cleaning.korean module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.korean.KoreanType"><code class="docutils literal notranslate"><span class="pre">KoreanType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.korean.cleaning___korean___filter_by_ratio"><code class="docutils literal notranslate"><span class="pre">cleaning___korean___filter_by_ratio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.korean.cleaning___korean___reduce_emoticon"><code class="docutils literal notranslate"><span class="pre">cleaning___korean___reduce_emoticon()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.length">etl.cleaning.length module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.length.cleaning___length___char_len_filter"><code class="docutils literal notranslate"><span class="pre">cleaning___length___char_len_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.length.cleaning___length___word_len_filter"><code class="docutils literal notranslate"><span class="pre">cleaning___length___word_len_filter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.number">etl.cleaning.number module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.number.cleaning___number___normalize"><code class="docutils literal notranslate"><span class="pre">cleaning___number___normalize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.table">etl.cleaning.table module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.table.cleaning___table___merge_col_vertical"><code class="docutils literal notranslate"><span class="pre">cleaning___table___merge_col_vertical()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.cleaning.html#module-etl.cleaning.unicode">etl.cleaning.unicode module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.unicode.cleaning___unicode___remove_punct"><code class="docutils literal notranslate"><span class="pre">cleaning___unicode___remove_punct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.unicode.cleaning___unicode___replace_punct"><code class="docutils literal notranslate"><span class="pre">cleaning___unicode___replace_punct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.cleaning.html#etl.cleaning.unicode.cleaning___unicode___normalize"><code class="docutils literal notranslate"><span class="pre">cleaning___unicode___normalize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.data_ingestion.html">etl.data_ingestion package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.arrow">etl.data_ingestion.arrow module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.arrow.data_ingestion___arrow___hf2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___arrow___hf2raw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.common_crawl">etl.data_ingestion.common_crawl module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___wet2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___common_crawl___wet2raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___dump2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___common_crawl___dump2raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.common_crawl.data_ingestion___common_crawl___raw2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___common_crawl___raw2ufl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.csv">etl.data_ingestion.csv module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.csv.data_ingestion___csv___csv2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___csv___csv2raw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.cultura_x">etl.data_ingestion.cultura_x module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.cultura_x.data_ingestion___cultura_x___raw2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___cultura_x___raw2ufl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.huggingface">etl.data_ingestion.huggingface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.huggingface.data_ingestion___huggingface___hf2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___huggingface___hf2raw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.parquet">etl.data_ingestion.parquet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.parquet.data_ingestion___parquet___pq2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___parquet___pq2raw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.red_pajama">etl.data_ingestion.red_pajama module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___parquet2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___red_pajama___parquet2ufl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___red_pajama___hf2ufl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___hf2raw"><code class="docutils literal notranslate"><span class="pre">data_ingestion___red_pajama___hf2raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.red_pajama.data_ingestion___red_pajama___raw2ufl_templatev1"><code class="docutils literal notranslate"><span class="pre">data_ingestion___red_pajama___raw2ufl_templatev1()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.slim_pajama">etl.data_ingestion.slim_pajama module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___parquet2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___slim_pajama___parquet2ufl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.slim_pajama.data_ingestion___slim_pajama___hf2ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___slim_pajama___hf2ufl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_ingestion.html#module-etl.data_ingestion.test">etl.data_ingestion.test module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_ingestion.html#etl.data_ingestion.test.data_ingestion___test___generate_fake_ufl"><code class="docutils literal notranslate"><span class="pre">data_ingestion___test___generate_fake_ufl()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.data_load.html">etl.data_load package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.aws">etl.data_load.aws module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.huggingface">etl.data_load.huggingface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_load.html#etl.data_load.huggingface.data_load___huggingface___ufl2hf_hub"><code class="docutils literal notranslate"><span class="pre">data_load___huggingface___ufl2hf_hub()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_load.html#etl.data_load.huggingface.data_load___huggingface___ufl2hf"><code class="docutils literal notranslate"><span class="pre">data_load___huggingface___ufl2hf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_load.html#etl.data_load.huggingface.data_load___huggingface___ufl2hf_obj"><code class="docutils literal notranslate"><span class="pre">data_load___huggingface___ufl2hf_obj()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.data_load.html#module-etl.data_load.parquet">etl.data_load.parquet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.data_load.html#etl.data_load.parquet.data_load___parquet___ufl2parquet"><code class="docutils literal notranslate"><span class="pre">data_load___parquet___ufl2parquet()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.pii.html">etl.pii package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#module-etl.pii.card">etl.pii.card module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.pii.html#etl.pii.card.pii___card___replace_card_number"><code class="docutils literal notranslate"><span class="pre">pii___card___replace_card_number()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.pii.html#module-etl.pii.nin">etl.pii.nin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.pii.html#nin-national-identification-number">NIN (National Identification Number)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.pii.html#etl.pii.nin.pii___nin___replace_korean_rrn"><code class="docutils literal notranslate"><span class="pre">pii___nin___replace_korean_rrn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.quality.html">etl.quality package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.quality.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.quality.html#module-etl.quality.language">etl.quality.language module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.quality.html#etl.quality.language.quality___language___fasttext_filter"><code class="docutils literal notranslate"><span class="pre">quality___language___fasttext_filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl/etl.utils.html">etl.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.log">etl.utils.log module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.utils.html#etl.utils.log.utils___log___count"><code class="docutils literal notranslate"><span class="pre">utils___log___count()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.sampling">etl.utils.sampling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.utils.html#etl.utils.sampling.utils___sampling___random"><code class="docutils literal notranslate"><span class="pre">utils___sampling___random()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="etl/etl.utils.html#module-etl.utils.statistics">etl.utils.statistics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="etl/etl.utils.html#etl.utils.statistics.utils___statistics___korean_nouns"><code class="docutils literal notranslate"><span class="pre">utils___statistics___korean_nouns()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"><span>#</span></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+	    </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="etl/etl.html" class="btn btn-neutral float-right" title="etl package">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Upstage AI.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/jucacrispim/sphinx_pdj_theme">theme</a> provided by <a href="https://poraodojuca.dev">Porão do Juca</a>.
+
+</footer>
+	</div>
+	</div>
+	  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/documentation_options.js">
+
+    </script>
+    <script type="text/javascript" src="_static/doctools.js">
+
+    </script>
+    <script type="text/javascript" src="_static/sphinx_highlight.js">
+
+    </script>
+
+  
+
+   <script type="text/javascript"
+           src="_static/js/theme.js"></script>
+
+   <script type="text/javascript"
+           src="_static/js/pdj.js"></script>
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+  </body>
+</html>
