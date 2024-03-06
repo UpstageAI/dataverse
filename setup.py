@@ -35,12 +35,12 @@ def get_extras_require():
 
 setup(
     name="dataverse",
-    version="0.1.0.dev0",
+    version="1.0.1",
     packages=find_packages(),
     author="Dataverse Team",
     author_email="dataverse@upstage.ai",
     description="An open-source simplifies ETL workflow with Python based on Spark",
-    license="MIT",
+    license="Apache License 2.0",
     include_package_data=True,
     install_requires=get_requirements(),
     entry_points={"console_scripts": ["dataverse = dataverse.api.cli:main"]},
