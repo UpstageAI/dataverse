@@ -12,3 +12,8 @@ faker
 awscli
 boto3
 pre-commit==3.6.0
+botocore
+rsa
+s3transfer
+isort
+pytest
