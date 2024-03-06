@@ -12,27 +12,22 @@
 The Universe of Data. 
 All about Data, Data Science, and Data Engineering.
 
-[Docs](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/) • [Guidelines](https://github.com/UpstageAI/dataverse/tree/main/guideline) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/7sswRCad)
+[Docs](https://data-verse.gitbook.io/docs/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/examples) • [API Reference](https://upstageai.github.io/dataverse/build/html/index.html) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/uC7cmSKwvm)
 <br><br>
 <div align="left">
 
 ## Welcome to Dataverse!
-Dataverse is a freely-accessible open-source project that supports your ETL pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
+Dataverse is a freely-accessible open-source project that supports your ETL(Extract, Transform and Load) pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
 <br>
 
 ## 🌌 Installation
-Currently, pip install is not supported. We will update it soon! <br>
-Below are the instructions for **macOS/Linux**. Windows users can find a step-by-step guide [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
-
 ### 🌠 Prerequisites
 To use this library, the following conditions are needed:
 - Python (version between 3.10 and 3.11)
 - JDK (version 11)
 - PySpark
-
-Detail guide for prerequisites can be found on [here](https://app.gitbook.com/o/n2RvU0RLjUkZsUbsb8hc/s/irHyocTgT4EK1aAMXB1I/installation).
-
+Detail installation guide for prerequisites can be found on [here](https://data-verse.gitbook.io/docs/installation).
 
 ### 🌠 Install via PyPi
 ```bash
@@ -42,7 +37,7 @@ pip install dataverse
 <br>
 
 ## 🌌 Quickstart
-Various and more detailed tutorials are [here](https://github.com/UpstageAI/dataverse/tree/main/guideline).
+Various and more detailed tutorials are [here](https://github.com/UpstageAI/dataverse/tree/main/examples).
 
 <details>
     <summary><u>Detail to the example etl configure.</u></summary>
@@ -107,19 +102,19 @@ ETL_config = OmegaConf.create({
 from dataverse.etl import ETLPipeline
 
 etl_pipeline = ETLPipeline()
-spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
+spark, dataset = etl_pipeline.run(config=ETL_config, verbose=True)
 ```
 <br>
 
 
 ## 🌌 Contributors
 <a href="https://github.com/UpstageAI/dataverse/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=UpstageAI/dataverse" width=600/>
+  <img src="https://contrib.rocks/image?repo=UpstageAI/dataverse" />
 </a>
 
 ## 🌌 Acknowledgements
 
-Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an ecosystem for LLM data. Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of large language models (LLMs).
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an data ecosystem for LLM(Large Language Model). Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of LLM.
 
 ## 🌌 License
 Dataverse is completely freely-accessible open-source and licensed under the Apache-2.0 license.
