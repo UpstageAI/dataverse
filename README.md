@@ -37,7 +37,7 @@ pip install dataverse
 <br>
 
 ## 🌌 Quickstart
-Various and more detailed tutorials are [here](https://github.com/UpstageAI/dataverse/tree/main/guideline).
+Various and more detailed tutorials are [here](https://github.com/UpstageAI/dataverse/tree/main/examples).
 
 <details>
     <summary><u>Detail to the example etl configure.</u></summary>
