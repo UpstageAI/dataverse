@@ -102,7 +102,7 @@ ETL_config = OmegaConf.create({
 from dataverse.etl import ETLPipeline
 
 etl_pipeline = ETLPipeline()
-spark, dataset = etl_pipeline.sample(config=ETL_config, verbose=True)
+spark, dataset = etl_pipeline.run(config=ETL_config, verbose=True)
 ```
 <br>
 
