@@ -1,0 +1,921 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="" lang="" version="-//W3C//DTD XHTML 1.1//EN" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="">
+    <link rel="icon" type="image/x-icon" href="">
+
+  
+  <title>etl.cleaning package &mdash; dataverse 1.0.0 documentation</title>
+  
+
+  
+
+  
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'/>
+
+
+  <link rel="stylesheet" href="../_static/css/img.css" type="text/css"/>
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/css/pdj.css" type="text/css" />
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/darker.css" type="text/css" media="(prefers-color-scheme: dark)"/>
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="dataverse 1.0.0 documentation" href="../index.html"/>
+        <link rel="up" title="etl package" href="etl.html"/>
+        <link rel="next" title="etl.data_ingestion package" href="etl.data_ingestion.html"/>
+        <link rel="prev" title="etl.bias package" href="etl.bias.html"/>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="cache-control" content="public" />
+    <meta name="robots" content="follow, all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+    <script type="module" src="https://googlechromelabs.github.io/dark-mode-toggle/src/dark-mode-toggle.mjs"></script>
+
+  </head>
+
+  <body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+	
+        <a href="../index.html" class="fa fa-home"> dataverse </a>
+	
+	
+        <div role="search">
+	  
+	  <form id ="rtd-search-form" class="wy-form"
+		action="../search.html" method="get">
+	    <input type="text" name="q" placeholder="Search docs" />
+	    <input type="hidden" name="check_keywords" value="yes" />
+	    <input type="hidden" name="area" value="default" />
+	  </form>
+	  
+	</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	
+          
+          
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="etl.html">etl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="etl.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#module-etl.pipeline">etl.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.html#module-etl.registry">etl.registry module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">etl.cleaning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.char">etl.cleaning.char module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.document">etl.cleaning.document module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.html">etl.cleaning.html module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.korean">etl.cleaning.korean module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.length">etl.cleaning.length module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.number">etl.cleaning.number module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.table">etl.cleaning.table module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-etl.cleaning.unicode">etl.cleaning.unicode module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.data_ingestion.html">etl.data_ingestion package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.arrow">etl.data_ingestion.arrow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.common_crawl">etl.data_ingestion.common_crawl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.csv">etl.data_ingestion.csv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.cultura_x">etl.data_ingestion.cultura_x module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.huggingface">etl.data_ingestion.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.parquet">etl.data_ingestion.parquet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.red_pajama">etl.data_ingestion.red_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.slim_pajama">etl.data_ingestion.slim_pajama module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_ingestion.html#module-etl.data_ingestion.test">etl.data_ingestion.test module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.data_load.html">etl.data_load package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.aws">etl.data_load.aws module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.huggingface">etl.data_load.huggingface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.data_load.html#module-etl.data_load.parquet">etl.data_load.parquet module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.pii.html">etl.pii package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#module-etl.pii.card">etl.pii.card module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.pii.html#module-etl.pii.nin">etl.pii.nin module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.quality.html">etl.quality package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.quality.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.quality.html#module-etl.quality.language">etl.quality.language module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etl.utils.html">etl.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.log">etl.utils.log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.sampling">etl.utils.sampling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etl.utils.html#module-etl.utils.statistics">etl.utils.statistics module</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+
+      </div>
+      &nbsp;
+    </nav>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      <nav class="wy-nav-top" id="barra-mobile" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">dataverse </a>
+      </nav>
+
+      <div class="wy-nav-content">
+	<div class="fundo-claro">
+	</div>
+	<div class="fundo-escuro">
+	</div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+	    
+	    <!-- <ul class="wy-breadcrumbs"> -->
+	    <!--   <li><a href="#">Docs</a> &raquo;</li> -->
+
+	    <!--   <li>Features</li> -->
+	    <!--   <li class="wy-breadcrumbs-aside"> -->
+
+	    <!-- 	<a href="_sources/index.txt" rel="nofollow"> View page source</a> -->
+
+	    <!--   </li> -->
+	    <!-- </ul> -->
+	    <!-- <hr/> -->
+	  </div>
+          <div role="main" class="">
+
+	    <div id="content" class="hfeed entry-container hentry">
+      	<div id="dark-mode-toggle-container">
+	  <dark-mode-toggle appearance="toggle" dark="switch to light mode" light="switch to dark mode">
+	  </dark-mode-toggle>
+	</div>
+  <section id="etl-cleaning-package">
+<h1>etl.cleaning package<a class="headerlink" href="#etl-cleaning-package" title="Link to this heading"><span>#</span></a></h1>
+<section id="module-etl.cleaning.char">
+<span id="etl-cleaning-char-module"></span><h2>etl.cleaning.char module<a class="headerlink" href="#module-etl.cleaning.char" title="Link to this heading"><span>#</span></a></h2>
+<p>A collection of modules for cleaning data at the character level.
+For example: whitespace, accent characters, and unprintable characters.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.char.cleaning___char___remove_accent">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.char.</span></span><span class="sig-name descname"><span class="pre">cleaning___char___remove_accent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.char.cleaning___char___remove_accent" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Strips accents from a piece of text.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>input</p></th>
+<th class="head"><p>output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>café
+résumé</p></td>
+<td><p>cafe
+resume</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Code is from facebookresearch/cc_net
+<a class="reference external" href="https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py">https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with accents removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.char.cleaning___char___normalize_whitespace">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.char.</span></span><span class="sig-name descname"><span class="pre">cleaning___char___normalize_whitespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.char.cleaning___char___normalize_whitespace" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Normalize whitespace.
+- Strips the leading and trailing whitespaces.
+- Replaces all consecutive whitespaces with a single space,
+excluding <code class="docutils literal notranslate"><span class="pre">\n</span></code> and <code class="docutils literal notranslate"><span class="pre">\r</span></code> characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with normalized whitespace.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.char.cleaning___char___remove_unprintable">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.char.</span></span><span class="sig-name descname"><span class="pre">cleaning___char___remove_unprintable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.char.cleaning___char___remove_unprintable" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Remove all the non-printable characters.</p>
+<p>Code is from facebookresearch/cc_net
+<a class="reference external" href="https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py">https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with unprintable characters are removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.document">
+<span id="etl-cleaning-document-module"></span><h2>etl.cleaning.document module<a class="headerlink" href="#module-etl.cleaning.document" title="Link to this heading"><span>#</span></a></h2>
+<p>A collection of modules for cleaning data at the document level.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.document.cleaning___document___split_by_word">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.document.</span></span><span class="sig-name descname"><span class="pre">cleaning___document___split_by_word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_per_chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.document.cleaning___document___split_by_word" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Split documents into smaller chunks by word.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>word_per_chunk</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of words per chunk. Defaults to 100.</p></li>
+<li><p><strong>delimiter</strong> (<em>str</em><em>, </em><em>optional</em>) – Delimiter to split the text. Defaults to “ “.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with documents split into smaller chunks.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If word_per_chunk is not a positive integer.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<ul>
+<li><p>word_per_chunk = 2</p></li>
+<li><p>delimiter = “ “</p></li>
+<li><p>input</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“hello world, how are you?”</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+<li><p>output</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“hello world,”</p></td>
+</tr>
+<tr class="row-odd"><td><p>“how are”</p></td>
+</tr>
+<tr class="row-even"><td><p>“you?”</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+</ul>
+<dl class="simple">
+<dt>Caveats:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>NO normalization is done here!</dt><dd><ul>
+<li><p>This doesn’t consider the whitespace normalization.</p></li>
+<li><p>Recommend using other normalization before this.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>All the keys from the original row are copied to all the new rows created.</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> is not unique anymore.</p></li>
+<li><p>Make sure <code class="docutils literal notranslate"><span class="pre">id</span></code> is assigned after this step.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.html">
+<span id="etl-cleaning-html-module"></span><h2>etl.cleaning.html module<a class="headerlink" href="#module-etl.cleaning.html" title="Link to this heading"><span>#</span></a></h2>
+<p>A collection of modules for cleaning data includes html.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.html.cleaning___html___extract_plain_text">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.html.</span></span><span class="sig-name descname"><span class="pre">cleaning___html___extract_plain_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_trafilatura</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.html.cleaning___html___extract_plain_text" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Extracts plain text from HTML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>use_trafilatura</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use trafilatura instead of html2text. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The plain data extracted from html.</p>
+</dd>
+</dl>
+<dl>
+<dt>Caveats:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">html2text</span></code> adds a double newline after each paragraph, which is not handled at this point.</p></li>
+<li><p>The option to use <cite>trafilatura</cite> is provided because extracting plain text with <code class="docutils literal notranslate"><span class="pre">trafilatura</span></code> does not seem to work well in some cases.</p>
+<blockquote>
+<div><ul>
+<li><p>[OK] Case:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&lt;body&gt;&lt;h1&gt;My First Heading&lt;/h1&gt;&lt;p&gt;My first paragraph.&lt;/p&gt;&lt;/body&gt;&quot;</span>
+
+<span class="c1"># html2text</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">html2text</span><span class="o">.</span><span class="n">html2text</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;# My First Heading</span><span class="se">\n\n</span><span class="s1">My first paragraph.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+<span class="c1"># trafilatura</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trafilatura</span><span class="o">.</span><span class="n">html2txt</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;My First HeadingMy first paragraph.&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>[ERROR] Case (trafilatura removes all the text):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&lt;p&gt;hello &lt;br&gt; nice to meet you.&lt;/p&gt;&quot;</span>
+
+<span class="c1"># html2text</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">html2text</span><span class="o">.</span><span class="n">html2text</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;hello  </span><span class="se">\n</span><span class="s1">nice to meet you.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+<span class="c1"># trafilatura</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trafilatura</span><span class="o">.</span><span class="n">html2txt</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.korean">
+<span id="etl-cleaning-korean-module"></span><h2>etl.cleaning.korean module<a class="headerlink" href="#module-etl.cleaning.korean" title="Link to this heading"><span>#</span></a></h2>
+<p>This is only for Korean text datas.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="etl.cleaning.korean.KoreanType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl.cleaning.korean.</span></span><span class="sig-name descname"><span class="pre">KoreanType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.cleaning.korean.KoreanType" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.korean.cleaning___korean___filter_by_ratio">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.korean.</span></span><span class="sig-name descname"><span class="pre">cleaning___korean___filter_by_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'word'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">korean_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">RDD</span></span></span><a class="headerlink" href="#etl.cleaning.korean.cleaning___korean___filter_by_ratio" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Filters out the text that has less than <cite>korean_ratio</cite> excluding space.</p>
+<p>Code is from eleutherAI/dps and was modified
+<a class="reference external" href="https://github.com/EleutherAI/dps/blob/master/dps/spark/prep/korean_prep.py#L52">https://github.com/EleutherAI/dps/blob/master/dps/spark/prep/korean_prep.py#L52</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – The type of filtering to be applied. Can be ‘char’ or ‘word’. Defaults to ‘word’.</p></li>
+<li><p><strong>korean_ratio</strong> (<em>float</em><em>, </em><em>optional</em>) – The minimum ratio of Korean characters or words required for a text to survive the filtering. Defaults to 0.5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The filtered data with it’s Korean ratio.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the filter_type is not ‘char’ or ‘word’, or if the korean_ratio is not between 0 and 1.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>With korean_ratio = 0.5</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“한국어가 포함 비율이 50% 이상인 경우만 남김”</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><dl class="simple">
+<dt>filter_type = ‘char’ -&gt; [survive!]</dt><dd><ul>
+<li><p>Korean characters: 17</p></li>
+<li><p>Non-Korean characters: 3</p></li>
+<li><p>Total characters: 20</p></li>
+<li><p>Korean character ratio: 17 / 20 &gt; 0.5 -&gt; True</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>filter_type = ‘word’ -&gt; [survive!]</dt><dd><ul>
+<li><p>Korean characters: 6</p></li>
+<li><p>Non-Korean characters: 1</p></li>
+<li><p>Total characters: 7</p></li>
+<li><p>Korean character ratio: 6 / 7 &gt; 0.5 -&gt; True</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>“korean including 비율이 50% 미만인 경우 제거”</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><dl class="simple">
+<dt>filter_type = ‘char’ -&gt; [remove!]</dt><dd><ul>
+<li><p>Korean characters: 10</p></li>
+<li><p>Non-Korean characters: 28</p></li>
+<li><p>Total characters: 38</p></li>
+<li><p>Korean word ratio: 10 / 38 &gt; 0.5 -&gt; False</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>filter_type = ‘word’ -&gt; [survive!]</dt><dd><ul>
+<li><p>Korean characters: 4</p></li>
+<li><p>Non-Korean characters: 3</p></li>
+<li><p>Total characters: 7</p></li>
+<li><p>Korean word ratio: 4 / 7 &gt; 0.5 -&gt; True</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The regex to count Korean characters doesn’t work properly on characters that are not words.</dt><dd><ul>
+<li><p>e.g 안녕”하세요 is counted is 2 korean words - [“안녕”, “하세요”]</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.korean.cleaning___korean___reduce_emoticon">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.korean.</span></span><span class="sig-name descname"><span class="pre">cleaning___korean___reduce_emoticon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_repeats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.korean.cleaning___korean___reduce_emoticon" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Reduces emoticon Korean characters.</p>
+<p>It performs the following steps:</p>
+<ol class="arabic">
+<li><p>Splits complete Korean characters into individual characters, preserving only the previous jaum and next moum.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>e.g. (remain) ㅋㅋ킄ㅋㅋㅋ -&gt; ㅋㅋ킄ㅋㅋㅋ</p></li>
+<li><p>e.g. (splited) ㅋㅋ쿠ㅜㅜㅜ -&gt; ㅋㅋㅋㅜㅜㅜㅜ</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>Reduces repeating Korean characters.</dt><dd><ul class="simple">
+<li><p>e.g. ㅋㅋㅋㅋㅋ -&gt; ㅋㅋ</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or columns to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>num_repeats</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of repeating characters to reduce. Defaults to 2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with reduced emoticon Korean characters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RDD</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>[ potential risk of splitting complete korean character ]</strong></p>
+<p>splitting emoticon characters into individual characters has high risk inside
+so only left one case that is <cite>complete korean character between jaum and moum</cite>
+other cases were added also but due to the risk, wiped out</p>
+</div>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/lovit/soynlp/blob/master/soynlp/normalizer/_normalizer.py">soynlp normalizer.py</a></p></li>
+<li><p><a class="reference external" href="https://github.com/EleutherAI/dps/blob/master/dps/spark/prep/korean_prep.py">dps korean_prep.py</a></p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.length">
+<span id="etl-cleaning-length-module"></span><h2>etl.cleaning.length module<a class="headerlink" href="#module-etl.cleaning.length" title="Link to this heading"><span>#</span></a></h2>
+<p>Filtering based on length.</p>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.length.cleaning___length___char_len_filter">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.length.</span></span><span class="sig-name descname"><span class="pre">cleaning___length___char_len_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.length.cleaning___length___char_len_filter" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Filters the data by character length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>min_len</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum length of characters to filter. If None, there is no minimum length.</p></li>
+<li><p><strong>max_len</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum length of characters to filter. If None, there is no maximum length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The filtered data as an RDD.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If both min_len and max_len are None.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>min_len &lt;= len &lt;= max_len</p></li>
+<li><p>min_len and max_len can not be None at the same time.</p></li>
+<li><p>If min_len is None, then only the maximum length is considered.</p></li>
+<li><p>If max_len is None, then only the minimum length is considered.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.length.cleaning___length___word_len_filter">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.length.</span></span><span class="sig-name descname"><span class="pre">cleaning___length___word_len_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.cleaning.length.cleaning___length___word_len_filter" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>filter by word length</p>
+<p>min_len &lt;= len &lt;= max_len
+- if min_len is None, then len &lt;= max_len
+- if max_len is None, then len &gt;= min_len</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subset</strong> – column to filter</p></li>
+<li><p><strong>min_len</strong> – minimum length to filter</p></li>
+<li><p><strong>max_len</strong> – maximum length to filter</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.number">
+<span id="etl-cleaning-number-module"></span><h2>etl.cleaning.number module<a class="headerlink" href="#module-etl.cleaning.number" title="Link to this heading"><span>#</span></a></h2>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.number.cleaning___number___normalize">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.number.</span></span><span class="sig-name descname"><span class="pre">cleaning___number___normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.number.cleaning___number___normalize" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Convert all the number to assigned number (e.g. 0)</p>
+<p>Code is from facebookresearch/cc_net
+<a class="reference external" href="https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py">https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py</a></p>
+<p class="rubric">Examples</p>
+<ul class="simple">
+<li><p>input</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><blockquote>
+<div><p>1234</p>
+</div></blockquote>
+<p>1234.5678</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>output</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><blockquote>
+<div><p>0000</p>
+</div></blockquote>
+<p>0000.0000</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+<li><p><strong>assign_number</strong> (<em>int</em><em>, </em><em>optional</em>) – The number to assign. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized data.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>AssertionError</strong> – If assign_number is not between 0 and 9 (inclusive).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.table">
+<span id="etl-cleaning-table-module"></span><h2>etl.cleaning.table module<a class="headerlink" href="#module-etl.cleaning.table" title="Link to this heading"><span>#</span></a></h2>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.table.cleaning___table___merge_col_vertical">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.table.</span></span><span class="sig-name descname"><span class="pre">cleaning___table___merge_col_vertical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'merge_col'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.table.cleaning___table___merge_col_vertical" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Merges two columns vertically into one column.</p>
+<p class="rubric">Example</p>
+<p>Before:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>col1</p></th>
+<th class="head"><p>col2</p></th>
+<th class="head"><p>species</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>4</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>6</p></td>
+<td><p>ducky</p></td>
+</tr>
+</tbody>
+</table>
+<p>After calling <code class="docutils literal notranslate"><span class="pre">cleaning_table_merge_col_vertical(...)</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>number</p></th>
+<th class="head"><p>species</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>ducky</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>duck</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>ducky</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>col1</strong> (<em>str</em>) – The name of the first column to merge.</p></li>
+<li><p><strong>col2</strong> (<em>str</em>) – The name of the second column to merge.</p></li>
+<li><p><strong>merge_col_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the merged column.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data with the merged column.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If col1 or col2 is not specified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl.cleaning.unicode">
+<span id="etl-cleaning-unicode-module"></span><h2>etl.cleaning.unicode module<a class="headerlink" href="#module-etl.cleaning.unicode" title="Link to this heading"><span>#</span></a></h2>
+<p>Copyright (c) 2024-present Upstage Co., Ltd.
+Apache-2.0 license</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.unicode.cleaning___unicode___remove_punct">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.unicode.</span></span><span class="sig-name descname"><span class="pre">cleaning___unicode___remove_punct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.unicode.cleaning___unicode___remove_punct" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Removes all the Unicode punctuations.</p>
+<p>Code is from facebookresearch/cc_net
+<a class="reference external" href="https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py">https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cleaned data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.unicode.cleaning___unicode___replace_punct">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.unicode.</span></span><span class="sig-name descname"><span class="pre">cleaning___unicode___replace_punct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyspark.rdd.RDD</span></span></span><a class="headerlink" href="#etl.cleaning.unicode.cleaning___unicode___replace_punct" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Replace all the unicode punctuations</p>
+<p>Code is from facebookresearch/cc_net
+<a class="reference external" href="https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py">https://github.com/facebookresearch/cc_net/blob/main/cc_net/text_normalizer.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cleaned data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl.cleaning.unicode.cleaning___unicode___normalize">
+<span class="sig-prename descclassname"><span class="pre">etl.cleaning.unicode.</span></span><span class="sig-name descname"><span class="pre">cleaning___unicode___normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyspark.rdd.RDD</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pyspark.sql.dataframe.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#etl.cleaning.unicode.cleaning___unicode___normalize" title="Link to this definition"><span>#</span></a></dt>
+<dd><p>Normalize the unicode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spark</strong> (<em>SparkSession</em>) – The Spark session object.</p></li>
+<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>RDD</em><em>, </em><em>DataFrame</em><em>]</em>) – The input data to be processed. It can be either an RDD or a DataFrame.</p></li>
+<li><p><strong>subset</strong> (<em>str</em><em>, </em><em>optional</em>) – A subset or column to consider. Defaults to ‘text’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cleaned data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+	    </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="etl.data_ingestion.html" class="btn btn-neutral float-right" title="etl.data_ingestion package">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="etl.bias.html" class="btn btn-neutral" title="etl.bias package"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, Upstage AI.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/jucacrispim/sphinx_pdj_theme">theme</a> provided by <a href="https://poraodojuca.dev">Porão do Juca</a>.
+
+</footer>
+	</div>
+	</div>
+	  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/doctools.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/sphinx_highlight.js">
+
+    </script>
+
+  
+
+   <script type="text/javascript"
+           src="../_static/js/theme.js"></script>
+
+   <script type="text/javascript"
+           src="../_static/js/pdj.js"></script>
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+  </body>
+</html>
