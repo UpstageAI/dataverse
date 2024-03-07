@@ -17,11 +17,11 @@ All about Data, Data Science, and Data Engineering.
 <div align="left">
 
 ## Welcome to Dataverse!
-Dataverse is a freely-accessible open-source project that supports your ETL(Extract, Transform and Load) pipeline with Python. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
+Dataverse is a freely-accessible open-source project that supports your **ETL(Extract, Transform and Load) pipeline with Python**. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
 ### Why should I use Dataverse?
-- **Enhanced productivity**: Dataverse streamline your workflow by integrating multiple preprocessing libraries into one, eliminating the hassle of settings and searching for the right tools. Furthermore, you can easily take advantages of Spark’s efficiency even if you’re not an Spark expert.
-- **Improved data quality**: Elevate your data quality with a variety of preprocessing functions. Dataverse helps you to make high-quality data for analysis, manage, and train LLM, etc.
+- **Integrated library**: Dataverse streamline your workflow by integrating multiple preprocessing libraries into one, eliminating the hassle of settings and searching for the right tools. You can even use HuggingFace datasets from hub directly into the pipeline.
+- **Simplified Spark usage**: You don't have to be a pro with Spark. With just a few setting configurations, you can easily take Spark's high performance effortlessly.
 - **Facilitated collaboration**: Offer uniform preprocessing codes to ensure consistent results whether who runs the code. Dataverse also enable collaboration among users with varying levels of Spark proficiency.
 
 ### Key Features of Dataverse
@@ -88,7 +88,7 @@ ETL_config = OmegaConf.create({
     },
     'etl': [
         { 
-            'name': 'data_ingestion___huggingface___hf2raw', # Extract
+            'name': 'data_ingestion___huggingface___hf2raw', # Extract; You can use HuggingFace datset from hub directly!
             'args': {'name_or_path': ['ai2_arc', 'ARC-Challenge']}
         },
         {
