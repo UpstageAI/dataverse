@@ -8,7 +8,7 @@ This page is not the Constituion of the _Dataverse_. We are providing guidelines
 
 # Table of Contents
 - [Questions or Feedback](#questions-or-feedback)
-- [🤝 How to Contribute?](#🤝-how-to-contribute)
+- [🤝 How to Contribute?](#-how-to-contribute)
 - [Tests](#Tests)
 - [Structure of Dataverse](#structure-of-dataverse)
 - [Design Philosophy](#design-philosophy)
