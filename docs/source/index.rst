@@ -14,6 +14,7 @@ Dataverse
    etl/etl.cleaning.rst
    etl/etl.data_ingestion.rst
    etl/etl.data_load.rst
+   etl/etl.deduplication.rst
    etl/etl.pii.rst
    etl/etl.quality.rst
    etl/etl.utils.rst
