@@ -19,15 +19,21 @@ All about Data, Data Science, and Data Engineering.
 ## Welcome to Dataverse!
 Dataverse is a freely-accessible open-source project that supports your **ETL(Extract, Transform and Load) pipeline with Python**. We offer a simple, standardized and user-friendly solution for data processing and management, catering to the needs of data scientists, analysts, and developers in LLM era. Even though you don't know much about Spark, you can use it easily via _dataverse_.
 
-### Why should I use Dataverse?
-- **Integrated library**: Dataverse streamline your workflow by integrating multiple preprocessing libraries into one, eliminating the hassle of settings and searching for the right tools. You can even use HuggingFace datasets from hub directly into the pipeline.
-- **Simplified Spark usage**: You don't have to be a pro with Spark. With just a few setting configurations, you can easily take Spark's high performance effortlessly.
-- **Facilitated collaboration**: Offer uniform preprocessing codes to ensure consistent results whether who runs the code. Dataverse also enable collaboration among users with varying levels of Spark proficiency.
+### With Dataverse, you are empowered to
+
+- utilize a range of preprocessing functions without the need to install multiple libraries.
+- create high-quality data for analysis and training of Large Language Models (LLM).
+- leverage Spark with ease, regardless of your expertise level.
+- facilitate smoother collaboration among users with varying degress of Spark proficiency.
+- enjoy freedom from the limitations of local environments by harnessing the capabilities of AWS EMR.
 
 ### Key Features of Dataverse
-- **Block-Based:** Dataverse lets you build Spark code like putting together puzzle pieces. You can easily add, take away, or rearrange pieces to get the results you want.
-- **Configure-Based:** Dataverse has a user-friendly setup where you don't need to know all the code. Just set up the options, and you're good to go.
-- **Extensible:** It's designed to meet your specific demands, allowing for custom features that fit perfectly with your project.
+- **Block-Based**: In Dataverse, a `block` means a `ETL registered function` which is running on Spark. You can build Spark code like putting together puzzle pieces. You can easily add, take away, or re-arrange pieces to get the results you want via configure.
+- **Configure-Based**: All the setups for Spark and steps of block can be defined with configure. You don't need to know all the code. Just set up the options, and you're good to go.
+- **Extensible**: It's designed to meet your specific demands, allowing for custom features that fit perfectly with your project.
+
+If you want to know more about Dataverse, please checkout our [docs](https://data-verse.gitbook.io/docs/).
+
 <br>
 
 ## 🌌 Installation
@@ -82,33 +88,38 @@ Various and more detailed tutorials are [here](https://github.com/UpstageAI/data
 from omegaconf import OmegaConf
 
 ETL_config = OmegaConf.create({
-    'spark': {
+    # Set up Spark
+    'spark': { 
         'appname': 'ETL',
         'driver': {'memory': '4g'},
     },
     'etl': [
         { 
-            'name': 'data_ingestion___huggingface___hf2raw', # Extract; You can use HuggingFace datset from hub directly!
-            'args': {'name_or_path': ['ai2_arc', 'ARC-Challenge']}
+          # Extract; You can use HuggingFace datset from hub directly!
+          'name': 'data_ingestion___huggingface___hf2raw', 
+          'args': {'name_or_path': ['ai2_arc', 'ARC-Challenge']}
         },
         {
-            'name': 'utils___sampling___random',
-            'args': {'sample_n_or_frac': 0.5}
+          # Reduce dataset scale
+          'name': 'utils___sampling___random',
+          'args': {'sample_n_or_frac': 0.5}
         },
         {
-            'name': 'deduplication___minhash___lsh_jaccard', # Transform
-            'args': {'threshold': 0.1,
-                    'ngram_size': 5,
-                    'subset': 'question'}
+          # Transform; deduplicate data via minhash
+          'name': 'deduplication___minhash___lsh_jaccard', 
+          'args': {'threshold': 0.1,
+                  'ngram_size': 5,
+                  'subset': 'question'}
         },
         {
-          'name': 'data_load___parquet___ufl2parquet', # Load
+          # Load; Save the data
+          'name': 'data_load___parquet___ufl2parquet',
           'args': {'save_path': './guideline/etl/sample/quickstart.parquet'}
         }
       ]
   })
 ```
-
+Above code block is an example of an ETL process in Dataverse. In Dataverse, the available ETL registered functions are referred to as `blocks`, and this example is comprised of four blocks. You can freely combine these blocks using config to create the ETL processes for your needs. The list of available functions and args of them can be found in the [API Reference](https://data-verse.readthedocs.io/en/latest/). Each functions 'args' should be added in dictionary format.
 
 ```python
 # 2. Run ETLpipeline.
@@ -118,11 +129,41 @@ from dataverse.etl import ETLPipeline
 etl_pipeline = ETLPipeline()
 spark, dataset = etl_pipeline.run(config=ETL_config, verbose=True)
 ```
+ETLPipeline is an object designed to manage the ETL processes. By inserting `ETL_config` which is defined in the previous step into ETLpipeline object and calling the `run` method, stacked ETL blocks are sequentially executed.
+
 ```python
 # 3. Result file is saved on the save_path
 ```
+As the example gave `save_path` argument to the last block of `ETL_config`, data passed through the process will be saved on the given path.
+
 <br>
 
+## 🌌 Modules
+Currently, a total of 43 functions are registered as the ETL process, which means they are available for use.
+| Type      | Package         | description                                                                                       | # of registered |
+|-----------|-----------------|---------------------------------------------------------------------------------------------------|-----------------|
+| Extract   | data_ingestion  | Loading data from any source to the preferred format                                              | 16              |
+| Transform | bias            | (WIP) Reduce skewed or prejudiced data, particularly data that reinforce stereotypes.             |                 |
+|           | cleaning        | Remove irrelevant, redundant, or noisy information, such as stop words or special characters.     | 13              |
+|           | decontamination | (WIP) Remove contaminated data including benchmark.                                               |                 |
+|           | deduplication   | Remove duplicated data, targeting not only identical matches but also similar data.               | 4               |
+|           | pii             | PII stands for Personally Identifiable Information. Removing sensitive information from data.     | 2               |
+|           | quality         | Improving the data quality, in the perspective of accuracy, consistency, and reliability of data. | 1               |
+|           | toxicity        | (WIP) Removing harmful, offensive, or inappropriate content within the data.                      |                 |
+| Load      | data_load       | Saving the processed data to a preferred source like data lake, database, etc.                    | 4               |
+| Utils     | utils           | Essential tools for data processing, including sampling, logging, statistics, etc.                | 3               |
+<br>
+
+
+## 🌌 AWS Support
+Dataverse supports AWS! Step by step guide to setting up is [here](https://data-verse.gitbook.io/docs/lets-start/aws-s3-support).
+</br>
+
+## 🌌 Dataverse use-case
+> If you have any use-cases of your own, please feel free to let us know. We would love to hear about them and possibly feature your case.
+
+*✨* [`Upstage`](https://www.upstage.ai/) is using Dataverse for preprocessing the data for the [Up 1T Token Club](https://en.content.upstage.ai/1tt).
+</br>
 
 ## 🌌 Contributors
 <a href="https://github.com/UpstageAI/dataverse/graphs/contributors">
@@ -131,7 +172,7 @@ spark, dataset = etl_pipeline.run(config=ETL_config, verbose=True)
 
 ## 🌌 Acknowledgements
 
-Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at `Upstage`, designed as an data ecosystem for LLM(Large Language Model). Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of LLM.
+Dataverse is an open-source project orchestrated by the **Data-Centric LLM Team** at [`Upstage`](https://www.upstage.ai/), designed as an data ecosystem for LLM(Large Language Model). Launched in March 2024, this initiative stands at the forefront of advancing data handling in the realm of LLM.
 
 ## 🌌 License
 Dataverse is completely freely-accessible open-source and licensed under the Apache-2.0 license.
