@@ -1,7 +1,7 @@
 requests
 numpy
 pandas
-fasttext
+fasttext-wheel
 omegaconf
 datasets
 pyspark
