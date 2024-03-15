@@ -37,6 +37,8 @@ Dataverse is a freely-accessible open-source project that supports your **ETL(Ex
 
 If you want to know more about Dataverse, please checkout our [docs](https://data-verse.gitbook.io/docs/).
 
+By clicking below image, it'll take you to a short intro video!
+[![Brief Introduction](./docs/images/dataverse_hero.png)](https://youtu.be/yYyyLuPNK5s?feature=shared)
 <br>
 
 ## 🌌 Installation
@@ -45,6 +47,7 @@ To use this library, the following conditions are needed:
 - Python (version between 3.10 and 3.11)
 - JDK (version 11)
 - PySpark
+
 Detail installation guide for prerequisites can be found on [here](https://data-verse.gitbook.io/docs/installation).
 
 ### 🌠 Install via PyPi
@@ -189,7 +192,7 @@ Dataverse is completely freely-accessible open-source and licensed under the Apa
 ```bibtex
 @misc{dataverse,
   title = {Dataverse},
-  author = {Hyunbyung Park, Sukyung Lee, Gyoungjin Gim, Yungi Kim, Seonghoon Yang, Jihoo Kim, Changbae Ahn, Chanjun Park},
+  author = {Hyunbyung Park, Sukyung Lee, Gyoungjin Gim, Yungi Kim, Dahyun Kim, Chanjun Park},
   year = {2024},
   publisher = {GitHub, Upstage AI},
   howpublished = {\url{https://github.com/UpstageAI/dataverse}},
