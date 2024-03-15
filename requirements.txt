@@ -3,6 +3,7 @@ numpy
 pandas
 fasttext-wheel
 omegaconf
+pyarrow==14.0.1
 datasets
 pyspark
 scipy
