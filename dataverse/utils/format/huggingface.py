@@ -1,4 +1,3 @@
-
 import os
 import datasets
 from pathlib import Path
@@ -10,7 +9,7 @@ from dataverse.utils.setting import SystemSetting
 def load_huggingface_dataset(name_or_path, split=None, from_disk=False):
     """
     load huggingface dataset
-    
+
     Args:
         name_or_path (str or list): the name or path of the huggingface dataset
         split (str): the split of the dataset
@@ -19,13 +18,14 @@ def load_huggingface_dataset(name_or_path, split=None, from_disk=False):
         if split is not None:
             raise ValueError("split is not supported when from_disk is True")
 
-        # load huggingface dataset
+        # load huggingface dataset from disk
         if isinstance(name_or_path, str):
             dataset = datasets.load_from_disk(name_or_path)
         elif isinstance(name_or_path, list):
             dataset = datasets.load_from_disk(*name_or_path)
         elif isinstance(name_or_path, ListConfig):
-            dataset = datasets.load_from_disk(*name_or_path)
+            dataset_list = [datasets.load_from_disk(nop) for nop in name_or_path]
+            dataset = datasets.concatenate_datasets(dataset_list)
         else:
             raise ValueError(f"Unsupported type of name_or_path: {type(name_or_path)}")
     else:
@@ -43,14 +43,11 @@ def load_huggingface_dataset(name_or_path, split=None, from_disk=False):
 
 
 def huggingface2parquet(
-        dataset: datasets.Dataset,
-        cache_dir: str = None,
-        verbose: bool = True,
-        **kwargs
-    ):
+    dataset: datasets.Dataset, cache_dir: str = None, verbose: bool = True, **kwargs
+):
     """
     Convert a huggingface dataset to parquet format and save it to the path.
-    
+
     Args:
         dataset (datasets.Dataset): a huggingface dataset
         cache_dir (str): cache path to save the dataset
@@ -88,6 +85,7 @@ def huggingface2parquet(
     dataset.to_parquet(dataset_path)
 
     return dataset_path
+
 
 if __name__ == "__main__":
     # test the function
