@@ -53,7 +53,7 @@ Before diving into coding, do take a moment to familiarize yourself with our cod
 1. Fork the repository of _Dataverse_.
 2. Clone your fork to your local disk.
 3. Create a new branch to hold your develompment changes. </br>
-You don't need to follow branch naming example below.
+It's not required to adhere strictly to the branch naming example provided; consider it a mild suggestion.
 ```
 git checkout -b {prefix}/{issue-number}-{description}
 ```
@@ -66,11 +66,15 @@ Go ahead and visit your GitHub fork, then initiate a pull request — it's time 
 
 Don't worry if the maintainers have some feedback or suggest changes—it's all part of the process and happens to even our most experienced contributors. Keep your updates flowing by working in your local branch and pushing any new changes to your fork. Your pull request will update automatically for everyone to see the progress.
 
+</br>
+
 # Tests
 The Dataverse test framework is built using [pytest](https://docs.pytest.org/en/8.0.x/). Ensure that you write a corresponding test for any new features or changes you make. You'll find the test files in the `dataverse/dataverse/tests` directory.
 
 - Create a new test file if you've introduced a new category or a sub-category for the ETL process.
 - If your addition is a new feature within an existing category or sub-category, include your tests in the existing test file.
+
+</br>
 
 # Directory of Dataverse
 For _Dataverse_'s overarching goals: check the [docs](https://data-verse.gitbook.io/docs#future-work)
@@ -95,6 +99,7 @@ gateway for users.
 - [`📂 tests`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/tests): Pytest files 
 - [`📂 utils`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/utils): The Utilities module functions as a collection of internal helper tools. Its key features include API utilities that simplify interaction with various external APIs, including AWS EMR. Please be aware that another utils module is also included within the etl module.
 
+</br>
 
 # Design Philosophy
 - [Principles for Configuration](#principles-for-configuration)
@@ -166,6 +171,9 @@ Code that ETL process uses should be in the same file. This is because of the `O
             helper_b()
 ```
 ETL process itself is meant to be built to be used in various combination of ETL pipeline **So try to make it as generic as possible.** 
+
+</br>
+
 # Commit Guidelines
 ### Commit strategy
 - Avoid mixing multiple, unrelated modifications in a single commit. One commit is related with one issue.
@@ -194,6 +202,7 @@ But the body is optional.
 - Use the present tense ("Add feature" not "Added feature")
 - Do not end the subject line with a punctuation
 
+</br>
 
 # Style Guides
 ### Pre-commit hook
