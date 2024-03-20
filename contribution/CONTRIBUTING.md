@@ -32,7 +32,8 @@ And if there's a shiny new feature you're dreaming of, don't be shy—head over 
 - Answer other users' question or help.
 
 ## __Documentation__
-We appreciate all the pull requests to fix typo / improve grammar or semantic structuring of documents. Feel free to check!
+We appreciate all the pull requests to fix typo / improve grammar or semantic structuring of documents. Feel free to check! <br/>
+Our API reference page is constructed with [Sphinx](https://www.sphinx-doc.org/en/master/). We adhere to the [Google style for docstrings](https://google.github.io/styleguide/pyguide.html) as a fundamental practice, so please follow this format. The source files are located within the `docs/source/` directory.
 
 ## __Report a Bug / Request New Feature / Suggest Enhancements__
 Please opne an issue whenever you find a bug or have an idea to enhance _Dataverse_. Maintainers will label it or leave comment on it as soon as they check the issue. Issues labeled as `open-for-contribution` mean they are open for contribution.
