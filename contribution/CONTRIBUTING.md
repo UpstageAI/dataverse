@@ -12,7 +12,7 @@ This page is not the Constituion of the _Dataverse_. We are providing guidelines
 - [Tests](#Tests)
 - [Structure of Dataverse](#structure-of-dataverse)
 - [Design Philosophy](#design-philosophy)
-- [Commit Messages](#commit-messages)
+- [Commit Guidelines](#commit-guidelines)
 - [Style Guides](#style-guides)
 
 </br>
@@ -73,8 +73,35 @@ Don't worry if the maintainers have some feedback or suggest changes—it's all 
 # Design Philosophy
 (TBD)
 
-# Commit Messages
-(TBD)
+# Commit Guidelines
+### Commit strategy
+- Avoid mixing multiple, unrelated modifications in a single commit. One commit is related with one issue.
+- Each commit should encapsulate a complete, autonomous upgrade to the code.
+
+### Commit messages
+Please make sure your commit messages follow `type`: `title (#<related issue number>)` format. <br/>
+For example:
+```plain text
+<TYPE>: Short summary with 72 characters or less (#<Issue number>)
+
+If you have more detalied explanatory text, put it as body.
+But the body is optional.
+```
+- Find adequate type in the below list:
+    - `NEW`: introducing a new feature
+    - `ENHANCE`: improve an existing code/feature.
+    - `FIX`: fix a code bug
+    - `DOCS`: write/update/add any kind of documents including docstring
+    - `REFACTOR`: refactor existing code without any specific improvements
+    - `STYLE`: changes that do not affect the meaning of the code (ex. white-space, line length)
+    - `TEST`: add additional testing
+    - `DEL`: remove code or files
+    - `RELEASE`: release new version of dataverse
+    - `OTHER`: anything not covered above (not recommended)
+- Use the present tense ("Add feature" not "Added feature")
+- Do not end the subject line with a punctuation
+
+
 # Style Guides
 (TBD)
 
