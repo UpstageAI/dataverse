@@ -67,9 +67,14 @@ Go ahead and visit your GitHub fork, then initiate a pull request — it's time 
 Don't worry if the maintainers have some feedback or suggest changes—it's all part of the process and happens to even our most experienced contributors. Keep your updates flowing by working in your local branch and pushing any new changes to your fork. Your pull request will update automatically for everyone to see the progress.
 
 # Tests
-(TBD)
+The Dataverse test framework is built using [pytest](https://docs.pytest.org/en/8.0.x/). Ensure that you write a corresponding test for any new features or changes you make. You'll find the test files in the `dataverse/dataverse/tests` directory.
+
+- Create a new test file if you've introduced a new category or a sub-category for the ETL process.
+- If your addition is a new feature within an existing category or sub-category, include your tests in the existing test file.
+
 # Structure of Dataverse
 (TBD)
+
 # Design Philosophy
 (TBD)
 
