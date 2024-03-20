@@ -12,7 +12,6 @@ This page is not the Constituion of the _Dataverse_. We are providing guidelines
 - [Tests](#Tests)
 - [Structure of Dataverse](#structure-of-dataverse)
 - [Design Philosophy](#design-philosophy)
-- [Git Branches](#git-branches)
 - [Commit Messages](#commit-messages)
 - [Style Guides](#style-guides)
 
@@ -54,7 +53,7 @@ Before diving into coding, do take a moment to familiarize yourself with our cod
 1. Fork the repository of _Dataverse_.
 2. Clone your fork to your local disk.
 3. Create a new branch to hold your develompment changes. </br>
-You can find more information about git branch naming rules at [here](#git-branches)
+You don't need to follow branch naming example below.
 ```
 git checkout -b {prefix}/{issue-number}-{description}
 ```
@@ -73,8 +72,7 @@ Don't worry if the maintainers have some feedback or suggest changes—it's all 
 (TBD)
 # Design Philosophy
 (TBD)
-# Git Branches
-(TBD)
+
 # Commit Messages
 (TBD)
 # Style Guides
