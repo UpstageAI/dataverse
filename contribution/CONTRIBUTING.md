@@ -103,5 +103,9 @@ But the body is optional.
 
 
 # Style Guides
-(TBD)
+### Pre-commit hook
+We provide a pre-commit git hook for style check. You can find exact check list in this [file](https://github.com/UpstageAI/dataverse/blob/main/.pre-commit-config.yaml). <br/> Please run the code below before a commit is created:
+```bash
+pre-commit run
+```
 
