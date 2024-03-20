@@ -16,6 +16,20 @@ body:
       required: true
 
   - type: textarea
+    id: expected-behavior
+    attributes:
+      label: "Expected Behavior"
+      placeholder: A clear and concise description of what you would expect to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: "Actual Behavior"
+      placeholder: A clear and concise description of what actually happened.
+      
+  - type: textarea
     id: reproduction
     attributes:
       label: Reproduction
@@ -33,16 +47,4 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: expected-behavior
-    attributes:
-      label: "Expected Behavior"
-      placeholder: A clear and concise description of what you would expect to happen.
-    validations:
-      required: true
 
-  - type: textarea
-    id: actual-behavior
-    attributes:
-      label: "Actual Behavior"
-      placeholder: A clear and concise description of what actually happened.
