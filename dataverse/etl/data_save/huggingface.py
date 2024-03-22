@@ -1,5 +1,5 @@
 """
-Data loading to Huggingface Datasets
+Data saving to Huggingface Datasets
 
 Huggingface support spark natively!
 https://huggingface.co/docs/datasets/use_with_spark
@@ -19,7 +19,7 @@ from dataverse.etl import register_etl
 
 
 @register_etl
-def data_load___huggingface___ufl2hf_hub(spark, ufl, hub_path, repartition=1, *args, **kwargs):
+def data_save___huggingface___ufl2hf_hub(spark, ufl, hub_path, repartition=1, *args, **kwargs):
     """
     TODO: Save data to Hugging Face dataset and upload to hub.
     """
@@ -28,7 +28,7 @@ def data_load___huggingface___ufl2hf_hub(spark, ufl, hub_path, repartition=1, *a
 
 
 @register_etl
-def data_load___huggingface___ufl2hf(
+def data_save___huggingface___ufl2hf(
     spark, ufl: Union[RDD, DataFrame], save_path: str, repartition: int = 1, *args, **kwargs
 ) -> str:
     """
@@ -64,7 +64,7 @@ def data_load___huggingface___ufl2hf(
 
 
 @register_etl
-def data_load___huggingface___ufl2hf_obj(
+def data_save___huggingface___ufl2hf_obj(
     spark, ufl: Union[RDD, DataFrame], repartition: int = 1, *args, **kwargs
 ) -> Dataset:
     """

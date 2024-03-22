@@ -10,7 +10,7 @@ Subpackages
    etl.bias
    etl.cleaning
    etl.data_ingestion
-   etl.data_load
+   etl.data_save
    etl.decontamination
    etl.deduplication
    etl.pii

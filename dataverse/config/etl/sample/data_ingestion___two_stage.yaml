@@ -9,7 +9,7 @@ etl:
 
   # you can choose to use the default template or create your own
   - name: data_ingestion___red_pajama___raw2ufl_templatev1
-  - name: data_load___parquet___ufl2parquet
+  - name: data_save___parquet___ufl2parquet
     args:
       save_path: ./sample/pajama_1G_ufl_2s.parquet
   

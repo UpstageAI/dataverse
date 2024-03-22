@@ -9,6 +9,6 @@ etl:
   - name: utils___sampling___random
     args:
       sample_n_or_frac: 0.1
-  - name: data_load___parquet___ufl2parquet
+  - name: data_save___parquet___ufl2parquet
     args:
       save_path: ./sample/sample_ufl.parquet

@@ -30,7 +30,7 @@ ETL_CATEGORIES = [
     "cleaning",
     "pii",
     "quality",
-    "data_load",
+    "data_save",
     "utils",
 ]
 

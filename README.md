@@ -82,7 +82,7 @@ Various and more detailed tutorials are [here](https://github.com/UpstageAI/data
         Deduplicate by <code>question</code> column, 5-gram minhash jaccard similarity threshold of 0.1.
     </ul>
     <ul>
-        <li style="line-height:250%;"> <b>data_load___parquet___ufl2parquet </b></li>
+        <li style="line-height:250%;"> <b>data_save___parquet___ufl2parquet </b></li>
         Save the processed dataset as a Parquet file to <code>./guideline/etl/sample/quickstart.parquet</code>.<br/>
         The final dataset comprises around 1.14k rows.
     </ul>
@@ -119,7 +119,7 @@ ETL_config = OmegaConf.create({
         },
         {
           # Load; Save the data
-          'name': 'data_load___parquet___ufl2parquet',
+          'name': 'data_save___parquet___ufl2parquet',
           'args': {'save_path': './guideline/etl/sample/quickstart.parquet'}
         }
       ]
@@ -156,7 +156,7 @@ Currently, about 50 functions are registered as the ETL process, which means the
 |           | pii             | PII stands for Personally Identifiable Information. Removing sensitive information from data.     |
 |           | quality         | Improving the data quality, in the perspective of accuracy, consistency, and reliability of data. |
 |           | toxicity        | (WIP) Removing harmful, offensive, or inappropriate content within the data.                      |
-| Load      | data_load       | Saving the processed data to a preferred source like data lake, database, etc.                    |
+| Load      | data_save       | Saving the processed data to a preferred source like data lake, database, etc.                    |
 | Utils     | utils           | Essential tools for data processing, including sampling, logging, statistics, etc.                |
 <br>
 
