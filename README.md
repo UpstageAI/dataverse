@@ -28,7 +28,7 @@ Dataverse is a freely-accessible open-source project that supports your **ETL(Ex
 - enjoy freedom from the limitations of local environments by harnessing the capabilities of AWS EMR.
 
 ### Architecture of Dataverse
-![Architecture of Dataverse](./docs/images/dataverse_system_architecture.jpg)
+![Architecture of Dataverse](./docs/images/dataverse_system_architecture_white.jpeg)
 
 ### Key Features of Dataverse
 - **Block-Based**: In Dataverse, a `block` means a `registered ETL function` which is running on Spark. You can build Spark code like putting together puzzle pieces. You can easily add, take away, or re-arrange pieces to get the results you want via configure.
