@@ -16,4 +16,4 @@ In this `link <https://data-verse.gitbook.io/docs/lets-start/installation>`__, y
 
 Dataverse supports AWS S3 and EMR
 ------------------------------------
-We are providing step by step guides to set up AWS S3 and EMR on *Dataverse*.
+We are providing step by step guides via `link <https://data-verse.gitbook.io/docs/lets-start/aws-setting-guides>`__ to set up AWS S3 and EMR on *Dataverse*.
