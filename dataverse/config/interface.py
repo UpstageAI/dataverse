@@ -23,7 +23,10 @@ from pathlib import Path
 class Config:
     """
     Interface to check & load the configurations
-    lightweight wrapper for OmegaConf
+    
+    This class provides a lightweight wrapper for OmegaConf and allows checking and loading configurations.
+    It supports loading configurations from various sources such as files, AWS S3, and config strings.
+    The class also provides methods for saving configurations and setting default values for missing config arguments.
     """
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("Config is not allowed to be instantiated")
@@ -31,15 +34,23 @@ class Config:
     @classmethod
     def load(cls, config: Union[str, dict, DictConfig, OmegaConf, Path]):
         """
-        config (Union[str, dict, OmegaConf]): config for the etl
-            - str or Path: (this could has several cases)
-                - path to the config file
-                - s3 path to the config file
-                - config string
-                    - this is like when you load `yaml` file with open()
-                        config = yaml.load(f)
-            - dict: config dict
-            - OmegaConf: config object
+        Load the configuration for the etl.
+
+        Args:
+            config (Union[str, dict, OmegaConf]): The configuration for the etl.
+                - str or Path: This could have several cases:
+                    - Path to the config file.
+                    - S3 path to the config file.
+                    - Config string. This is similar to loading a `yaml` file with `open()`.
+                - dict: Config dictionary.
+                - OmegaConf: Config object.
+
+        Returns:
+            The loaded configuration.
+
+        Raises:
+            ValueError: If the provided config is not a valid path or S3 path.
+            TypeError: If the provided config is not of type str, dict, or OmegaConf.
         """
         if isinstance(config, (str, Path)):
             if isinstance(config, Path):
@@ -57,23 +68,23 @@ class Config:
                     config_content = aws_s3_read(bucket, key)
                     config = OmegaConf.create(config_content)
                 else:
-                    # assume it's a config string that starts with s3
+                    # Assume it's a config string that starts with s3
                     config_str = config
                     config = OmegaConf.create(config_str)
 
-                    # check if it's config string or not
-                    # in case of config string it should create a config object
-                    # if not, it will create {'config': None}
+                    # Check if it's a config string or not
+                    # In case of a config string, it should create a config object
+                    # If not, it will create {'config': None}
                     if config_str in config and config[config_str] is None:
                         raise ValueError(f"config {config_str} is not a valid s3 path")
             
             # String Config
             else:
-                # assume it's a config string
+                # Assume it's a config string
                 config_str = config
                 config = OmegaConf.create(config_str)
 
-                # same as above, check if it's config string or not
+                # Same as above, check if it's a config string or not
                 if config_str in config and config[config_str] is None:
                     raise ValueError(f"config {config_str} is not a valid path")
 
@@ -88,6 +99,16 @@ class Config:
 
     @classmethod
     def save(cls, config, path: Union[str, Path]):
+        """
+        Saves the configuration to a specified path.
+
+        Args:
+            config: The configuration to be saved.
+            path (Union[str, Path]): The path where the configuration should be saved.
+
+        Raises:
+            ValueError: If the provided path is not a valid S3 path.
+        """
         if path.startswith(('s3://', 's3a://', 's3n://')):
             aws_s3_matched = re.match(r's3[a,n]?://([^/]+)/(.*)', path)
             if aws_s3_matched:
@@ -101,7 +122,13 @@ class Config:
     @classmethod
     def default(cls, emr: bool = False):
         """
-        fill the missing config with default
+        Fill the missing config with default values.
+
+        Args:
+            emr (bool, optional): Flag indicating whether the config is for EMR. Defaults to False.
+
+        Returns:
+            dict: Default configuration dictionary.
         """
         local_dir = f"{SystemSetting().CACHE_DIR}/.cache/dataverse/tmp"
 
@@ -199,6 +226,14 @@ class Config:
     @classmethod
     def set_default(cls, config: OmegaConf, emr: bool = False):
         """
-        set the missing config args with default
+        Sets the missing config arguments with default values.
+
+        Args:
+            config (OmegaConf): The configuration object to merge with default values.
+            emr (bool, optional): Whether to use EMR configuration. Defaults to False.
+
+        Returns:
+            OmegaConf: The merged configuration object.
+
         """
         return OmegaConf.merge(cls.default(emr=emr), config)

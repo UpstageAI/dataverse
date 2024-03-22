@@ -1,8 +1,7 @@
-etl.toxicity package
+etl.toxicity
 ====================
 
-Module contents
----------------
+Identifying and eliminating harmful, offensive, or inappropriate content within the data.
 
 .. automodule:: etl.toxicity
    :members:

@@ -1,6 +1,8 @@
-etl.data\_ingestion package
+etl.data\_ingestion
 ===========================
-
+Facilitating the loading of data from various sources
+(e.g., data in Huggingface Hub, and parquet/csv/arrow format data in local storage)
+into a preferred format.
 
 etl.data\_ingestion.arrow module
 --------------------------------

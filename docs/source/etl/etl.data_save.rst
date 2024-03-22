@@ -1,6 +1,7 @@
-etl.data\_save package
+etl.data\_save
 ======================
-
+Persisting the processed data into a preferred destination,
+such as a data lake or database.
 
 etl.data\_save.aws module
 -------------------------

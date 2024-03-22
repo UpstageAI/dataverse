@@ -1,8 +1,7 @@
-etl.quality package
+etl.quality
 ===================
 
-Submodules
-----------
+Improving the quality of data from the perspectives of accuracy, consistency, and reliability for LLMs.
 
 etl.quality.language module
 ---------------------------

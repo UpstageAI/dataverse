@@ -1,6 +1,6 @@
-etl.deduplication package
+etl.deduplication
 =========================
-
+Eliminating duplicated data on dataset by dataset basis or globally across multiple datasets.
 
 etl.deduplication.common\_crawl module
 --------------------------------------
