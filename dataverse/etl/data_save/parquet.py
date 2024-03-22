@@ -1,5 +1,5 @@
 """
-Data loading to Parquets
+Data saving to Parquets
 
 Copyright (c) 2024-present Upstage Co., Ltd.
 Apache-2.0 license
@@ -15,7 +15,7 @@ from dataverse.etl import register_etl
 
 
 @register_etl
-def data_load___parquet___ufl2parquet(
+def data_save___parquet___ufl2parquet(
     spark,
     ufl: Union[RDD, DataFrame],
     save_path: str,

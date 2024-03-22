@@ -10,4 +10,4 @@ etl:
     args:
       sample_n_or_frac: 0.1
   - name: deduplication___minhash___lsh_jaccard
-  - name: data_load___huggingface___ufl2hf_obj
+  - name: data_save___huggingface___ufl2hf_obj

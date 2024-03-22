@@ -282,7 +282,7 @@ class ETLPipeline:
         # ================= [ Run ETL ] ====================
         # [ Load RDD/DataFrame ] - data ingestion
         # [ Preprocessing ]
-        # [ Save RDD/DataFrame ] - data load
+        # [ Save RDD/DataFrame ] - data save
         etl_configs = config.etl
         total_etl_n = len(etl_configs)
 
@@ -304,8 +304,8 @@ class ETLPipeline:
             etl_instance = etl_class()
 
             # this is middle creator mode
-            # if the last ETL process is not data load
-            if etl_i == total_etl_n - 1 and etl_category != "data_load":
+            # if the last ETL process is not data save
+            if etl_i == total_etl_n - 1 and etl_category != "data_save":
                 if verbose:
                     print(
                         (
@@ -314,7 +314,7 @@ class ETLPipeline:
                             f"{'=' * 50}\n"
                             f"Last ETL process was assigned for [ {etl_category} ]\n"
                             "Spark session will not be stopped and will be returned\n"
-                            "If this is not intended, please assign [ data_load ] at the end.\n"
+                            "If this is not intended, please assign [ data_save ] at the end.\n"
                             f"{'=' * 50}\n"
                             "Example:\n"
                             "=> spark, data = etl_pipeline.run(config)\n"

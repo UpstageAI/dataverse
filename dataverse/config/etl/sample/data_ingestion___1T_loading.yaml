@@ -6,6 +6,6 @@ spark:
     memory: 16g
 etl:
   - name: data_ingestion___red_pajama___hf2ufl
-  - name: data_load___parquet___ufl2parquet
+  - name: data_save___parquet___ufl2parquet
     args:
       save_path: ./sample/redpajama_1T_ufl.parquet

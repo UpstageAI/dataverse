@@ -7,13 +7,18 @@ Dataverse
 ===================
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
+
+   
+.. toctree::
    :maxdepth: 3
    :caption: Documentation:
 
    etl/etl.rst
    etl/etl.cleaning.rst
    etl/etl.data_ingestion.rst
-   etl/etl.data_load.rst
+   etl/etl.data_save.rst
    etl/etl.deduplication.rst
    etl/etl.pii.rst
    etl/etl.quality.rst
