@@ -35,7 +35,7 @@ def get_extras_require():
 
 setup(
     name="dataverse",
-    version="1.0.3",
+    version="1.0.4",
     packages=find_packages(),
     author="Dataverse Team",
     author_email="dataverse@upstage.ai",
