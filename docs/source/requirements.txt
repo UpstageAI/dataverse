@@ -4,7 +4,7 @@ sphinx-rtd-theme
 requests
 numpy
 pandas
-fasttext
+fasttext-wheel
 omegaconf
 datasets
 pyspark
