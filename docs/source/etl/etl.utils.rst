@@ -1,8 +1,7 @@
-etl.utils package
+etl.utils
 =================
-
-Submodules
-----------
+Providing essential functionalities for data processing,
+including sampling, logging, and statistical analysis.
 
 etl.utils.log module
 --------------------

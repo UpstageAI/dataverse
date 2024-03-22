@@ -32,18 +32,6 @@ class ETLPipeline:
     Attributes:
         registry (ETLRegistry): The registry of ETL processes.
 
-    Methods:
-        __len__(): Returns the number of ETL processes in the registry.
-        status(): Prints the status of the registry.
-        search(category=None, sub_category=None): Searches the registry for ETL processes matching the specified
-            category and sub-category.
-        get(key): Retrieves an ETL class from the registry.
-        setup_spark_conf(config, verbose=False): Sets up the Spark configuration based on the provided config.
-        sample(n=100, config=None, sample_etl="data_ingestion___test___generate_fake_ufl", verbose=False):
-            Generates a sample dataset using the specified ETL process and Spark session.
-        run(config, verbose=False, cache=False, emr=False, *args, **kwargs): Runs the ETL process based on the
-            provided config.
-
     Examples:
         >>> etl_pipeline = ETLPipeline()
         >>> etl_pipeline.status()
@@ -96,14 +84,17 @@ class ETLPipeline:
             list: A list of search results matching the specified category and sub-category.
 
         Examples:
-            # Return every ETL
-            >>> etl_pipeline.search()
-
-            # Only selected category
+            Return every ETL
+            
+            >>> etl_pipeline.search() 
+            
+            Only selected category
+            
             >>> etl_pipeline.search('data_ingestion')
             >>> etl_pipeline.search(category='data_ingestion')
-
-            # Only selected category & sub_category
+            
+            Only selected category & sub_category
+            
             >>> etl_pipeline.search('data_ingestion', 'ufl')
             >>> etl_pipeline.search(category='data_ingestion', sub_category='ufl')
         """

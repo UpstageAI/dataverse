@@ -15,14 +15,8 @@ Dataverse
    :maxdepth: 3
    :caption: Documentation:
 
-   etl/etl.rst
-   etl/etl.cleaning.rst
-   etl/etl.data_ingestion.rst
-   etl/etl.data_save.rst
-   etl/etl.deduplication.rst
-   etl/etl.pii.rst
-   etl/etl.quality.rst
-   etl/etl.utils.rst
+   etl/etl
+   config/config.interface
 .. etl/etl.toxicity.rst
 .. etl/etl.decontamination.rst
 

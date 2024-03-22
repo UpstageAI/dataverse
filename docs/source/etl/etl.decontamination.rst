@@ -1,8 +1,7 @@
-etl.decontamination package
+etl.decontamination
 ===========================
 
-Module contents
----------------
+Identifying and removing contaminated data such as benchmark datasets.
 
 .. automodule:: etl.decontamination
    :members:

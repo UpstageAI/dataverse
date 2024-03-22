@@ -1,6 +1,7 @@
-etl.cleaning package
+etl.cleaning
 ====================
-
+Removing irrelevant, redun-dant, or noisy information from the data,
+such as stop words or special characters.
 
 etl.cleaning.char module
 ------------------------

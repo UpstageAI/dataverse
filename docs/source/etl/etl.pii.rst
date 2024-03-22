@@ -1,9 +1,8 @@
-etl.pii package
+etl.pii
 ===============
 
-Submodules
-----------
-
+Ensuring the removal of sensitive information, such as personally identifiable data, from the dataset.
+  
 etl.pii.card module
 -------------------
 

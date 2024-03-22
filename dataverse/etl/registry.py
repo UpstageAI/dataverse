@@ -90,13 +90,8 @@ class ETLRegistry:
         __len__(): Returns the number of registered ETL classes.
         __repr__(): Returns a string representation of the registry.
         __str__(): Returns a string representation of the registry.
-        reset(): Resets the registry.
-        register(key, etl): Registers an ETL class with a given key.
         _update_status(key): Updates the status of the registry.
-        search(category, sub_category): Searches for ETL classes based on category and sub-category.
         _convert_to_report_format(status, print_sub_category, print_etl_name): Converts the status to a report format.
-        get(key): Retrieves an ETL class based on the key.
-        get_all(): Retrieves all the registered ETL classes.
     """
 
     _initialized = False
@@ -147,10 +142,11 @@ class ETLRegistry:
             KeyError: If the key is already registered.
 
         Note:
-            The key should be in the format of:
-            - all lowercase
-            - separated by ___
-            - it should have 2 layers of category
+            - The key should be in the format of:
+                - all lowercase
+                - separated by ___
+                - it should have 2 layers of category
+            
             - Example: <etl_type>___<file_key>___<etl_key> or <category>___<sub_category>___<etl_key>.
         """
         if not key.islower():
@@ -297,10 +293,11 @@ class ETLRegistry:
             KeyError: If the key is not registered in the registry.
 
         Note:
-             The key should be in the format of:
-            - all lowercase
-            - separated by ___
-            - it should have 2 layers of category
+            - The key should be in the format of:
+                - all lowercase
+                - separated by ___
+                - it should have 2 layers of category
+            
             - Example: <etl_type>___<file_key>___<etl_key> or <category>___<sub_category>___<etl_key>.
         """
         if not key.islower():
@@ -318,6 +315,9 @@ class ETLRegistry:
     def get_all(self):
         """
         get all the etls
+        
+        Returns:
+            list: list of all registered etls
         """
         return list(self._registry.values())
 
@@ -353,15 +353,12 @@ class BaseETL(ETLStructure, metaclass=ETLAutoRegistry):
     This class provides a base structure for implementing spark ETL processes.
     If you need to use `self` directly, inherit this class.
 
-    Attributes:
-        None
-
     Methods:
-        run(data: Union[RDD, DataFrame], *args, **kwargs):
+        run(self, data, *args, **kwargs):
             Run the preprocessing logic.
             This method should be implemented by subclasses.
 
-        __call__(*args, **kwargs):
+        __call__(self, *args, **kwargs):
             Call the `run` method to perform the preprocessing.
     """
 
