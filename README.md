@@ -161,7 +161,7 @@ Currently, about 50 functions are registered as the ETL process, which means the
 <br>
 
 ## 🌌 Dataverse supports AWS
-Dataverse supports AWS! Step by step guide to setting up is [here](https://data-verse.gitbook.io/docs/lets-start/aws-s3-support).
+Dataverse works with AWS S3 and EMR, enabling you to load and save data on S3 and execute ETL pipelines through EMR. Step by step guide to setting up is [here](https://data-verse.gitbook.io/docs/lets-start/aws-s3-support).
 </br>
 
 ## 🌌 Dataverse use-case
