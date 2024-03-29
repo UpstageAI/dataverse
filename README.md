@@ -190,11 +190,12 @@ Dataverse is completely freely-accessible open-source and licensed under the Apa
 > If you want to cite our 🌌 Dataverse project, feel free to use the following bibtex
 
 ```bibtex
-@misc{dataverse,
-  title = {Dataverse},
-  author = {Hyunbyung Park, Sukyung Lee, Gyoungjin Gim, Yungi Kim, Dahyun Kim, Chanjun Park},
-  year = {2024},
-  publisher = {GitHub, Upstage AI},
-  howpublished = {\url{https://github.com/UpstageAI/dataverse}},
+@misc{park2024dataverse,
+      title={Dataverse: Open-Source ETL (Extract, Transform, Load) Pipeline for Large Language Models}, 
+      author={Hyunbyung Park and Sukyung Lee and Gyoungjin Gim and Yungi Kim and Dahyun Kim and Chanjun Park},
+      year={2024},
+      eprint={2403.19340},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
 }
 ```
