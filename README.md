@@ -10,9 +10,10 @@
 <br>
 
 The Universe of Data. 
-All about Data, Data Science, and Data Engineering.
+All about Data, Data Science, and Data Engineering. </br>
+Upstage Solar is powered by Dataverse! Try at Upstage [Console](https://console.upstage.ai/)!
 
-[Docs](https://data-verse.gitbook.io/docs/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/examples) • [API Reference](https://data-verse.readthedocs.io/en/latest/) • [FAQ](https://data-verse.gitbook.io/docs/documents/faqs) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/aAqF7pyq4h)
+[Docs](https://data-verse.gitbook.io/docs/) • [Examples](https://github.com/UpstageAI/dataverse/tree/main/examples) • [API Reference](https://data-verse.readthedocs.io/en/latest/) • [FAQ](https://data-verse.gitbook.io/docs/documents/faqs) • [Contribution Guide](https://github.com/UpstageAI/dataverse/blob/main/contribution/CONTRIBUTING.md)  • [Contact](mailto:dataverse@upstage.ai)  • [Discord](https://discord.gg/aAqF7pyq4h) • [Paper](https://arxiv.org/abs/2403.19340)
 <br><br>
 <div align="left">
 
@@ -187,7 +188,7 @@ Dataverse is completely freely-accessible open-source and licensed under the Apa
 
 
 ## 🌌 Citation
-> If you want to cite our 🌌 Dataverse project, feel free to use the following bibtex
+If you want to cite our 🌌 Dataverse project, feel free to use the following bibtex. You can check our paper via [link](https://arxiv.org/abs/2403.19340).
 
 ```bibtex
 @misc{park2024dataverse,
