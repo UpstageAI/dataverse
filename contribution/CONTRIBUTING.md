@@ -94,7 +94,7 @@ For _Dataverse_'s overarching goals: check the [docs](https://data-verse.gitbook
 - [`📂 api`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/api): The Dataverse API serves as a
 gateway for users.
 - [`📂 config`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/config): Contains configuration files for the Dataverse application. You can also find sample configuration file for etl process under this directory.
-- [`📂 etl`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/etl): Main directory of _Dataverse_ where all of the data processors are placed. Data processors are seperated with it's category.
+- [`📂 etl`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/etl): Main directory of _Dataverse_ where all of the data processors are placed. Data processors are separated with it's category.
 - [`📂 lab`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/lab): TBD. Data analysis will be supported via here.
 - [`📂 tests`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/tests): Pytest files 
 - [`📂 utils`](https://github.com/UpstageAI/dataverse/tree/main/dataverse/utils): The Utilities module functions as a collection of internal helper tools. Its key features include API utilities that simplify interaction with various external APIs, including AWS EMR. Please be aware that another utils module is also included within the etl module.
