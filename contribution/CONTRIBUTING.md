@@ -35,10 +35,10 @@ We appreciate all the pull requests to fix typo / improve grammar or semantic st
 Our API reference page is constructed with [Sphinx](https://www.sphinx-doc.org/en/master/). We adhere to the [Google style for docstrings](https://google.github.io/styleguide/pyguide.html) as a fundamental practice, so please follow this format. The source files are located within the `docs/source/` directory.
 
 ## __Report a Bug / Request New Feature / Suggest Enhancements__
-Please opne an issue whenever you find a bug or have an idea to enhance _Dataverse_. Maintainers will label it or leave comment on it as soon as they check the issue. Issues labeled as `Open for contribution` mean they are open for contribution.
+Please open an issue whenever you find a bug or have an idea to enhance _Dataverse_. Maintainers will label it or leave comment on it as soon as they check the issue. Issues labeled as `Open for contribution` mean they are open for contribution.
 
 ## __Fix a Bug / Add New Feature / Improve Existing Feature__
-If you have a particular roadmap, goals, or new feature, share it via issue. already fixed a bug or have new feature that enhacnes _Dataverse_, you can jump on to fourth step which is opening pull requests. Please note that when you open pull requests without opening an issue or maintainers' check, it can be declined if it does not aligh with philosophy of _Dataverse_.
+If you have a particular roadmap, goals, or new feature, share it via issue. When you already fixed a bug or have new feature that enhances _Dataverse_, you can jump on to fourth step which is opening pull requests. Please note that when you open pull requests without opening an issue or maintainers' check, it can be declined if it does not aligh with philosophy of _Dataverse_.
 
 ### __1️⃣ Check issues labeled as__ `Open for contribution`
 You can find issues waiting for your contribution by filtering label with `Open for contribution`. This label does not stand alone. It is always with `Bug`, `Docs` or `Enhancement`. Issues with `Critical` or `ASAP` label are more urgent. 
