@@ -22,6 +22,7 @@ import pyspark
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.ml.feature import NGram, RegexTokenizer
 from scipy.integrate import quad as integrate
 
 from dataverse.etl.registry import register_etl
@@ -437,6 +438,29 @@ def deduplication___minhash___lsh_jaccard(
         gen.randint(0, mod_prime, dtype=np.uint64, size=band_n * row_per_band),
     )
 
+    subset_type: str = [t for c, t in data_df.dtypes if c == subset][0]
+    if subset_type.startswith("str"):
+        # assume subset col should be tokenized
+        tokens_df = RegexTokenizer(
+            inputCol=subset, 
+            outputCol=tokens_col,
+            pattern="\\W"
+        ).transform(
+            data_df
+            .select(id_col, F.col(subset).substr(1, 10_000_000).alias(subset)) 
+        ).select(id_col, tokens_col)
+
+    elif subset_type.startswith("array"):
+        print("already tokenized.")
+        tokens_col = subset
+        tokens_df = data_df.select(id_col, tokens_col)
+
+    shingles_df = NGram(
+        n=ngram_size, 
+        inputCol=tokens_col, 
+        outputCol=ngrams_col
+    ).transform(tokens_df).select(id_col, ngrams_col)
+    
     # region: Data Loading
     data = data.withColumn("__id__", F.monotonically_increasing_id()).cache()
     # endregion
