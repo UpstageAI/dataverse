@@ -459,40 +459,44 @@ def deduplication___minhash___lsh_jaccard(
         .connectedComponents(broadcastThreshold=200 * (1024 ** 2))
     )
 
-    # region: Merge Results
-    if not duplicate_edges.isEmpty():
-        self_edges: pyspark.RDD = duplicate_edges.values().distinct().map(lambda x: (x, x)).cache()
-        all_edges: pyspark.RDD = duplicate_edges.union(self_edges).cache()
-        data = data.join(
-            spark.createDataFrame(all_edges, schema=["__id__", "__component__"]),
-            on="__id__",
-            how="left",
-        ).cache()
-        duplicate_edges.unpersist()
-        # endregion
+    join_df = data_df.join(
+        assignment.select(
+            F.col("id").alias(id_col), 
+            F.col("component").alias(component_col)
+        ),
+        on=id_col,
+        how="left"
+    )
 
-        self_edges.unpersist()
-
-        # region: Quality Control: This section is hard-coded for The Stack
-        cliques: RDD = all_edges.groupBy(lambda x: x[1]).cache()
-        all_edges.unpersist()
-
-        data = data.join(
-            spark.createDataFrame(
-                cliques.mapValues(lambda x: process_cluster(cluster=list(x))).flatMap(
-                    lambda x: [(ele[0], True) for ele in x[1]]
-                ),
-                schema=["__id__", "__keep__"],
-            ),
-            on="__id__",
-            how="left",
+    if duplicates_save_path is not None:
+        duplicates_df = (
+            join_df
+            .filter(F.col(component_col).isNotNull())
+            .drop(ngrams_col)
         )
-        cliques.unpersist()
-        data = data.filter(F.col("__component__").isNull() | F.col("__keep__")).cache()
-        data = data.drop("__component__", "__keep__").cache()
-    # endregion
+        if id_col == temp_id_col:
+            duplicates_df = duplicates_df.drop(id_col)
+        if tokens_col != subset:
+            duplicates_df = duplicates_df.drop(tokens_col)
+        
+        duplicates_df.write.parquet(duplicates_save_path)
+        duplicates_df.unpersist()
 
-    # drop temporary columns
-    data = data.drop("__id__").cache()
+    final_df = (
+        join_df
+        .filter(F.col(component_col).isNull())
+        .union(
+            join_df
+            .filter(F.col(component_col).isNotNull())
+            .dropDuplicates([component_col])
+        )
+        .drop(component_col, ngrams_col)
+    )
 
-    return data
+    if id_col == temp_id_col:
+        final_df = final_df.drop(id_col)
+    if tokens_col != subset:
+        final_df = final_df.drop(tokens_col)
+
+    edges_df.unpersist()
+    return final_df.rdd
