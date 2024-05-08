@@ -460,31 +460,7 @@ def deduplication___minhash___lsh_jaccard(
         inputCol=tokens_col, 
         outputCol=ngrams_col
     ).transform(tokens_df).select(id_col, ngrams_col)
-    
-    # region: Data Loading
-    data = data.withColumn("__id__", F.monotonically_increasing_id()).cache()
-    # endregion
 
-
-    # region: MinHash
-    records: RDD = data.select("__id__", subset).rdd.cache()
-    buckets: RDD = (
-        records.flatMap(
-            lambda x: generate_hash_values(
-                content=x[1],  # subset
-                idx=x[0],  # __id__
-                num_perm=num_perm,
-                ngram_size=ngram_size,
-                min_length=min_length,
-                hashranges=HASH_RANGES,
-                permutations=PERMUTATIONS,
-            )
-        )  # (band_idx, band hash value, idx)
-        .groupBy(lambda x: (x[0], x[1]))  # group by (band_idx, band hash value)
-        .mapValues(lambda x: [ele[2] for ele in x])  # ((band_idx, hash value), [idx, ...])
-    ).cache()
-    records.unpersist()
-    # endregion
 
     # region: Connected Components
     edges: RDD = buckets.flatMap(lambda x: generate_edges(x[1])).distinct().cache()
