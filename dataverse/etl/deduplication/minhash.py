@@ -402,8 +402,6 @@ def deduplication___minhash___lsh_jaccard(
         ).filter(
             F.size(tokens_col) >= min_length
         )
-        
-
     elif subset_type.startswith("array"):
         print("already tokenized.")
         tokens_col = subset
