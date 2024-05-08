@@ -18,3 +18,4 @@ rsa
 s3transfer
 isort
 pytest
+graphframes-latest

@@ -118,7 +118,8 @@ class ETLPipeline:
         spark_conf.set("spark.executor.memory", config.spark.executor.memory)
         spark_conf.set("spark.local.dir", config.spark.local.dir)
         spark_conf.set("spark.ui.port", config.spark.ui.port)
-
+        spark_conf.set("spark.jars.packages", "graphframes:graphframes:0.8.3-spark3.5-s_2.12")
+        
         # AWS S3 Support
         if aws_check_credentials(verbose=verbose):
             session = boto3.Session()
