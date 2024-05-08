@@ -336,8 +336,10 @@ def deduplication___minhash___lsh_jaccard(
         num_perm (int, optional): Number of permutations. Default is 250.
         band_n (int, optional): Number of bands. If not provided, it will be calculated based on the threshold and num_perm.
         row_per_band (int, optional): Number of rows per band. If not provided, it will be calculated based on the threshold and num_perm.
+        id_col (str, optional): Key column for extract duplicated rows. If not provided, temporary id column will be created.
         subset (str, optional): Column to deduplicate on. Default is "text".
         seed (int, optional): Random seed. Default is 42.
+        duplicates_save_path (str, optional): Save path for duplicated entries. If not provided, not saving the duplicates.
 
     Returns:
         RDD: Deduplicated data as a DataFrame.
@@ -395,7 +397,12 @@ def deduplication___minhash___lsh_jaccard(
         ).transform(
             data_df
             .select(id_col, F.col(subset).substr(1, 10_000_000).alias(subset)) 
-        ).select(id_col, tokens_col)
+        ).select(
+            id_col, tokens_col
+        ).filter(
+            F.size(tokens_col) >= min_length
+        )
+        
 
     elif subset_type.startswith("array"):
         print("already tokenized.")
