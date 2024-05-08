@@ -427,13 +427,37 @@ def deduplication___minhash___lsh_jaccard(
         )
     )
 
-    # region: Connected Components
-    edges: RDD = buckets.flatMap(lambda x: generate_edges(x[1])).distinct().cache()
-    buckets.unpersist()
-    duplicate_edges, converged, iteration = alternating_algo(edges, max_iteration=20)
-    duplicate_edges.cache()
-    edges.unpersist()
-    # endregion
+    edge_udf = F.udf(
+        generate_edges, 
+        returnType=T.ArrayType(T.ArrayType(data_df.schema[id_col].dataType))
+    )
+    edges_df = (
+        signature_df
+        .select("ids")
+        .filter(F.size("ids") > 1)
+        .select(F.explode(edge_udf("ids")).alias("edges"))
+        .distinct()
+        .selectExpr("edges[0] as src", "edges[1] as dst")
+    ).persist(pyspark.StorageLevel.DISK_ONLY)
+
+    count = edges_df.count()
+    if count == 0:
+        print("no entry for deduplication.")
+        edges_df.unpersist()
+        data_df.unpersist()
+        return data
+    
+    vertices_df = (
+        edges_df
+        .selectExpr("src as id")
+        .union(edges_df.selectExpr("dst as id"))
+        .distinct()
+    )
+
+    assignment = (
+        GraphFrame(vertices_df, edges_df)
+        .connectedComponents(broadcastThreshold=200 * (1024 ** 2))
+    )
 
     # region: Merge Results
     if not duplicate_edges.isEmpty():
