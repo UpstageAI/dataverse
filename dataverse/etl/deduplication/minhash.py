@@ -10,6 +10,7 @@ Apache-2.0 license
 
 import hashlib
 import re
+import os
 import struct
 import sys
 from itertools import tee
@@ -19,8 +20,7 @@ from typing import Any, List, Text, Tuple, Union
 import numpy as np
 import pyspark
 from pyspark.rdd import RDD
-from pyspark.sql import SparkSession
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from scipy.integrate import quad as integrate
 
@@ -371,6 +371,7 @@ def deduplication___minhash___lsh_jaccard(
     row_per_band: int = None,
     subset: str = "text",
     seed: int = 42,
+    duplicates_save_path: Union[str, None] = None,
     *args,
     **kwargs,
 ) -> RDD:
@@ -396,7 +397,12 @@ def deduplication___minhash___lsh_jaccard(
     from graphframes import GraphFrame
 
     if isinstance(data, RDD):
-        data = data.toDF()
+        data_df = data.toDF()
+    elif isinstance(data, DataFrame):
+        data_df = data
+
+    if os.path.exists(duplicates_save_path):
+        assert "duplicates_save_path already exists."
 
     RNG = np.random.RandomState(seed)
 
