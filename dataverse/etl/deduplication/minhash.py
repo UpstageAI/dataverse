@@ -426,23 +426,21 @@ def deduplication___minhash___lsh_jaccard(
         print(f"create temp id col: {id_col}")
         data_df = data_df.withColumn(id_col, F.monotonically_increasing_id())
         data_df.persist(pyspark.StorageLevel.DISK_ONLY)
-        
-    RNG = np.random.RandomState(seed)
 
     if band_n is None or row_per_band is None:
         band_n, row_per_band = optimal_param(threshold, num_perm)
 
-    HASH_RANGES: List[Tuple[int, int]] = [
-        (i * row_per_band, (i + 1) * row_per_band) for i in range(band_n)
-    ]
-    PERMUTATIONS: Tuple[np.ndarray, np.ndarray] = (
-        RNG.randint(1, MOD_PRIME, size=(num_perm,), dtype=DTYPE),
-        RNG.randint(0, MOD_PRIME, size=(num_perm,), dtype=DTYPE),
+    mod_prime = 1 << 61 - 1 
+    gen = np.random.RandomState(seed)
+    hash_params = (
+        gen.randint(1, mod_prime, dtype=np.uint64, size=band_n * row_per_band),
+        gen.randint(0, mod_prime, dtype=np.uint64, size=band_n * row_per_band),
     )
 
     # region: Data Loading
     data = data.withColumn("__id__", F.monotonically_increasing_id()).cache()
     # endregion
+
 
     # region: MinHash
     records: RDD = data.select("__id__", subset).rdd.cache()
