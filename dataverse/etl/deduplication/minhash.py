@@ -19,6 +19,7 @@ from typing import Any, List, Text, Tuple, Union
 import numpy as np
 import pyspark
 from pyspark.rdd import RDD
+from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from scipy.integrate import quad as integrate
@@ -360,7 +361,7 @@ def process_cluster(cluster: List[Any]) -> List[Any]:
 
 @register_etl
 def deduplication___minhash___lsh_jaccard(
-    spark,
+    spark: SparkSession,
     data: Union[RDD, DataFrame],
     threshold: float = 0.7,
     ngram_size: int = 5,
@@ -391,6 +392,9 @@ def deduplication___minhash___lsh_jaccard(
     Returns:
         RDD: Deduplicated data as a DataFrame.
     """
+    spark.sparkContext.setCheckpointDir("checkpoint")
+    from graphframes import GraphFrame
+
     if isinstance(data, RDD):
         data = data.toDF()
 
