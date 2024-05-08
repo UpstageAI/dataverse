@@ -369,6 +369,7 @@ def deduplication___minhash___lsh_jaccard(
     num_perm: int = 250,
     band_n: int = None,
     row_per_band: int = None,
+    id_col: Union[str, None] = None,
     subset: str = "text",
     seed: int = 42,
     duplicates_save_path: Union[str, None] = None,
@@ -404,6 +405,28 @@ def deduplication___minhash___lsh_jaccard(
     if os.path.exists(duplicates_save_path):
         assert "duplicates_save_path already exists."
 
+    temp_id_col, component_col, tokens_col, ngrams_col = \
+        "__id__", "__component__", "__tokens__", "__ngrams__"
+    
+    exist_cols = set(data_df.columns)
+    while True:
+        if temp_id_col in exist_cols:
+            temp_id_col += "_"
+        elif component_col in exist_cols:
+            component_col += "_"
+        elif tokens_col in exist_cols:
+            tokens_col += "_"
+        elif ngrams_col in exist_cols:
+            ngrams_col += "_"
+        else:
+            break
+
+    if id_col is None:
+        id_col = temp_id_col
+        print(f"create temp id col: {id_col}")
+        data_df = data_df.withColumn(id_col, F.monotonically_increasing_id())
+        data_df.persist(pyspark.StorageLevel.DISK_ONLY)
+        
     RNG = np.random.RandomState(seed)
 
     if band_n is None or row_per_band is None:
