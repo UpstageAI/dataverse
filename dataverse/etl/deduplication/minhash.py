@@ -9,6 +9,7 @@ Apache-2.0 license
 """
 
 import hashlib
+import functools
 import re
 import os
 import struct
@@ -22,6 +23,7 @@ import pyspark
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql import types as T
 from pyspark.ml.feature import NGram, RegexTokenizer
 from scipy.integrate import quad as integrate
 
@@ -192,95 +194,48 @@ def ngrams(sequence: List[Text], n: int, min_length: int = 5):
     return zip(*iterables)
 
 
-def sha1_hash32(data):
-    """
-    Directly taken from datasketch package to avoid abstraction.
-
-    Parameters
-    ----------
-    data : bytes
-
-    Returns
-    -------
-    int
-        The first 4 bytes (32 bits) of the SHA1 hash of the input data.
-
-    Examples
-    --------
-    >>> sha1_hash32(b"hello")
-    499578026
-    >>> bin(sha1_hash32(b"hello"))
-    '0b11101110001101111010010101010'
-    >>> sha1_hash32(b"hello world").bit_length()
-    30
-    """
-    return struct.unpack("<I", hashlib.sha1(data).digest()[:4])[0]
+def get_hash(text: str, n_bytes: int=8):
+    return int.from_bytes(
+        hashlib.sha1(text.encode("utf-8")).digest()[:n_bytes], 
+        sys.byteorder
+    ) 
 
 
-def generate_hash_values(
-    content: str,
-    idx: int,
-    num_perm: int,
-    ngram_size: int,
-    min_length: int,
-    hashranges: List[Tuple[int, int]],
-    permutations: Tuple[np.ndarray, np.ndarray],
-) -> List[Tuple[int, bytes, int]]:
-    """
-    Generate the MinHashLSH values for a given document.
+def get_signatures(
+    shingles: List[str], 
+    band_n: int, 
+    row_per_band: int, 
+    mod_prime: int, 
+    hash_params: Tuple[np.ndarray]
+):
+    if not shingles:
+        return []
+    
+    shingles = np.array(
+        [get_hash(shingle) for shingle in set(shingles)], 
+        dtype=np.uint64
+    )
 
-    Parameters
-    ----------
-    content : str
-        The content of the document.
-    idx : int
-        The index of the document.
-    num_perm : int
-        The number of permutations.
-    ngram_size : int
-        The size of the n-grams.
-    min_length : int
-        The minimum number of tokens in a document.
-    hashranges : list
-        The ranges of offsets for each hash value.
-    permutations : Tuple[np.ndarray, np.ndarray]
-        The permutations for the hash values.
+    signatures = np.full(
+        shape=(band_n * row_per_band), 
+        fill_value=mod_prime, 
+        dtype=np.uint64
+    )
 
-    Returns
-    -------
-    List[Tuple[int, bytes, int]]
-        The list of (band_idx, hash value, idx) for the document.
+    chunk_size = 2 ** 10
+    a, b = hash_params
+    for i in range(0, len(shingles), chunk_size):
+        shingles_chunk = shingles[i:i+chunk_size]
+        signatures = np.minimum(
+            signatures, 
+            np.min((shingles_chunk.reshape(-1, 1) * a + b) % mod_prime, axis=0)
+        )
 
-    Examples
-    --------
-    >>> content = "hello world"
-    >>> idx = 0
-    >>> num_perm = 250
-    >>> ngram_size = 1
-    >>> hashranges = [(i, i + 25) for i in range(0, 250, 25)]
-    >>> PERMUTATIONS = (
-    ...     RNG.randint(1, MOD_PRIME, size=(num_perm,), dtype=DTYPE),
-    ...     RNG.randint(0, MOD_PRIME, size=(num_perm,), dtype=DTYPE),
-    ... )
-    >>> res = generate_hash_values(content, idx, num_perm, ngram_size, 0, hashranges, PERMUTATIONS)
-    >>> len(res)
-    10
-    >>> sum(len(h) for _, h, _ in res) == len(res) * 25 * np.dtype(DTYPE).itemsize
-    True
-    """
-    tokens = {
-        " ".join(t).encode("utf-8")
-        for t in ngrams(NON_ALPHA.split(content.lower()), ngram_size, min_length)
-    }
-    a, b = permutations
-    hv = np.array([sha1_hash32(token) for token in tokens], dtype=DTYPE)
-    phv = np.bitwise_and(((hv * np.tile(a, (len(tokens), 1)).T).T + b) % MOD_PRIME, MAX_HASH)  # type: ignore
-    hash_values = np.vstack([phv, np.ones(num_perm, dtype=DTYPE) * MAX_HASH]).min(axis=0)
-    Hs = [bytes(hash_values[start:end].byteswap().data) for start, end in hashranges]
-    return [(band_idx, H, idx) for band_idx, H in enumerate(Hs)]
-
-
-# endregion
+    return [
+        f"{idx:02d}" \
+        + signatures[i*row_per_band:(i+1)*row_per_band].tobytes().hex() 
+        for idx, i in enumerate(range(band_n))
+    ]
 
 
 # region: MinHashLSH
@@ -348,17 +303,9 @@ def optimal_param(
                 opt = (b, r)
     return opt
 
-
-# endregion
-
-
 # region: Quality Control
 def process_cluster(cluster: List[Any]) -> List[Any]:
     return cluster[:1]
-
-
-# endregion
-
 
 @register_etl
 def deduplication___minhash___lsh_jaccard(
@@ -461,6 +408,24 @@ def deduplication___minhash___lsh_jaccard(
         outputCol=ngrams_col
     ).transform(tokens_df).select(id_col, ngrams_col)
 
+    sig_udf = F.udf(
+        functools.partial(
+            get_signatures,
+            band_n=band_n,
+            row_per_band=row_per_band,
+            mod_prime=mod_prime,
+            hash_params=hash_params
+        ), 
+        returnType=T.ArrayType(T.StringType())
+    )
+    signature_df = (
+        shingles_df
+        .select(id_col, F.explode(sig_udf(ngrams_col)).alias("band"))
+        .groupby("band")
+        .agg(
+            F.collect_set(id_col).alias("ids")
+        )
+    )
 
     # region: Connected Components
     edges: RDD = buckets.flatMap(lambda x: generate_edges(x[1])).distinct().cache()
