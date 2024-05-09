@@ -215,7 +215,10 @@ def deduplication___minhash___lsh_jaccard(
     elif isinstance(data, DataFrame):
         data_df = data
 
-    if os.path.exists(duplicates_save_path):
+    if (
+        duplicates_save_path is not None 
+        and os.path.exists(duplicates_save_path)
+    ):
         assert "duplicates_save_path already exists."
 
     temp_id_col, component_col, tokens_col, ngrams_col = \
