@@ -59,8 +59,8 @@ def load_fasttext(
     return _FastText(model_path=str(fasttext_path))
 
 
-def language_predict_fasttext(row, model, top_k: int = 1, score_rounding: int = 2):
-    text = row["text"].replace("\n", "")
+def language_predict_fasttext(row, subset, model, top_k: int = 1, score_rounding: int = 2):
+    text = row[subset].replace("\n", "")
     labels, scores = model.predict(text, k=top_k)
     labels = [label.replace("__label__", "") for label in labels]
 
@@ -135,6 +135,7 @@ def quality___language___fasttext_filter(
     data = data.mapPartitions(
         functools.partial(
             language_predict_fasttext_by_partition,
+            subset=subset,
             top_k=top_k,
             score_rounding=score_rounding,
         )
